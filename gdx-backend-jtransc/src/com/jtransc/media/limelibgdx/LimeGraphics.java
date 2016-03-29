@@ -6,10 +6,30 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.jtransc.media.limelibgdx.dummy.DummyGL20;
-import jtransc.annotation.haxe.HaxeMethodBody;
+import com.jtransc.media.limelibgdx.gl.LimeGL20;
 
 public class LimeGraphics implements Graphics {
-	final private GL20 gl = new DummyGL20();
+	//final private GL20 gl = new DummyGL20();
+	final private GL20 gl = new LimeGL20();
+	int frameId = 0;
+	private Monitor2[] monitors = new Monitor2[]{
+			new Monitor2(640, 480, "default")
+	};
+	private DisplayMode2[] displayModes = new DisplayMode2[]{
+			new DisplayMode2(640, 480, 60, 32)
+	};
+
+	class Monitor2 extends Monitor {
+		protected Monitor2(int virtualX, int virtualY, String name) {
+			super(virtualX, virtualY, name);
+		}
+	}
+
+	class DisplayMode2 extends DisplayMode {
+		protected DisplayMode2(int width, int height, int refreshRate, int bitsPerPixel) {
+			super(width, height, refreshRate, bitsPerPixel);
+		}
+	}
 
 	@Override
 	public boolean isGL30Available() {
@@ -28,27 +48,27 @@ public class LimeGraphics implements Graphics {
 
 	@Override
 	public int getWidth() {
-		return 0;
+		return 640;
 	}
 
 	@Override
 	public int getHeight() {
-		return 0;
+		return 480;
 	}
 
 	@Override
 	public int getBackBufferWidth() {
-		return 0;
+		return 640;
 	}
 
 	@Override
 	public int getBackBufferHeight() {
-		return 0;
+		return 480;
 	}
 
 	@Override
 	public long getFrameId() {
-		return 0;
+		return frameId;
 	}
 
 	@Override
@@ -73,27 +93,27 @@ public class LimeGraphics implements Graphics {
 
 	@Override
 	public float getPpiX() {
-		return 0;
+		return 160;
 	}
 
 	@Override
 	public float getPpiY() {
-		return 0;
+		return 160;
 	}
 
 	@Override
 	public float getPpcX() {
-		return 0;
+		return 160;
 	}
 
 	@Override
 	public float getPpcY() {
-		return 0;
+		return 160;
 	}
 
 	@Override
 	public float getDensity() {
-		return 0;
+		return 160;
 	}
 
 	@Override
@@ -103,37 +123,37 @@ public class LimeGraphics implements Graphics {
 
 	@Override
 	public Monitor getPrimaryMonitor() {
-		return null;
+		return monitors[0];
 	}
 
 	@Override
 	public Monitor getMonitor() {
-		return null;
+		return monitors[0];
 	}
 
 	@Override
 	public Monitor[] getMonitors() {
-		return new Monitor[0];
+		return monitors;
 	}
 
 	@Override
 	public DisplayMode[] getDisplayModes() {
-		return new DisplayMode[0];
+		return displayModes;
 	}
 
 	@Override
 	public DisplayMode[] getDisplayModes(Monitor monitor) {
-		return new DisplayMode[0];
+		return displayModes;
 	}
 
 	@Override
 	public DisplayMode getDisplayMode() {
-		return null;
+		return displayModes[0];
 	}
 
 	@Override
 	public DisplayMode getDisplayMode(Monitor monitor) {
-		return null;
+		return displayModes[0];
 	}
 
 	@Override
@@ -142,7 +162,7 @@ public class LimeGraphics implements Graphics {
 	}
 
 	@Override
-	public boolean setWindowedMode(int i, int i1) {
+	public boolean setWindowedMode(int width, int height) {
 		return false;
 	}
 

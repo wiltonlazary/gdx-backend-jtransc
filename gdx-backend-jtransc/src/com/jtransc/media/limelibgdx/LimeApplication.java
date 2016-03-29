@@ -2,8 +2,33 @@ package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.utils.Clipboard;
+import jtransc.annotation.haxe.HaxeAddFiles;
+import jtransc.annotation.haxe.HaxeAddLibraries;
+import jtransc.annotation.haxe.HaxeCustomMain;
 import jtransc.annotation.haxe.HaxeMethodBody;
 
+@HaxeAddFiles({
+		"HaxeLimeGdxApplication.hx"
+		//"AGALMiniAssembler.hx",
+		//"HaxeLimeAudio.hx",
+		//"HaxeLimeJTranscApplication.hx",
+		//"HaxeLimeRender.hx",
+		//"HaxeLimeRenderFlash.hx",
+		//"HaxeLimeRenderGL.hx",
+		//"HaxeLimeRenderImpl.hx",
+		//"HaxeLimeIO.hx"
+})
+@HaxeCustomMain("" +
+		"package $entryPointPackage;\n" +
+		"class $entryPointSimpleName extends HaxeLimeGdxApplication {\n" +
+		"    public function new() {\n" +
+		"        super();\n" +
+		"        $inits\n" +
+		"        $mainClass.$mainMethod(HaxeNatives.strArray(HaxeNatives.args()));\n" +
+		"    }\n" +
+		"}\n"
+)
+@HaxeAddLibraries({"lime:2.9.0"})
 public class LimeApplication implements Application {
 	final private ApplicationListener applicationListener;
 	final private Graphics graphics = new LimeGraphics();
@@ -11,6 +36,7 @@ public class LimeApplication implements Application {
 	final private Input input = new LimeInput();
 	final private Files files = new LimeFiles();
 	final private Net net = new LimeNet();
+	private int logLevel = LOG_DEBUG;
 
 	public LimeApplication(ApplicationListener applicationListener, String title, int width, int height) {
 		this.applicationListener = applicationListener;
@@ -25,7 +51,13 @@ public class LimeApplication implements Application {
 		Gdx.gl = graphics.getGL20();
 		Gdx.gl20 = graphics.getGL20();
 		Gdx.gl30 = graphics.getGL30();
+
+		setApplicationListenerToLime(applicationListener);
+		applicationListener.create();
 	}
+
+	@HaxeMethodBody("HaxeLimeGdxApplication.listener = p0;")
+	native private void setApplicationListenerToLime(ApplicationListener applicationListener);
 
 	@Override
 	public ApplicationListener getApplicationListener() {
@@ -57,44 +89,50 @@ public class LimeApplication implements Application {
 		return net;
 	}
 
+	private void _log(int level, String tag, String message, Throwable exception) {
+		if (level <= this.logLevel) {
+			System.out.println("[" + tag + "] " + message + " : " + exception);
+		}
+	}
+
 	@Override
 	public void log(String tag, String message) {
-
+		_log(LOG_INFO, tag, message, null);
 	}
 
 	@Override
 	public void log(String tag, String message, Throwable exception) {
-
+		_log(LOG_INFO, tag, message, exception);
 	}
 
 	@Override
 	public void error(String tag, String message) {
-
+		_log(LOG_ERROR, tag, message, null);
 	}
 
 	@Override
 	public void error(String tag, String message, Throwable exception) {
-
+		_log(LOG_ERROR, tag, message, exception);
 	}
 
 	@Override
 	public void debug(String tag, String message) {
-
+		_log(LOG_DEBUG, tag, message, null);
 	}
 
 	@Override
 	public void debug(String tag, String message, Throwable exception) {
-
+		_log(LOG_DEBUG, tag, message, exception);
 	}
 
 	@Override
 	public void setLogLevel(int logLevel) {
-
+		this.logLevel = logLevel;
 	}
 
 	@Override
 	public int getLogLevel() {
-		return 0;
+		return this.logLevel;
 	}
 
 	@Override
@@ -137,7 +175,7 @@ public class LimeApplication implements Application {
 
 	@Override
 	public void postRunnable(Runnable runnable) {
-
+		System.err.println("ERROR! postRunnable: " + runnable);
 	}
 
 	@Override
@@ -147,11 +185,11 @@ public class LimeApplication implements Application {
 
 	@Override
 	public void addLifecycleListener(LifecycleListener listener) {
-
+		System.err.println("ERROR! addLifecycleListener: " + listener);
 	}
 
 	@Override
 	public void removeLifecycleListener(LifecycleListener listener) {
-
+		System.err.println("ERROR! removeLifecycleListener: " + listener);
 	}
 }

@@ -7,6 +7,7 @@ import jtransc.annotation.haxe.HaxeImports;
 import jtransc.annotation.haxe.HaxeMethodBody;
 
 import java.nio.Buffer;
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 @HaxeImports({
@@ -166,423 +167,351 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	@HaxeMethodBody("GL.bindRenderbuffer(p0, p1);")
 	native public void glBindRenderbuffer(int target, int renderbuffer);
 
-	/*
-	public void glBlendColor(float red, float green, float blue, float alpha) {
-		GL.blendColor(red, green, blue, alpha);
-	}
+	@HaxeMethodBody("GL.blendColor(p0, p1, p2, p3);")
+	native public void glBlendColor(float red, float green, float blue, float alpha);
 
-	public void glBlendEquation(int mode) {
-		GL.blendEquation(mode);
-	}
+	@HaxeMethodBody("GL.blendEquation(p0);")
+	native public void glBlendEquation(int mode);
 
-	public void glBlendEquationSeparate(int modeRGB, int modeAlpha) {
-		GL.blendEquationSeparate(modeRGB, modeAlpha);
-	}
+	@HaxeMethodBody("GL.blendEquationSeparate(p0, p1);")
+	native public void glBlendEquationSeparate(int modeRGB, int modeAlpha);
 
-	public void glBlendFuncSeparate(int srcRGB, int dstRGB, int srcAlpha, int dstAlpha) {
-		GL.blendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
-	}
+	@HaxeMethodBody("GL.blendFuncSeparate(p0, p1, p2, p3);")
+	native public void glBlendFuncSeparate(int srcRGB, int dstRGB, int srcAlpha, int dstAlpha);
 
-	public void glBufferData(int target, int size, Buffer data, int usage) {
-		GL.bufferData(target, size, data, usage);
-	}
+	@HaxeMethodBody("GL.bufferData(p0, p1, _convertBuffer(p2), p3);")
+	native public void glBufferData(int target, int size, Buffer data, int usage);
 
-	public void glBufferSubData(int target, int offset, int size, Buffer data) {
-		GL.bufferSubData(target, offset, size, data);
-	}
+	@HaxeMethodBody("GL.bufferSubData(p0, p1, p2, _convertBuffer(p3));")
+	native public void glBufferSubData(int target, int offset, int size, Buffer data);
 
-	public int glCheckFramebufferStatus(int target) {
-		return GL.checkFramebufferStatus(target);
-	}
+	@HaxeMethodBody("return GL.checkFramebufferStatus(p0);")
+	native public int glCheckFramebufferStatus(int target);
 
-	public void glCompileShader(int shader) {
-		GL.compileShader(shader);
-	}
+	@HaxeMethodBody("GL.compileShader(p0);")
+	native public void glCompileShader(int shader);
 
-	public int glCreateProgram() {
-		return GL.createProgram();
-	}
+	@HaxeMethodBody("return GL.createProgram();")
+	native public int glCreateProgram();
 
-	public int glCreateShader(int type) {
-		return GL.createShader(type);
-	}
+	@HaxeMethodBody("return GL.createShader(p0);")
+	native public int glCreateShader(int type);
 
-	public void glDeleteBuffer(int buffer) {
-		GL.deleteBuffer(buffer);
-	}
+	@HaxeMethodBody("GL.deleteBuffer(p0);")
+	native public void glDeleteBuffer(int buffer);
 
 	public void glDeleteBuffers(int n, IntBuffer buffers) {
 		for (int i = 0; i < n; i++) glDeleteBuffer(buffers.get(i));
 	}
 
-	public void glDeleteFramebuffer(int framebuffer) {
-		GL.deleteFramebuffer(framebuffer);
-	}
+	@HaxeMethodBody("GL.deleteFramebuffer(p0);")
+	native public void glDeleteFramebuffer(int framebuffer);
 
 	public void glDeleteFramebuffers(int n, IntBuffer framebuffers) {
 		for (int i = 0; i < n; i++) glDeleteFramebuffer(framebuffers.get(i));
 	}
 
-	public void glDeleteProgram(int program) {
-		GL.deleteProgram(program);
-	}
+	@HaxeMethodBody("GL.deleteProgram(p0);")
+	native public void glDeleteProgram(int program);
 
-	public void glDeleteRenderbuffer(int renderbuffer) {
-		GL.deleteRenderbuffer(renderbuffer);
-	}
+	@HaxeMethodBody("GL.deleteRenderbuffer(p0);")
+	native public void glDeleteRenderbuffer(int renderbuffer);
 
 	public void glDeleteRenderbuffers(int n, IntBuffer renderbuffers) {
 		for (int i = 0; i < n; i++) glDeleteRenderbuffer(renderbuffers.get(i));
 	}
 
-	public void glDeleteShader(int shader) {
-		GL.deleteShader(shader);
-	}
+	@HaxeMethodBody("GL.deleteShader(p0);")
+	native public void glDeleteShader(int shader);
 
-	public void glDetachShader(int program, int shader) {
-		GL.detachShader(program, shader);
-	}
+	@HaxeMethodBody("GL.detachShader(p0, p1);")
+	native public void glDetachShader(int program, int shader);
 
-	public void glDisableVertexAttribArray(int index) {
-		GL.disableVertexAttribArray(index);
-	}
+	@HaxeMethodBody("GL.disableVertexAttribArray(p0);")
+	native public void glDisableVertexAttribArray(int index);
 
-	public void glDrawElements(int mode, int count, int type, int indices) {
-		GL.drawElements(mode, count, type, indices);
-	}
+	@HaxeMethodBody("GL.drawElements(p0, p1, p2, p3);")
+	native public void glDrawElements(int mode, int count, int type, int indices);
 
-	public void glEnableVertexAttribArray(int index) {
-		GL.enableVertexAttribArray(index);
-	}
+	@HaxeMethodBody("GL.enableVertexAttribArray(p0);")
+	native public void glEnableVertexAttribArray(int index);
 
-	public void glFramebufferRenderbuffer(int target, int attachment, int renderbuffertarget, int renderbuffer) {
-		GL.framebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer);
-	}
+	@HaxeMethodBody("GL.framebufferRenderbuffer(p0, p1, p2, p3);")
+	native public void glFramebufferRenderbuffer(int target, int attachment, int renderbuffertarget, int renderbuffer);
 
-	public void glFramebufferTexture2D(int target, int attachment, int textarget, int texture, int level) {
-		GL.framebufferTexture2D(target, attachment, textarget, texture, level);
-	}
+	@HaxeMethodBody("GL.framebufferTexture2D(p0, p1, p2, p3, p4);")
+	native public void glFramebufferTexture2D(int target, int attachment, int textarget, int texture, int level);
 
-	public int glGenBuffer() {
-		return GL.createBuffer();
-	}
+	@HaxeMethodBody("return GL.createBuffer();")
+	native public int glGenBuffer();
 
 	public void glGenBuffers(int n, IntBuffer buffers) {
-		for (int i = 0; i < n; i++) buffers.put(i, glGenBuffers());
+		for (int i = 0; i < n; i++) buffers.put(i, glGenBuffer());
 	}
 
-	public void glGenerateMipmap(int target) {
-		GL.generateMipmap(target);
-	}
+	@HaxeMethodBody("GL.generateMipmap(p0);")
+	native public void glGenerateMipmap(int target);
 
-	public int glGenFramebuffer() {
-		return GL.createFramebuffer();
-	}
+	@HaxeMethodBody("return GL.createFramebuffer();")
+	native public int glGenFramebuffer();
 
 	public void glGenFramebuffers(int n, IntBuffer framebuffers) {
 		for (int i = 0; i < n; i++) framebuffers.put(i, glGenFramebuffer());
 	}
 
-	public int glGenRenderbuffer() {
-		return GL.createRenderbuffer();
-	}
+	@HaxeMethodBody("return GL.createRenderbuffer();")
+	native public int glGenRenderbuffer();
 
 	public void glGenRenderbuffers(int n, IntBuffer renderbuffers) {
 		for (int i = 0; i < n; i++) renderbuffers.put(i, glGenRenderbuffer());
 	}
 
-	public String glGetActiveAttrib(int program, int index, IntBuffer size, Buffer type) {
-		return GL.getActiveAttrib(program, index, size, type);
-	}
-
-	public String glGetActiveUniform(int program, int index, IntBuffer size, Buffer type) {
-		return GL.getActiveUniform(program, index, size, type);
-	}
-
-	public void glGetAttachedShaders(int program, int maxcount, Buffer count, IntBuffer shaders) {
-		GL.getAttachedShaders(program, maxcount, buffer, shaders)
-	}
-
-	public int glGetAttribLocation(int program, String name) {
-		return GL.getAttribLocation(program, name);
-	}
-
-	public void glGetBooleanv(int pname, Buffer params) {
-		GL.getBooleanv(pname, params);
-	}
-
-	public void glGetBufferParameteriv(int target, int pname, IntBuffer params) {
-		GL.getBufferParameteriv(target, name, params);
-	}
-
-	public void glGetFloatv(int pname, FloatBuffer params) {
-		GL.getFloatv(pname, params);
-	}
-
-	public void glGetFramebufferAttachmentParameteriv(int target, int attachment, int pname, IntBuffer params) {
-		GL.getFramebufferAttachmentParameter(target, attachment, pname, params);
-	}
-
-	public void glGetProgramiv(int program, int pname, IntBuffer params) {
-		GL.getProgramiv(program, pname, params);
-	}
-
-	public String glGetProgramInfoLog(int program) {
-		return GL.getProgramInfoLog(program);
-	}
-
-	public void glGetRenderbufferParameteriv(int target, int pname, IntBuffer params) {
-		GL.getRenderbufferParameteriv(target, pname, params);
-	}
-
-	public void glGetShaderiv(int shader, int pname, IntBuffer params) {
-		GL.getShaderiv(shader, pname, params);
-	}
-
-	public String glGetShaderInfoLog(int shader) {
-		return GL.getShaderInfoLog(shader);
-	}
-
-	public void glGetShaderPrecisionFormat(int shadertype, int precisiontype, IntBuffer range, IntBuffer precision) {
-		GL.getShaderPrecisionFormat(shadertype, precisiontype, range, precision);
-	}
-
-	public void glGetTexParameterfv(int target, int pname, FloatBuffer params) {
-		GL.getTexParameter(target, pname, params);
-	}
-
-	public void glGetTexParameteriv(int target, int pname, IntBuffer params) {
-		GL.getTexParameter(target, pname, params);
-	}
-
-	public void glGetUniformfv(int program, int location, FloatBuffer params) {
-		GL.getUniform(program, location, params);
-	}
-
-	public void glGetUniformiv(int program, int location, IntBuffer params) {
-		GL.getUniform(program, location, params);
-	}
-
-	public int glGetUniformLocation(int program, String name) {
-		return GL.getUniformLocation(program, name);
-	}
-
-	public void glGetVertexAttribfv(int index, int pname, FloatBuffer params) {
-		GL.getVertexAttrib(index, pname, params);
-	}
-
-	public void glGetVertexAttribiv(int index, int pname, IntBuffer params) {
-		GL.getVertexAttrib(index, pname, params);
-	}
+	@HaxeMethodBody("return HaxeNatives.str(GL.getActiveAttrib(p0, p1, p2, _convertBuffer(p3)));")
+	native public String glGetActiveAttrib(int program, int index, IntBuffer size, Buffer type);
 
-	public void glGetVertexAttribPointerv(int index, int pname, Buffer pointer) {
-		//GL.getVertexAttrib(index, pname, params);
-	}
+	@HaxeMethodBody("return HaxeNatives.str(GL.getActiveUniform(p0, p1, p2, p3));")
+	native public String glGetActiveUniform(int program, int index, IntBuffer size, Buffer type);
 
-	public boolean glIsBuffer(int buffer) {
-		return GL.isBuffer(buffer);
-	}
+	@HaxeMethodBody("GL.getAttachedShaders(p0, p1, p2, p3);")
+	native public void glGetAttachedShaders(int program, int maxcount, Buffer count, IntBuffer shaders);
 
-	public boolean glIsEnabled(int cap) {
-		return GL.isEnabled(cap);
-	}
+	@HaxeMethodBody("return GL.getAttribLocation(p0, p1._str);")
+	native public int glGetAttribLocation(int program, String name);
 
-	public boolean glIsFramebuffer(int framebuffer) {
-		return GL.isFramebuffer(framebuffer);
-	}
+	@HaxeMethodBody("GL.getBooleanv(p0, p1);")
+	native public void glGetBooleanv(int pname, Buffer params);
 
-	public boolean glIsProgram(int program) {
-		return GL.isProgram(program);
-	}
+	@HaxeMethodBody("GL.getBufferParameteriv(p0, p1, p2);")
+	native public void glGetBufferParameteriv(int target, int pname, IntBuffer params);
 
-	public boolean glIsRenderbuffer(int renderbuffer) {
-		return GL.isRenderbuffer(renderbuffer);
-	}
+	@HaxeMethodBody("GL.getFloatv(p0, p1);")
+	native public void glGetFloatv(int pname, FloatBuffer params);
 
-	public boolean glIsShader(int shader) {
-		return GL.isShader(shader);
-	}
+	@HaxeMethodBody("GL.getFramebufferAttachmentParameter(p0, p1, p2, p3);")
+	native public void glGetFramebufferAttachmentParameteriv(int target, int attachment, int pname, IntBuffer params);
 
-	public boolean glIsTexture(int texture) {
-		return GL.isTexture(texture);
-	}
+	@HaxeMethodBody("GL.getProgramiv(p0, p1, p2);")
+	native public void glGetProgramiv(int program, int pname, IntBuffer params);
 
-	public void glLinkProgram(int program) {
-		GL.linkProgram(program);
-	}
+	@HaxeMethodBody("return GL.getProgramInfoLog(p0);")
+	native public String glGetProgramInfoLog(int program);
 
-	public void glReleaseShaderCompiler() {
-		GL.releaseShaderCompiler();
-	}
+	@HaxeMethodBody("GL.getRenderbufferParameteriv(p0, p1, p2);")
+	native public void glGetRenderbufferParameteriv(int target, int pname, IntBuffer params);
 
-	public void glRenderbufferStorage(int target, int internalformat, int width, int height) {
-		GL.renderbufferStorage(target, internalformat, width, height);
-	}
+	@HaxeMethodBody("GL.getShaderiv(p0, p1, p2);")
+	native public void glGetShaderiv(int shader, int pname, IntBuffer params);
 
-	public void glSampleCoverage(float value, boolean invert) {
-		GL.sampleCoverage(value, invert);
-	}
+	@HaxeMethodBody("return GL.getShaderInfoLog(p0);")
+	native public String glGetShaderInfoLog(int shader);
 
-	public void glShaderBinary(int n, IntBuffer shaders, int binaryformat, Buffer binary, int length) {
-		GL.shaderBinary(n, shaders, binaryformat, binary, length);
-	}
+	@HaxeMethodBody("GL.getShaderPrecisionFormat(p0, p1, p2, p3);")
+	native public void glGetShaderPrecisionFormat(int shadertype, int precisiontype, IntBuffer range, IntBuffer precision);
 
-	public void glShaderSource(int shader, String string) {
-		GL.shaderSource(shader, string);
-	}
+	@HaxeMethodBody("GL.getTexParameter(p0, p1, p2);")
+	native public void glGetTexParameterfv(int target, int pname, FloatBuffer params);
 
-	public void glStencilFuncSeparate(int face, int func, int ref, int mask) {
-		GL.stencilFuncSeparate(face, func, ref, mask);
-	}
+	@HaxeMethodBody("GL.getTexParameter(p0, p1, p2);")
+	native public void glGetTexParameteriv(int target, int pname, IntBuffer params);
 
-	public void glStencilMaskSeparate(int face, int mask) {
-		GL.stencilMaskSeparate(face, mask);
-	}
+	@HaxeMethodBody("GL.glGetUniformfv(p0, p1, p2)")
+	native public void glGetUniformfv(int program, int location, FloatBuffer params);
 
-	public void glStencilOpSeparate(int face, int fail, int zfail, int zpass) {
-		GL.stencilOpSeparate(face, fail, zfail, zpass);
-	}
+	@HaxeMethodBody("GL.glGetUniformiv(p0, p1, p2);")
+	native public void glGetUniformiv(int program, int location, IntBuffer params);
 
-	public void glTexParameterfv(int target, int pname, FloatBuffer params) {
-		GL.texParameterf(target, pname, params);
-	}
+	@HaxeMethodBody("return GL.getUniformLocation(p0, p1);")
+	native public int glGetUniformLocation(int program, String name);
 
-	public void glTexParameteri(int target, int pname, int param) {
-		GL.texParameteri(target, pname, param);
-	}
+	@HaxeMethodBody("GL.getVertexAttrib(p0, p1, p2);")
+	native public void glGetVertexAttribfv(int index, int pname, FloatBuffer params);
 
-	public void glTexParameteriv(int target, int pname, IntBuffer params) {
-		GL.texParameteri(target, pname, params);
-	}
+	@HaxeMethodBody("GL.getVertexAttrib(p0, p1, p2);")
+	native public void glGetVertexAttribiv(int index, int pname, IntBuffer params);
 
-	public void glUniform1f(int location, float x) {
-		GL.uniform1f(location, x);
-	}
+	@HaxeMethodBody("GL.getVertexAttrib(p0, p1, p2);")
+	native public void glGetVertexAttribPointerv(int index, int pname, Buffer pointer);
 
-	public void glUniform1fv(int location, int count, FloatBuffer v) {
-		GL.uniform1fv(location, count, v);
-	}
+	@HaxeMethodBody("return GL.isBuffer(buffer);")
+	native public boolean glIsBuffer(int buffer);
 
-	public void glUniform1fv(int location, int count, float[] v, int offset) {
-		GL.uniform1fv(location, count, v, offset);
-	}
+	@HaxeMethodBody("return GL.isEnabled(p0);")
+	native public boolean glIsEnabled(int cap);
 
-	public void glUniform1i(int location, int x) {
-		GL.uniform1i(location, x);
-	}
+	@HaxeMethodBody("return GL.isFramebuffer(p0);")
+	native public boolean glIsFramebuffer(int framebuffer);
 
-	public void glUniform1iv(int location, int count, IntBuffer v) {
-	}
+	@HaxeMethodBody("return GL.isProgram(p0);")
+	native public boolean glIsProgram(int program);
 
-	public void glUniform1iv(int location, int count, int[] v, int offset) {
-	}
+	@HaxeMethodBody("return GL.isRenderbuffer(p0);")
+	native public boolean glIsRenderbuffer(int renderbuffer);
 
-	public void glUniform2f(int location, float x, float y) {
-	}
+	@HaxeMethodBody("return GL.isShader(p0);")
+	native public boolean glIsShader(int shader);
 
-	public void glUniform2fv(int location, int count, FloatBuffer v) {
-	}
+	@HaxeMethodBody("return GL.isTexture(p0);")
+	native public boolean glIsTexture(int texture);
 
-	public void glUniform2fv(int location, int count, float[] v, int offset) {
-	}
+	@HaxeMethodBody("GL.linkProgram(p0);")
+	native public void glLinkProgram(int program);
 
-	public void glUniform2i(int location, int x, int y) {
-	}
+	@HaxeMethodBody("GL.releaseShaderCompiler();")
+	native public void glReleaseShaderCompiler();
 
-	public void glUniform2iv(int location, int count, IntBuffer v) {
-	}
+	@HaxeMethodBody("GL.renderbufferStorage(p0, p1, p2, p3);")
+	native public void glRenderbufferStorage(int target, int internalformat, int width, int height);
 
-	public void glUniform2iv(int location, int count, int[] v, int offset) {
-	}
+	@HaxeMethodBody("GL.sampleCoverage(p0, p1);")
+	native public void glSampleCoverage(float value, boolean invert);
 
-	public void glUniform3f(int location, float x, float y, float z) {
-	}
+	@HaxeMethodBody("GL.shaderBinary(p0, p1, p2, p3, p4);")
+	native public void glShaderBinary(int n, IntBuffer shaders, int binaryformat, Buffer binary, int length);
 
-	public void glUniform3fv(int location, int count, FloatBuffer v) {
-	}
+	@HaxeMethodBody("GL.shaderSource(p0, p1);")
+	native public void glShaderSource(int shader, String string);
 
-	public void glUniform3fv(int location, int count, float[] v, int offset) {
-	}
+	@HaxeMethodBody("GL.stencilFuncSeparate(p0, p1, p2, p3);")
+	native public void glStencilFuncSeparate(int face, int func, int ref, int mask);
 
-	public void glUniform3i(int location, int x, int y, int z) {
-	}
+	@HaxeMethodBody("GL.stencilMaskSeparate(p0, p1);")
+	native public void glStencilMaskSeparate(int face, int mask);
 
-	public void glUniform3iv(int location, int count, IntBuffer v) {
-	}
+	@HaxeMethodBody("GL.stencilOpSeparate(p0, p1, p2, p3);")
+	native public void glStencilOpSeparate(int face, int fail, int zfail, int zpass);
 
-	public void glUniform3iv(int location, int count, int[] v, int offset) {
-	}
+	@HaxeMethodBody("GL.texParameterf(p0, p1, p2);")
+	native public void glTexParameterfv(int target, int pname, FloatBuffer params);
 
-	public void glUniform4f(int location, float x, float y, float z, float w) {
-	}
+	@HaxeMethodBody("GL.texParameteri(p0, p1, p2);")
+	native public void glTexParameteri(int target, int pname, int param);
 
-	public void glUniform4fv(int location, int count, FloatBuffer v) {
-	}
+	@HaxeMethodBody("GL.texParameteri(p0, p1, p2);")
+	native public void glTexParameteriv(int target, int pname, IntBuffer params);
 
-	public void glUniform4fv(int location, int count, float[] v, int offset) {
-	}
+	@HaxeMethodBody("GL.useProgram(p0);")
+	native public void glUseProgram(int program);
 
-	public void glUniform4i(int location, int x, int y, int z, int w) {
-	}
+	@HaxeMethodBody("GL.validateProgram(p0);")
+	native public void glValidateProgram(int program);
 
-	public void glUniform4iv(int location, int count, IntBuffer v) {
-	}
+	@HaxeMethodBody("GL.uniform1f(p0, p1);")
+	native public void glUniform1f(int location, float x);
 
-	public void glUniform4iv(int location, int count, int[] v, int offset) {
-	}
+	@HaxeMethodBody("GL.uniform1fv(p0, p1, p2);")
+	native public void glUniform1fv(int location, int count, FloatBuffer v);
 
-	public void glUniformMatrix2fv(int location, int count, boolean transpose, FloatBuffer value) {
-	}
+	@HaxeMethodBody("GL.uniform1fv(p0, p1, p2, p3);")
+	native public void glUniform1fv(int location, int count, float[] v, int offset);
 
-	public void glUniformMatrix2fv(int location, int count, boolean transpose, float[] value, int offset) {
-	}
+	@HaxeMethodBody("GL.uniform1i(p0, p1);")
+	native public void glUniform1i(int location, int x);
 
-	public void glUniformMatrix3fv(int location, int count, boolean transpose, FloatBuffer value) {
-	}
+	@HaxeMethodBody("GL.uniform1iv(p0, p1, p2);")
+	native public void glUniform1iv(int location, int count, IntBuffer v);
 
-	public void glUniformMatrix3fv(int location, int count, boolean transpose, float[] value, int offset) {
-	}
+	@HaxeMethodBody("GL.uniform1iv(p0, p1, p2, p3);")
+	native public void glUniform1iv(int location, int count, int[] v, int offset);
 
-	public void glUniformMatrix4fv(int location, int count, boolean transpose, FloatBuffer value) {
-	}
+	@HaxeMethodBody("GL.uniform2f(p0, p1, p2);")
+	native public void glUniform2f(int location, float x, float y);
 
-	public void glUniformMatrix4fv(int location, int count, boolean transpose, float[] value, int offset) {
-	}
+	@HaxeMethodBody("GL.uniform2fv(p0, p1, p2);")
+	native public void glUniform2fv(int location, int count, FloatBuffer v);
 
-	public void glUseProgram(int program) {
-	}
+	@HaxeMethodBody("GL.uniform2fv(p0, p1, p2, p3);")
+	native public void glUniform2fv(int location, int count, float[] v, int offset);
 
-	public void glValidateProgram(int program) {
-	}
+	@HaxeMethodBody("GL.uniform2i(p0, p1, p2);")
+	native public void glUniform2i(int location, int x, int y);
 
-	public void glVertexAttrib1f(int indx, float x) {
-	}
+	@HaxeMethodBody("GL.uniform2iv(p0, p1, p2);")
+	native public void glUniform2iv(int location, int count, IntBuffer v);
 
-	public void glVertexAttrib1fv(int indx, FloatBuffer values) {
-	}
+	@HaxeMethodBody("GL.uniform2iv(p0, p1, p2, p3);")
+	native public void glUniform2iv(int location, int count, int[] v, int offset);
 
-	public void glVertexAttrib2f(int indx, float x, float y) {
-	}
+	@HaxeMethodBody("GL.uniform3f(p0, p1, p2, p3);")
+	native public void glUniform3f(int location, float x, float y, float z);
 
-	public void glVertexAttrib2fv(int indx, FloatBuffer values) {
-	}
+	@HaxeMethodBody("GL.uniform3fv(p0, p1, p2);")
+	native public void glUniform3fv(int location, int count, FloatBuffer v);
 
-	public void glVertexAttrib3f(int indx, float x, float y, float z) {
-	}
+	@HaxeMethodBody("GL.uniform3fv(p0, p1, p2, p3);")
+	native public void glUniform3fv(int location, int count, float[] v, int offset);
 
-	public void glVertexAttrib3fv(int indx, FloatBuffer values) {
-	}
+	@HaxeMethodBody("GL.uniform3i(p0, p1, p2, p3);")
+	native public void glUniform3i(int location, int x, int y, int z);
 
-	public void glVertexAttrib4f(int indx, float x, float y, float z, float w) {
-	}
+	@HaxeMethodBody("GL.uniform3iv(p0, p1, p2);")
+	native public void glUniform3iv(int location, int count, IntBuffer v);
 
-	public void glVertexAttrib4fv(int indx, FloatBuffer values) {
-	}
+	@HaxeMethodBody("GL.uniform3iv(p0, p1, p2, p3);")
+	native public void glUniform3iv(int location, int count, int[] v, int offset);
 
-	public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride, Buffer ptr) {
-	}
+	@HaxeMethodBody("GL.uniform4f(p0, p1, p2, p3, p4);")
+	native public void glUniform4f(int location, float x, float y, float z, float w);
 
-	public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride, int ptr) {
-	}
-	*/
+	@HaxeMethodBody("GL.uniform4fv(p0, p1, p2);")
+	native public void glUniform4fv(int location, int count, FloatBuffer v);
+
+	@HaxeMethodBody("GL.uniform4fv(p0, p1, p2, p3);")
+	native public void glUniform4fv(int location, int count, float[] v, int offset);
+
+	@HaxeMethodBody("GL.uniform4i(p0, p1, p2, p3, p4);")
+	native public void glUniform4i(int location, int x, int y, int z, int w);
+
+	@HaxeMethodBody("GL.uniform4iv(p0, p1, p2);")
+	native public void glUniform4iv(int location, int count, IntBuffer v);
+
+	@HaxeMethodBody("GL.uniform4iv(p0, p1, p2, p3);")
+	native public void glUniform4iv(int location, int count, int[] v, int offset);
+
+	@HaxeMethodBody("GL.uniformMatrix2fv(p0, p1, p2, p3);")
+	native public void glUniformMatrix2fv(int location, int count, boolean transpose, FloatBuffer value);
+
+	@HaxeMethodBody("GL.uniformMatrix2fv(p0, p1, p2, p3, p4);")
+	native public void glUniformMatrix2fv(int location, int count, boolean transpose, float[] value, int offset);
+
+	@HaxeMethodBody("GL.uniformMatrix3fv(p0, p1, p2, p3);")
+	native public void glUniformMatrix3fv(int location, int count, boolean transpose, FloatBuffer value);
+
+	@HaxeMethodBody("GL.uniformMatrix3fv(p0, p1, p2, p3, p4);")
+	native public void glUniformMatrix3fv(int location, int count, boolean transpose, float[] value, int offset);
+
+	@HaxeMethodBody("GL.uniformMatrix4fv(p0, p1, p2, p3);")
+	native public void glUniformMatrix4fv(int location, int count, boolean transpose, FloatBuffer value);
+
+	@HaxeMethodBody("GL.uniformMatrix4fv(p0, p1, p2, p3, p4);")
+	native public void glUniformMatrix4fv(int location, int count, boolean transpose, float[] value, int offset);
+
+	@HaxeMethodBody("GL.vertexAttrib1f(p0, p1);")
+	native public void glVertexAttrib1f(int indx, float x);
+
+	@HaxeMethodBody("GL.vertexAttrib1fv(p0, p1);")
+	native public void glVertexAttrib1fv(int indx, FloatBuffer values);
+
+	@HaxeMethodBody("GL.vertexAttrib2f(p0, p1, p2);")
+	native public void glVertexAttrib2f(int indx, float x, float y);
+
+	@HaxeMethodBody("GL.vertexAttrib2fv(p0, p1);")
+	native public void glVertexAttrib2fv(int indx, FloatBuffer values);
+
+	@HaxeMethodBody("GL.vertexAttrib3f(p0, p1, p2, p3);")
+	native public void glVertexAttrib3f(int indx, float x, float y, float z);
+
+	@HaxeMethodBody("GL.vertexAttrib3fv(p0, p1);")
+	native public void glVertexAttrib3fv(int indx, FloatBuffer values);
+
+	@HaxeMethodBody("GL.vertexAttrib4f(p0, p1, p2, p3, p4);")
+	native public void glVertexAttrib4f(int indx, float x, float y, float z, float w);
+
+	@HaxeMethodBody("GL.vertexAttrib4fv(p0, p1);")
+	native public void glVertexAttrib4fv(int indx, FloatBuffer values);
+
+	@HaxeMethodBody("GL.vertexAttribPointer(p0, p1, p2, p3, p4, p5);")
+	native public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride, Buffer ptr);
+
+	@HaxeMethodBody("GL.vertexAttribPointer(p0, p1, p2, p3, p4, p5);")
+	native public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride, int ptr);
 }

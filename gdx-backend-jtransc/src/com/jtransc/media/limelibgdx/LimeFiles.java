@@ -6,37 +6,37 @@ import com.badlogic.gdx.files.FileHandle;
 public class LimeFiles implements Files {
 	@Override
 	public FileHandle getFileHandle(String s, FileType fileType) {
-		return null;
+		return new MyFileHandle(s);
 	}
 
 	@Override
 	public FileHandle classpath(String s) {
-		return null;
+		return new MyFileHandle(s);
 	}
 
 	@Override
 	public FileHandle internal(String s) {
-		return null;
+		return new MyFileHandle(s);
 	}
 
 	@Override
 	public FileHandle external(String s) {
-		return null;
+		return new MyFileHandle(s);
 	}
 
 	@Override
 	public FileHandle absolute(String s) {
-		return null;
+		return new MyFileHandle(s);
 	}
 
 	@Override
 	public FileHandle local(String s) {
-		return null;
+		return new MyFileHandle(s);
 	}
 
 	@Override
 	public String getExternalStoragePath() {
-		return null;
+		return "/";
 	}
 
 	@Override
@@ -46,11 +46,18 @@ public class LimeFiles implements Files {
 
 	@Override
 	public String getLocalStoragePath() {
-		return null;
+		return "/";
 	}
 
 	@Override
 	public boolean isLocalStorageAvailable() {
 		return false;
+	}
+
+	static private class MyFileHandle extends FileHandle {
+		public MyFileHandle(String s) {
+			super(s);
+			System.out.println("MyFileHandle: " + s);
+		}
 	}
 }

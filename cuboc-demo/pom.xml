@@ -105,6 +105,9 @@
                         <param>lime:js</param>
                     </targets>
                     <release>true</release>
+                    <assets>
+                        <asset>assets</asset>
+                    </assets>
                 </configuration>
                 <executions><execution><goals><goal>jtransc</goal></goals></execution></executions>
             </plugin>
