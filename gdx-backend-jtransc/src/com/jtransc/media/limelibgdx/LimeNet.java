@@ -9,31 +9,31 @@ import com.badlogic.gdx.net.SocketHints;
 public class LimeNet implements Net {
 	@Override
 	public void sendHttpRequest(HttpRequest httpRequest, HttpResponseListener httpResponseListener) {
-
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public void cancelHttpRequest(HttpRequest httpRequest) {
-
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public ServerSocket newServerSocket(Protocol protocol, String s, int i, ServerSocketHints serverSocketHints) {
-		return null;
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public ServerSocket newServerSocket(Protocol protocol, int i, ServerSocketHints serverSocketHints) {
-		return null;
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public Socket newClientSocket(Protocol protocol, String s, int i, SocketHints socketHints) {
-		return null;
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public boolean openURI(String s) {
-		return false;
+		throw new NotImplementedException();
 	}
 }

@@ -27,8 +27,8 @@
     </properties>
 
     <groupId>com.jtransc</groupId>
-    <artifactId>gdx-backend-jtransc</artifactId>
-    <version>0.1.5</version>
+    <artifactId>cubocy-badlogicgames-demo</artifactId>
+    <version>0.0.1</version>
 
     <dependencies>
         <dependency>
@@ -37,8 +37,8 @@
             <version>${jtransc.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.jtransc.media</groupId>
-            <artifactId>jtransc-media-core</artifactId>
+            <groupId>com.jtransc</groupId>
+            <artifactId>gdx-backend-jtransc</artifactId>
             <version>${jtransc.version}</version>
         </dependency>
         <!--
@@ -89,15 +89,24 @@
 
     <build>
         <sourceDirectory>src</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>assets</directory>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
+                <groupId>com.jtransc</groupId>
+                <artifactId>jtransc-maven-plugin</artifactId>
+                <version>0.1.5</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <mainClass>CubocJTransc</mainClass>
+                    <targets>
+                        <param>lime:js</param>
+                    </targets>
+                    <release>true</release>
                 </configuration>
+                <executions><execution><goals><goal>jtransc</goal></goals></execution></executions>
             </plugin>
         </plugins>
     </build>

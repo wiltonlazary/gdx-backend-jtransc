@@ -196,7 +196,7 @@ public class LimeInput implements Input {
 
 	@Override
 	public Orientation getNativeOrientation() {
-		return null;
+		return Orientation.Landscape;
 	}
 
 	@Override

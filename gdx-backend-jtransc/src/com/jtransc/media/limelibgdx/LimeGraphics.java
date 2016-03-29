@@ -5,9 +5,12 @@ import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.jtransc.media.limelibgdx.dummy.DummyGL20;
 import jtransc.annotation.haxe.HaxeMethodBody;
 
 public class LimeGraphics implements Graphics {
+	final private GL20 gl = new DummyGL20();
+
 	@Override
 	public boolean isGL30Available() {
 		return false;
@@ -15,7 +18,7 @@ public class LimeGraphics implements Graphics {
 
 	@Override
 	public GL20 getGL20() {
-		return null;
+		return gl;
 	}
 
 	@Override
@@ -50,22 +53,22 @@ public class LimeGraphics implements Graphics {
 
 	@Override
 	public float getDeltaTime() {
-		return 0;
+		return 0.12f;
 	}
 
 	@Override
 	public float getRawDeltaTime() {
-		return 0;
+		return 0.12f;
 	}
 
 	@Override
 	public int getFramesPerSecond() {
-		return 0;
+		return 60;
 	}
 
 	@Override
 	public GraphicsType getType() {
-		return null;
+		return GraphicsType.WebGL;
 	}
 
 	@Override

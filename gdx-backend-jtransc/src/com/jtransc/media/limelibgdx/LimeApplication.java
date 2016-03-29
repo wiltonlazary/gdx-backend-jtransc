@@ -2,36 +2,59 @@ package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.utils.Clipboard;
+import jtransc.annotation.haxe.HaxeMethodBody;
 
 public class LimeApplication implements Application {
+	final private ApplicationListener applicationListener;
+	final private Graphics graphics = new LimeGraphics();
+	final private Audio audio = new LimeAudio();
+	final private Input input = new LimeInput();
+	final private Files files = new LimeFiles();
+	final private Net net = new LimeNet();
+
+	public LimeApplication(ApplicationListener applicationListener, String title, int width, int height) {
+		this.applicationListener = applicationListener;
+
+		Gdx.app = this;
+		Gdx.graphics = graphics;
+		Gdx.audio = audio;
+		Gdx.input = input;
+		Gdx.files = files;
+		Gdx.net = net;
+
+		Gdx.gl = graphics.getGL20();
+		Gdx.gl20 = graphics.getGL20();
+		Gdx.gl30 = graphics.getGL30();
+	}
+
 	@Override
 	public ApplicationListener getApplicationListener() {
-		return new LimeApplicationListener();
+		return applicationListener;
 	}
 
 	@Override
 	public Graphics getGraphics() {
-		return new LimeGraphics();
+		return graphics;
 	}
 
 	@Override
 	public Audio getAudio() {
-		return new LimeAudio();
+		return audio;
 	}
 
 	@Override
 	public Input getInput() {
-		return new LimeInput();
+		return input;
 	}
 
 	@Override
 	public Files getFiles() {
-		return new LimeFiles();
+		return files;
 	}
 
 	@Override
 	public Net getNet() {
-		return new LimeNet();
+		return net;
 	}
 
 	@Override
@@ -76,7 +99,7 @@ public class LimeApplication implements Application {
 
 	@Override
 	public ApplicationType getType() {
-		return null;
+		return ApplicationType.WebGL;
 	}
 
 	@Override
@@ -101,7 +124,15 @@ public class LimeApplication implements Application {
 
 	@Override
 	public Clipboard getClipboard() {
-		return null;
+		return new Clipboard() {
+			@Override
+			@HaxeMethodBody("return HaxeNatives.str(lime.system.Clipboard.text);")
+			native public String getContents();
+
+			@Override
+			@HaxeMethodBody("lime.system.Clipboard.text = p0._str;")
+			native public void setContents(String content);
+		};
 	}
 
 	@Override
@@ -111,7 +142,7 @@ public class LimeApplication implements Application {
 
 	@Override
 	public void exit() {
-
+		System.exit(0);
 	}
 
 	@Override
