@@ -2,6 +2,28 @@ class HaxeLimeGdxApplication extends lime.app.Application {
     static public var instance:HaxeLimeGdxApplication;
     static public var listener:com.badlogic.gdx.ApplicationListener_;
 
+    static public function convertFloatBuffer(buf:java_.nio.FloatBuffer_, size:Int = -1):lime.utils.Float32Array {
+        var len:Int = buf.limit__I();
+        var out:lime.utils.Float32Array = new lime.utils.Float32Array(len);
+        for (n in 0 ... len) out.set(n, buf.get_I_F(n));
+        return out;
+    }
+
+
+    static public function convertIntBuffer(buf:java_.nio.IntBuffer_, size:Int = -1):lime.utils.Int32Array {
+        var len = buf.limit__I();
+        var out = new lime.utils.Int32Array(len);
+        for (n in 0 ... len) out.set(n, buf.get_I_I(n));
+        return out;
+    }
+
+    static public function convertBuffer(buf:java_.nio.Buffer_, size:Int = -1):lime.utils.Int8Array {
+        var len:Int = buf.limit__I();
+        var out:lime.utils.Int8Array = new lime.utils.Int8Array(len);
+        //for (n in 0 ... len) out.set(n, buf.get_I_F(n));
+        throw 'Not implemented convertBuffer!';
+        return out;
+    }
 
     static public function loopInit(init: Void -> Void) {
     }
