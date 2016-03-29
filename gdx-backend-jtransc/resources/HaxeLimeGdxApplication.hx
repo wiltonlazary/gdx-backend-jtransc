@@ -1,6 +1,7 @@
 class HaxeLimeGdxApplication extends lime.app.Application {
     static public var instance:HaxeLimeGdxApplication;
     static public var listener:com.badlogic.gdx.ApplicationListener_;
+    static public var initializedListener:Boolean = false;
 
     static public function convertFloatBuffer(buf:java_.nio.FloatBuffer_, size:Int = -1):lime.utils.Float32Array {
         var len:Int = buf.limit__I();
@@ -42,6 +43,13 @@ class HaxeLimeGdxApplication extends lime.app.Application {
 
     public override function render(renderer:lime.graphics.Renderer) {
         super.render(renderer);
+        if (listener != null) {
+            if (!initializedListener) {
+                initializedListener = true;
+                listener.create__V();
+            }
+            listener.render__V();
+        }
     }
 
     public override function update(deltaTime:Int) {

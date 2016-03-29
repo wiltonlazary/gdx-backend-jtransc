@@ -53,7 +53,6 @@ public class LimeApplication implements Application {
 		Gdx.gl30 = graphics.getGL30();
 
 		setApplicationListenerToLime(applicationListener);
-		applicationListener.create();
 	}
 
 	@HaxeMethodBody("HaxeLimeGdxApplication.listener = p0;")

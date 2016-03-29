@@ -349,7 +349,7 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 
 	// 	public static inline function getBufferParameter (target:Int, pname:Int):Int /*Dynamic*/ {
 
-	@HaxeMethodBody("GL.getBufferParameter(p0, p1);")
+	@HaxeMethodBody("return GL.getBufferParameter(p0, p1);")
 	native private int glGetBufferParameter(int target, int pname);
 
 	public void glGetBufferParameteriv(int target, int pname, IntBuffer params) {
@@ -370,11 +370,19 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	@HaxeMethodBody("return HaxeNatives.str(GL.getProgramInfoLog(programs.get(p0)));")
 	native public String glGetProgramInfoLog(int program);
 
-	@HaxeMethodBody("GL.getRenderbufferParameteriv(p0, p1, p2);")
-	native public void glGetRenderbufferParameteriv(int target, int pname, IntBuffer params);
+	@HaxeMethodBody("return GL.getRenderbufferParameter(p0, p1);")
+	native private int glGetRenderbufferParameter(int target, int pname);
 
-	@HaxeMethodBody("GL.getShaderiv(shaders.get(p0), p1, p2);")
-	native public void glGetShaderiv(int shader, int pname, IntBuffer params);
+	public void glGetRenderbufferParameteriv(int target, int pname, IntBuffer params) {
+		params.put(0, glGetRenderbufferParameter(target, pname));
+	}
+
+	@HaxeMethodBody("return GL.getShaderParameter(shaders.get(p0), p1);")
+	native private int glGetShader(int shader, int pname);
+
+	public void glGetShaderiv(int shader, int pname, IntBuffer params) {
+		params.put(0, glGetShader(shader, pname));
+	}
 
 	@HaxeMethodBody("return HaxeNatives.str(GL.getShaderInfoLog(shaders.get(p0)));")
 	native public String glGetShaderInfoLog(int shader);
@@ -394,16 +402,16 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 		precision.put(0, glGetShaderPrecisionFormatPrecision(shadertype, precisiontype));
 	}
 
-	@HaxeMethodBody("GL.getTexParameter(p0, p1, p2);")
+	//@HaxeMethodBody("GL.getTexParameter(p0, p1, p2);")
 	native public void glGetTexParameterfv(int target, int pname, FloatBuffer params);
 
-	@HaxeMethodBody("GL.getTexParameter(p0, p1, p2);")
+	//@HaxeMethodBody("GL.getTexParameter(p0, p1, p2);")
 	native public void glGetTexParameteriv(int target, int pname, IntBuffer params);
 
-	@HaxeMethodBody("GL.glGetUniformfv(p0, p1, p2);")
+	//@HaxeMethodBody("GL.glGetUniformfv(p0, p1, p2);")
 	native public void glGetUniformfv(int program, int location, FloatBuffer params);
 
-	@HaxeMethodBody("GL.glGetUniformiv(programs.get(p0), p1, p2);")
+	//@HaxeMethodBody("GL.glGetUniformiv(programs.get(p0), p1, p2);")
 	native public void glGetUniformiv(int program, int location, IntBuffer params);
 
 	@HaxeMethodBody("var id = lastId++; var location = GL.getUniformLocation(programs.get(p0), p1._str); uniformLocations.set(id, location); return id;")
@@ -416,8 +424,9 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 		params.put(0, glGetVertexAttrib(index, pname));
 	}
 
-	@HaxeMethodBody("GL.getVertexAttrib(p0, p1, _intBuffer(p2));")
-	native public void glGetVertexAttribiv(int index, int pname, IntBuffer params);
+	public void glGetVertexAttribiv(int index, int pname, IntBuffer params) {
+		params.put(0, glGetVertexAttrib(index, pname));
+	}
 
 	//@HaxeMethodBody("GL.getVertexAttrib(p0, p1, p2);")
 	native public void glGetVertexAttribPointerv(int index, int pname, Buffer pointer);
@@ -452,10 +461,10 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	@HaxeMethodBody("GL.sampleCoverage(p0, p1);")
 	native public void glSampleCoverage(float value, boolean invert);
 
-	@HaxeMethodBody("GL.shaderBinary(p0, p1, p2, p3, p4);")
+	//@HaxeMethodBody("GL.shaderBinary(p0, p1, p2, p3, p4);")
 	native public void glShaderBinary(int n, IntBuffer shaders, int binaryformat, Buffer binary, int length);
 
-	@HaxeMethodBody("GL.shaderSource(shaders.get(p0), p1);")
+	@HaxeMethodBody("GL.shaderSource(shaders.get(p0), p1._str);")
 	native public void glShaderSource(int shader, String string);
 
 	@HaxeMethodBody("GL.stencilFuncSeparate(p0, p1, p2, p3);")
