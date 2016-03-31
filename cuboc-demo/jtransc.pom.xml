@@ -36,38 +36,21 @@
             <artifactId>jtransc-rt-core</artifactId>
             <version>${jtransc.version}</version>
         </dependency>
-		<!--
         <dependency>
             <groupId>com.jtransc</groupId>
             <artifactId>gdx-backend-jtransc</artifactId>
             <version>${jtransc.version}</version>
         </dependency>
-        -->
-
-        <dependency>
-            <groupId>com.badlogicgames.gdx</groupId>
-            <artifactId>gdx-backend-lwjgl</artifactId>
-            <version>${gdx.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.badlogicgames.gdx</groupId>
-            <artifactId>gdx-platform</artifactId>
-            <version>${gdx.version}</version>
-            <classifier>natives-desktop</classifier>
-            <scope>compile</scope>
-        </dependency>
         <dependency>
             <groupId>com.badlogicgames.gdx</groupId>
             <artifactId>gdx-platform</artifactId>
             <version>${gdx.version}</version>
             <scope>compile</scope>
-            <!-- natives-desktop -->
         </dependency>
     </dependencies>
 
     <build>
+        <sourceDirectory>src</sourceDirectory>
         <resources>
             <resource>
                 <directory>assets</directory>
@@ -87,7 +70,7 @@
 						</goals>
 						<configuration>
 							<sources>
-								<source>${basedir}/src_desktop</source>
+								<source>${basedir}/src_jtransc</source>
 								<source>${basedir}/src</source>
 							</sources>
 						</configuration>
@@ -101,6 +84,7 @@
                 <configuration>
                     <mainClass>CubocJTransc</mainClass>
                     <targets>
+						<param>lime:windows</param>
                         <param>lime:js</param>
                     </targets>
                     <release>true</release>

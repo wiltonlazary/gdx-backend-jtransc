@@ -19,7 +19,7 @@ package com.badlogic.gdx.graphics;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
-import jtransc.JTranscBits;
+import com.jtransc.media.limelibgdx.util.ColorFormat8;
 import jtransc.annotation.haxe.HaxeAddMembers;
 import jtransc.annotation.haxe.HaxeMethodBody;
 
@@ -109,10 +109,6 @@ public class Pixmap implements Disposable {
 		this.format = Format.RGBA8888;
 	}
 
-	public static int make(int r, int g, int b, float a) {
-		return JTranscBits.makeInt((byte) r, (byte) g, (byte) b, (byte) a);
-	}
-
 	/**
 	 * Sets the type of {@link Blending} to be used for all operations. Default is {@link Blending#SourceOver}.
 	 *
@@ -195,8 +191,7 @@ public class Pixmap implements Disposable {
 	 * @param a The alpha component.
 	 */
 	public void setColor(float r, float g, float b, float a) {
-
-		color = make((int) (r * 255), (int) (g * 255), (int) (b * 255), (int) (a * 255));
+		color = ColorFormat8.GDX.make((int) (r * 255), (int) (g * 255), (int) (b * 255), (int) (a * 255));
 	}
 
 	/**
@@ -340,8 +335,9 @@ public class Pixmap implements Disposable {
 	 * @param y The y-coordinate
 	 * @return The pixel color in RGBA8888 format.
 	 */
-	@HaxeMethodBody("return this.image.getPixel(p0, p1);")
-	native public int getPixel(int x, int y);
+	public int getPixel(int x, int y) {
+		return ColorFormat8.transform(ColorFormat8.LIME, ColorFormat8.GDX, _getPixel(x, y));
+	}
 
 	/**
 	 * Draws a pixel at the given location with the current color.
@@ -360,8 +356,9 @@ public class Pixmap implements Disposable {
 	 * @param y     the y-coordinate
 	 * @param color the color in RGBA8888 format.
 	 */
-	@HaxeMethodBody("this.image.setPixel(p0, p1, p2);")
-	native public void drawPixel(int x, int y, int color);
+	public void drawPixel(int x, int y, int color) {
+		_setPixel(x, y, ColorFormat8.transform(ColorFormat8.GDX, ColorFormat8.LIME, color));
+	}
 
 	native private void circle(int x, int y, int radius, DrawType drawType);
 
@@ -378,4 +375,11 @@ public class Pixmap implements Disposable {
 	private enum DrawType {
 		FILL, STROKE
 	}
+
+	@HaxeMethodBody("return this.image.getPixel(p0, p1);")
+	native private int _getPixel(int x, int y);
+
+	@HaxeMethodBody("this.image.setPixel(p0, p1, p2);")
+	native private void _setPixel(int x, int y, int color);
+
 }
