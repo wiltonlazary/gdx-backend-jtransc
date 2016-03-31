@@ -82,13 +82,21 @@ public class TextureLoader extends AsynchronousAssetLoader<Texture, TextureLoade
 	}
 
 	static public class TextureParameter extends AssetLoaderParameters<Texture> {
-		/** the format of the final Texture. Uses the source images format if null **/
+		/**
+		 * the format of the final Texture. Uses the source images format if null
+		 **/
 		public Format format = null;
-		/** whether to generate mipmaps **/
+		/**
+		 * whether to generate mipmaps
+		 **/
 		public boolean genMipMaps = false;
-		/** The texture to put the {@link TextureData} in, optional. **/
+		/**
+		 * The texture to put the {@link TextureData} in, optional.
+		 **/
 		public Texture texture = null;
-		/** TextureData for textures created on the fly, optional. When set, all format and genMipMaps are ignored */
+		/**
+		 * TextureData for textures created on the fly, optional. When set, all format and genMipMaps are ignored
+		 */
 		public TextureData textureData = null;
 		public TextureFilter minFilter = TextureFilter.Nearest;
 		public TextureFilter magFilter = TextureFilter.Nearest;

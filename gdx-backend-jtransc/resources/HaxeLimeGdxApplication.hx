@@ -94,22 +94,6 @@ class HaxeLimeGdxApplication extends lime.app.Application {
         HaxeLimeGdxApplication.instance = this;
         addModule(new JTranscModule());
     }
-
-    static public function loadTexture(app:com.jtransc.media.limelibgdx.LimeApplication_, target:Int, textureId:Int, path2:String) {
-    	var path = 'assets/$path2';
-    	// public var gl:GLRenderContext;
-    	var textures = com.jtransc.media.limelibgdx.gl.LimeGL20_.textures;
-    	trace('Loading...$path');
-    	lime.Assets.loadImage(path).onComplete(function(image:lime.graphics.Image) {
-    		trace('Loaded...$path');
-    		var oldTextureId = com.jtransc.media.limelibgdx.gl.LimeGL20_.bindedTextureId;
-    		GL.bindTexture(target, textures.get(textureId));
-			GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, image.buffer.width, image.buffer.height, 0, GL.RGBA, GL.UNSIGNED_BYTE, image.data);
-    		GL.bindTexture(target, textures.get(oldTextureId));
-    	}).onError(function(e) {
-    		trace('Error loading...$path ($e)');
-    	});
-    }
 }
 
 class JTranscModule extends lime.app.Module {

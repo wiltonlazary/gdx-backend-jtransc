@@ -108,6 +108,7 @@
                     <assets>
                         <asset>assets</asset>
                     </assets>
+					<embedResources>true</embedResources>
                 </configuration>
                 <executions><execution><goals><goal>jtransc</goal></goals></execution></executions>
             </plugin>

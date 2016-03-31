@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.jtransc.media.limelibgdx.dummy.DummyGL20;
 import com.jtransc.media.limelibgdx.gl.LimeGL20;
+import jtransc.JTranscSystem;
 
 public class LimeGraphics implements Graphics {
 	//final private GL20 gl = new DummyGL20();
@@ -29,6 +30,18 @@ public class LimeGraphics implements Graphics {
 		protected DisplayMode2(int width, int height, int refreshRate, int bitsPerPixel) {
 			super(width, height, refreshRate, bitsPerPixel);
 		}
+	}
+
+	int lastStamp = 0;
+	float deltaTime = 0f;
+	public void frame() {
+		int currentStamp = JTranscSystem.stamp();
+		frameId++;
+
+		int ms = JTranscSystem.elapsedTime(lastStamp, currentStamp);
+		deltaTime = (float)ms / 1000f;
+
+		lastStamp = currentStamp;
 	}
 
 	@Override
@@ -73,12 +86,12 @@ public class LimeGraphics implements Graphics {
 
 	@Override
 	public float getDeltaTime() {
-		return 0.12f;
+		return deltaTime;
 	}
 
 	@Override
 	public float getRawDeltaTime() {
-		return 0.12f;
+		return deltaTime;
 	}
 
 	@Override

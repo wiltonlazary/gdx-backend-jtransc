@@ -14,34 +14,34 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
 @HaxeAddFiles({
-		"HaxeLimeGdxApplication.hx"
-		//"AGALMiniAssembler.hx",
-		//"HaxeLimeAudio.hx",
-		//"HaxeLimeJTranscApplication.hx",
-		//"HaxeLimeRender.hx",
-		//"HaxeLimeRenderFlash.hx",
-		//"HaxeLimeRenderGL.hx",
-		//"HaxeLimeRenderImpl.hx",
-		//"HaxeLimeIO.hx"
+	"HaxeLimeGdxApplication.hx"
+	//"AGALMiniAssembler.hx",
+	//"HaxeLimeAudio.hx",
+	//"HaxeLimeJTranscApplication.hx",
+	//"HaxeLimeRender.hx",
+	//"HaxeLimeRenderFlash.hx",
+	//"HaxeLimeRenderGL.hx",
+	//"HaxeLimeRenderImpl.hx",
+	//"HaxeLimeIO.hx"
 })
 @HaxeCustomMain("" +
-		"package $entryPointPackage;\n" +
-		"class $entryPointSimpleName extends HaxeLimeGdxApplication {\n" +
-		"    public function new() {\n" +
-		"        super();\n" +
-		"        $inits\n" +
-		"        $mainClass.$mainMethod(HaxeNatives.strArray(HaxeNatives.args()));\n" +
-		"    }\n" +
-		"}\n"
+	"package $entryPointPackage;\n" +
+	"class $entryPointSimpleName extends HaxeLimeGdxApplication {\n" +
+	"    public function new() {\n" +
+	"        super();\n" +
+	"        $inits\n" +
+	"        $mainClass.$mainMethod(HaxeNatives.strArray(HaxeNatives.args()));\n" +
+	"    }\n" +
+	"}\n"
 )
 @HaxeAddLibraries({"lime:2.9.0"})
 public class LimeApplication implements Application {
 	final private ApplicationListener applicationListener;
-	final private Graphics graphics = new LimeGraphics();
-	final private Audio audio = new LimeAudio();
-	final private Input input = new LimeInput();
-	final private Files files = new LimeFiles();
-	final private Net net = new LimeNet();
+	final private LimeGraphics graphics = new LimeGraphics();
+	final private LimeAudio audio = new LimeAudio();
+	final private LimeInput input = new LimeInput();
+	final private LimeFiles files = new LimeFiles();
+	final private LimeNet net = new LimeNet();
 	private int logLevel = LOG_DEBUG;
 
 	public LimeApplication(ApplicationListener applicationListener, String title, int width, int height) {
@@ -198,21 +198,6 @@ public class LimeApplication implements Application {
 		System.err.println("ERROR! removeLifecycleListener: " + listener);
 	}
 
-	public void loadTexture(int target, int textureId, File file) {
-		setTexture(target, textureId, ByteBuffer.wrap(new byte[] { 0, 0, 0, 0 }), 1, 1);
-		_loadTexture(this, target, textureId, file.getPath());
-	}
-
-	@HaxeMethodBody("HaxeLimeGdxApplication.loadTexture(p0, p1, p2, p3._str);")
-	native private void _loadTexture(LimeApplication app, int target, int textureId, String filePath);
-
-	public void setTexture(int target, int textureId, Buffer buffer, int width, int height) {
-		int oldTextureBinding = GlUtils.getInteger(GL20.GL_TEXTURE_BINDING_2D);
-		Gdx.gl.glBindTexture(target, textureId);
-		Gdx.gl.glTexImage2D(target, 0, GL20.GL_RGBA, width, height, 0, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, buffer);
-		Gdx.gl.glBindTexture(target, oldTextureBinding);
-	}
-
 	public void create() {
 		applicationListener.create();
 	}
@@ -220,5 +205,6 @@ public class LimeApplication implements Application {
 	public void render() {
 		applicationListener.render();
 		LimeInput.lime_frame();
+		graphics.frame();
 	}
 }
