@@ -1,8 +1,12 @@
 import lime.graphics.opengl.GL;
+import lime.ui.Window;
+import lime.ui.KeyCode;
+import lime.graphics.Renderer;
+import com.jtransc.media.limelibgdx.LimeInput_;
 
 class HaxeLimeGdxApplication extends lime.app.Application {
     static public var instance:HaxeLimeGdxApplication;
-    static public var listener:com.badlogic.gdx.ApplicationListener_;
+    static public var app:com.jtransc.media.limelibgdx.LimeApplication_;
     static public var initializedListener:Bool = false;
 
     static public function convertByteBuffer(buf, size = -1) {
@@ -72,12 +76,12 @@ class HaxeLimeGdxApplication extends lime.app.Application {
 
     public override function render(renderer:lime.graphics.Renderer) {
         super.render(renderer);
-        if (listener != null) {
+        if (app != null) {
             if (!initializedListener) {
                 initializedListener = true;
-                listener.create__V();
+                app.create__V();
             }
-            listener.render__V();
+            app.render__V();
         }
     }
 
@@ -109,10 +113,19 @@ class HaxeLimeGdxApplication extends lime.app.Application {
 }
 
 class JTranscModule extends lime.app.Module {
-    override public function onMouseUp (window:lime.ui.Window, x:Float, y:Float, button:Int):Void {
+    override public function onMouseUp (window:Window, x:Float, y:Float, button:Int):Void {
+    	LimeInput_.lime_onMouseUp_DDI_V(x, y, button);
     }
-    override public function onMouseDown (window:lime.ui.Window, x:Float, y:Float, button:Int):Void {
+    override public function onMouseDown (window:Window, x:Float, y:Float, button:Int):Void {
+    	LimeInput_.lime_onMouseDown_DDI_V(x, y, button);
     }
-    override public function onMouseMove (window:lime.ui.Window, x:Float, y:Float):Void {
+    override public function onMouseMove (window:Window, x:Float, y:Float):Void {
+    	LimeInput_.lime_onMouseMove_DD_V(x, y);
     }
+	override public function onKeyDown(window:Window, keyCode:KeyCode, modifier:lime.ui.KeyModifier):Void {
+		LimeInput_.lime_onKeyDown_II_V(keyCode, modifier);
+	}
+	override public function onKeyUp(window:Window, keyCode:KeyCode, modifier:lime.ui.KeyModifier):Void {
+		LimeInput_.lime_onKeyUp_II_V(keyCode, modifier);
+	}
 }

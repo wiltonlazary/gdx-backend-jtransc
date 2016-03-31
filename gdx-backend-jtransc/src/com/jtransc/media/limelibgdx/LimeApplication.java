@@ -58,11 +58,11 @@ public class LimeApplication implements Application {
 		Gdx.gl20 = graphics.getGL20();
 		Gdx.gl30 = graphics.getGL30();
 
-		setApplicationListenerToLime(applicationListener);
+		setApplicationToLime(this);
 	}
 
-	@HaxeMethodBody("HaxeLimeGdxApplication.listener = p0;")
-	native private void setApplicationListenerToLime(ApplicationListener applicationListener);
+	@HaxeMethodBody("HaxeLimeGdxApplication.app = p0;")
+	native private void setApplicationToLime(LimeApplication app);
 
 	@Override
 	public ApplicationListener getApplicationListener() {
@@ -211,5 +211,14 @@ public class LimeApplication implements Application {
 		Gdx.gl.glBindTexture(target, textureId);
 		Gdx.gl.glTexImage2D(target, 0, GL20.GL_RGBA, width, height, 0, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, buffer);
 		Gdx.gl.glBindTexture(target, oldTextureBinding);
+	}
+
+	public void create() {
+		applicationListener.create();
+	}
+
+	public void render() {
+		applicationListener.render();
+		LimeInput.lime_frame();
 	}
 }
