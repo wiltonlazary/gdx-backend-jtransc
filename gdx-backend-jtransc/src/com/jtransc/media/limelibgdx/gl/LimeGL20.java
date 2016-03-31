@@ -26,6 +26,8 @@ import java.nio.IntBuffer;
 	"static private function _buffer(a, size:Int = -1) { return HaxeLimeGdxApplication.convertBuffer(a, size); }",
 	"static private function _floatBuffer(a, size:Int = -1) { return HaxeLimeGdxApplication.convertFloatBuffer(a, size); }",
 	"static private function _intBuffer(a, size:Int = -1) { return HaxeLimeGdxApplication.convertIntBuffer(a, size); }",
+	"static private function _intArray(a, offset:Int, size:Int) { return HaxeLimeGdxApplication.convertIntArray(a, offset, size); }",
+	"static private function _floatArray(a, offset:Int, size:Int) { return HaxeLimeGdxApplication.convertFloatArray(a, offset, size); }",
 	// GLTexture
 	"static private var lastId = 0;",
 	"static private var textures = new Map<Int, GLTexture>();",
@@ -98,7 +100,7 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	@HaxeMethodBody("GL.drawArrays(p0, p1, p2);")
 	native public void glDrawArrays(int mode, int first, int count);
 
-	//@HaxeMethodBody("GL.drawElements(p0, p1, p2, _buffer(p3));")
+	@HaxeMethodBody("GL.drawElements(p0, p1, p2, p3.position__I());")
 	native public void glDrawElements(int mode, int count, int type, Buffer indices);
 
 	@HaxeMethodBody("GL.enable(p0);")
@@ -408,10 +410,10 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	//@HaxeMethodBody("GL.getTexParameter(p0, p1, p2);")
 	native public void glGetTexParameteriv(int target, int pname, IntBuffer params);
 
-	//@HaxeMethodBody("GL.glGetUniformfv(p0, p1, p2);")
+	//@HaxeMethodBody("GL.getUniformfv(p0, p1, p2);")
 	native public void glGetUniformfv(int program, int location, FloatBuffer params);
 
-	//@HaxeMethodBody("GL.glGetUniformiv(programs.get(p0), p1, p2);")
+	//@HaxeMethodBody("GL.getUniformiv(programs.get(p0), p1, p2);")
 	native public void glGetUniformiv(int program, int location, IntBuffer params);
 
 	@HaxeMethodBody("var id = lastId++; var location = GL.getUniformLocation(programs.get(p0), p1._str); uniformLocations.set(id, location); return id;")
@@ -499,7 +501,7 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	@HaxeMethodBody("GL.uniform1fv(uniformLocations.get(p0), _floatBuffer(p2, p1));")
 	native public void glUniform1fv(int location, int count, FloatBuffer v);
 
-	//@HaxeMethodBody("GL.uniform1fv(uniformLocations.get(p0), p1, p2, p3);")
+	@HaxeMethodBody("GL.uniform1fv(uniformLocations.get(p0), _floatArray(p2, p3, p1));")
 	native public void glUniform1fv(int location, int count, float[] v, int offset);
 
 	@HaxeMethodBody("GL.uniform1i(uniformLocations.get(p0), p1);")
@@ -508,7 +510,7 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	@HaxeMethodBody("GL.uniform1iv(uniformLocations.get(p0), _intBuffer(p2, p1));")
 	native public void glUniform1iv(int location, int count, IntBuffer v);
 
-	//@HaxeMethodBody("GL.uniform1iv(uniformLocations.get(p0), p1, p2, p3);")
+	@HaxeMethodBody("GL.uniform1iv(uniformLocations.get(p0), _intArray(p2, p3, p1));")
 	native public void glUniform1iv(int location, int count, int[] v, int offset);
 
 	@HaxeMethodBody("GL.uniform2f(uniformLocations.get(p0), p1, p2);")
@@ -517,7 +519,7 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	@HaxeMethodBody("GL.uniform2fv(uniformLocations.get(p0), _floatBuffer(p2, p1));")
 	native public void glUniform2fv(int location, int count, FloatBuffer v);
 
-	//@HaxeMethodBody("GL.uniform2fv(uniformLocations.get(p0), p1, p2, p3);")
+	@HaxeMethodBody("GL.uniform2fv(uniformLocations.get(p0), _floatArray(p2, p3, p1));")
 	native public void glUniform2fv(int location, int count, float[] v, int offset);
 
 	@HaxeMethodBody("GL.uniform2i(uniformLocations.get(p0), p1, p2);")
@@ -526,7 +528,7 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	@HaxeMethodBody("GL.uniform2iv(uniformLocations.get(p0), _intBuffer(p2, p1));")
 	native public void glUniform2iv(int location, int count, IntBuffer v);
 
-	//@HaxeMethodBody("GL.uniform2iv(uniformLocations.get(p0), p1, p2, p3);")
+	@HaxeMethodBody("GL.uniform2iv(uniformLocations.get(p0), _intArray(p2, p3, p1));")
 	native public void glUniform2iv(int location, int count, int[] v, int offset);
 
 	@HaxeMethodBody("GL.uniform3f(uniformLocations.get(p0), p1, p2, p3);")
@@ -535,7 +537,7 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	@HaxeMethodBody("GL.uniform3fv(uniformLocations.get(p0), _floatBuffer(p2, p1));")
 	native public void glUniform3fv(int location, int count, FloatBuffer v);
 
-	//@HaxeMethodBody("GL.uniform3fv(uniformLocations.get(p0), p1, p2, p3);")
+	@HaxeMethodBody("GL.uniform3fv(uniformLocations.get(p0), _floatArray(p2, p3, p1));")
 	native public void glUniform3fv(int location, int count, float[] v, int offset);
 
 	@HaxeMethodBody("GL.uniform3i(uniformLocations.get(p0), p1, p2, p3);")
@@ -544,7 +546,7 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	@HaxeMethodBody("GL.uniform3iv(uniformLocations.get(p0), _intBuffer(p2, p1));")
 	native public void glUniform3iv(int location, int count, IntBuffer v);
 
-	//@HaxeMethodBody("GL.uniform3iv(uniformLocations.get(p0), p1, p2, p3);")
+	@HaxeMethodBody("GL.uniform3iv(uniformLocations.get(p0), _intArray(p2, p3, p1));")
 	native public void glUniform3iv(int location, int count, int[] v, int offset);
 
 	@HaxeMethodBody("GL.uniform4f(uniformLocations.get(p0), p1, p2, p3, p4);")
@@ -570,19 +572,20 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	@HaxeMethodBody("GL.uniformMatrix2fv(uniformLocations.get(p0), p2, _floatBuffer(p3, p1));")
 	native public void glUniformMatrix2fv(int location, int count, boolean transpose, FloatBuffer value);
 
-	//@HaxeMethodBody("GL.uniformMatrix2fv(uniformLocations.get(p0), p1, p2, p3, p4);")
-	native public void glUniformMatrix2fv(int location, int count, boolean transpose, float[] value, int offset);
+	public void glUniformMatrix2fv(int location, int count, boolean transpose, float[] value, int offset) {
+		glUniformMatrix2fv(location, count, transpose, FloatBuffer.wrap(value, offset, value.length - offset));
+	}
 
 	@HaxeMethodBody("GL.uniformMatrix3fv(uniformLocations.get(p0), p2, _floatBuffer(p3, p1));")
 	native public void glUniformMatrix3fv(int location, int count, boolean transpose, FloatBuffer value);
 
-	//@HaxeMethodBody("GL.uniformMatrix3fv(uniformLocations.get(p0), p1, p2, p3, p4);")
+	@HaxeMethodBody("GL.uniformMatrix3fv(uniformLocations.get(p0), p2, _floatArray(p3, p4, p1));")
 	native public void glUniformMatrix3fv(int location, int count, boolean transpose, float[] value, int offset);
 
-	//@HaxeMethodBody("GL.uniformMatrix4fv(uniformLocations.get(p0), p1, p2, _floatBuffer(p3));")
+	@HaxeMethodBody("GL.uniformMatrix4fv(uniformLocations.get(p0), p2, _floatBuffer(p3, p1));")
 	native public void glUniformMatrix4fv(int location, int count, boolean transpose, FloatBuffer value);
 
-	//@HaxeMethodBody("GL.uniformMatrix4fv(uniformLocations.get(p0), p1, p2, p3, p4);")
+	@HaxeMethodBody("GL.uniformMatrix4fv(uniformLocations.get(p0), p2, _floatArray(p3, p4, p1));")
 	native public void glUniformMatrix4fv(int location, int count, boolean transpose, float[] value, int offset);
 
 	@HaxeMethodBody("GL.vertexAttrib1f(p0, p1);")
@@ -612,6 +615,7 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	//@HaxeMethodBody("GL.vertexAttribPointer(p0, p1, p2, p3, p4, _buffer(p5));")
 	native public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride, Buffer ptr);
 
-	//@HaxeMethodBody("GL.vertexAttribPointer(p0, p1, p2, p3, p4, p5);")
+	// 	public static inline function vertexAttribPointer (indx:Int, size:Int, type:Int, normalized:Bool, stride:Int, offset:Int):Void {
+	@HaxeMethodBody("GL.vertexAttribPointer(p0, p1, p2, p3, p4, p5);")
 	native public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride, int ptr);
 }
