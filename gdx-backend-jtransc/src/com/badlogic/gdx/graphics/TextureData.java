@@ -1,9 +1,14 @@
 package com.badlogic.gdx.graphics;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.glutils.FileTextureData;
 import com.badlogic.gdx.graphics.glutils.MipMapGenerator;
+import com.jtransc.media.limelibgdx.LimeApplication;
+import com.jtransc.media.limelibgdx.util.GlUtils;
+
+import java.nio.ByteBuffer;
 
 /** Used by a {@link Texture} to load the pixel data. A TextureData can either return a {@link Pixmap} or upload the pixel data
  * itself. It signals it's type via {@link #getType()} to the Texture that's using it. The Texture will then either invoke
@@ -117,7 +122,8 @@ public interface TextureData {
 
 				@Override
 				public void consumeCustomData(int target) {
-					System.out.println("consumeCustomData: " + file);
+					int textureId = GlUtils.getInteger(GL20.GL_TEXTURE_BINDING_2D);
+					((LimeApplication)Gdx.app).loadTexture(target, textureId, file.file());
 				}
 
 				@Override

@@ -1,11 +1,17 @@
 package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Clipboard;
+import com.jtransc.media.limelibgdx.util.GlUtils;
 import jtransc.annotation.haxe.HaxeAddFiles;
 import jtransc.annotation.haxe.HaxeAddLibraries;
 import jtransc.annotation.haxe.HaxeCustomMain;
 import jtransc.annotation.haxe.HaxeMethodBody;
+
+import java.io.File;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
 
 @HaxeAddFiles({
 		"HaxeLimeGdxApplication.hx"
@@ -190,5 +196,20 @@ public class LimeApplication implements Application {
 	@Override
 	public void removeLifecycleListener(LifecycleListener listener) {
 		System.err.println("ERROR! removeLifecycleListener: " + listener);
+	}
+
+	public void loadTexture(int target, int textureId, File file) {
+		setTexture(target, textureId, ByteBuffer.wrap(new byte[] { 0, 0, 0, 0 }), 1, 1);
+		_loadTexture(this, target, textureId, file.getPath());
+	}
+
+	@HaxeMethodBody("HaxeLimeGdxApplication.loadTexture(p0, p1, p2, p3._str);")
+	native private void _loadTexture(LimeApplication app, int target, int textureId, String filePath);
+
+	public void setTexture(int target, int textureId, Buffer buffer, int width, int height) {
+		int oldTextureBinding = GlUtils.getInteger(GL20.GL_TEXTURE_BINDING_2D);
+		Gdx.gl.glBindTexture(target, textureId);
+		Gdx.gl.glTexImage2D(target, 0, GL20.GL_RGBA, width, height, 0, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, buffer);
+		Gdx.gl.glBindTexture(target, oldTextureBinding);
 	}
 }

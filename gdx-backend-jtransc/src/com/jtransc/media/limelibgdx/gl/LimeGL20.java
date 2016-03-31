@@ -29,20 +29,22 @@ import java.nio.IntBuffer;
 	"static private function _intArray(a, offset:Int, size:Int) { return HaxeLimeGdxApplication.convertIntArray(a, offset, size); }",
 	"static private function _floatArray(a, offset:Int, size:Int) { return HaxeLimeGdxApplication.convertFloatArray(a, offset, size); }",
 	// GLTexture
-	"static private var lastId = 0;",
-	"static private var textures = new Map<Int, GLTexture>();",
-	"static private var programs = new Map<Int, GLProgram>();",
-	"static private var shaders = new Map<Int, GLShader>();",
-	"static private var buffers = new Map<Int, GLBuffer>();",
-	"static private var frameBuffers = new Map<Int, GLFramebuffer>();",
-	"static private var renderBuffers = new Map<Int, GLRenderbuffer>();",
-	"static private var uniformLocations = new Map<Int, GLUniformLocation>();",
+	"static public var lastId = 1000;",
+	"static public var textures = new Map<Int, GLTexture>();",
+	"static public var programs = new Map<Int, GLProgram>();",
+	"static public var shaders = new Map<Int, GLShader>();",
+	"static public var buffers = new Map<Int, GLBuffer>();",
+	"static public var frameBuffers = new Map<Int, GLFramebuffer>();",
+	"static public var renderBuffers = new Map<Int, GLRenderbuffer>();",
+	"static public var uniformLocations = new Map<Int, GLUniformLocation>();",
 })
 public class LimeGL20 extends DummyGL20 implements GL20 {
 	@HaxeMethodBody("GL.activeTexture(p0);")
 	native public void glActiveTexture(int texture);
 
-	@HaxeMethodBody("GL.bindTexture(p0, textures.get(p1));")
+	static public int bindedTextureId = 0;
+
+	@HaxeMethodBody("bindedTextureId = p1; GL.bindTexture(p0, textures.get(p1));")
 	native public void glBindTexture(int target, int texture);
 
 	@HaxeMethodBody("GL.blendFunc(p0, p1);")
@@ -128,6 +130,14 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	@HaxeMethodBody("return GL.getParameter(p0);")
 	native private int glGetInteger(int pname);
 
+	private int glGetInteger2(int pname) {
+		switch (pname) {
+			case GL20.GL_TEXTURE_BINDING_2D:
+				return bindedTextureId;
+		}
+		return glGetInteger(pname);
+	}
+
 	@HaxeMethodBody("return GL.getParameter(p0);")
 	native private boolean glGetBoolean(int pname);
 
@@ -135,7 +145,7 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	native private float glGetFloat(int pname);
 
 	public void glGetIntegerv(int pname, IntBuffer params) {
-		params.put(0, glGetInteger(pname));
+		params.put(0, glGetInteger2(pname));
 	}
 
 	@HaxeMethodBody("return HaxeNatives.str(cast(GL.getParameter(p0), String));")
@@ -346,7 +356,7 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	native public int glGetAttribLocation(int program, String name);
 
 	public void glGetBooleanv(int pname, Buffer params) {
-		((ByteBuffer)params).putInt(0, glGetBoolean(pname) ? 1 : 0);
+		((ByteBuffer) params).putInt(0, glGetBoolean(pname) ? 1 : 0);
 	}
 
 	// 	public static inline function getBufferParameter (target:Int, pname:Int):Int /*Dynamic*/ {
@@ -454,8 +464,8 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	@HaxeMethodBody("GL.linkProgram(programs.get(p0));")
 	native public void glLinkProgram(int program);
 
-	//@HaxeMethodBody("GL.releaseShaderCompiler();")
-	native public void glReleaseShaderCompiler();
+	public void glReleaseShaderCompiler() {
+	}
 
 	@HaxeMethodBody("GL.renderbufferStorage(p0, p1, p2, p3);")
 	native public void glRenderbufferStorage(int target, int internalformat, int width, int height);
@@ -464,7 +474,9 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	native public void glSampleCoverage(float value, boolean invert);
 
 	//@HaxeMethodBody("GL.shaderBinary(p0, p1, p2, p3, p4);")
-	native public void glShaderBinary(int n, IntBuffer shaders, int binaryformat, Buffer binary, int length);
+	public void glShaderBinary(int n, IntBuffer shaders, int binaryformat, Buffer binary, int length) {
+		throw new RuntimeException("Not supported glShaderBinary");
+	}
 
 	@HaxeMethodBody("GL.shaderSource(shaders.get(p0), p1._str);")
 	native public void glShaderSource(int shader, String string);
