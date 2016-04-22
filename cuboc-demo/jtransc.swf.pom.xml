@@ -84,11 +84,7 @@
                 <configuration>
                     <mainClass>CubocJTransc</mainClass>
                     <targets>
-						<param>lime:windows</param>
-<!--
-						<param>lime:android</param>
-                        <param>lime:js</param>
--->
+                        <param>lime:swf</param>
                     </targets>
                     <release>true</release>
                     <assets>

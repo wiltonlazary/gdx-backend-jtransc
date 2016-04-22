@@ -9,10 +9,13 @@ class HaxeLimeGdxApplication extends lime.app.Application {
     static public var app:com.jtransc.media.limelibgdx.LimeApplication_;
     static public var initializedListener:Bool = false;
 
+    static private var DEBUG = false;
+
     static public function convertByteBuffer(buf, size = -1) {
         var len = buf.limit__I();
         var out = new lime.utils.UInt8Array(len);
         for (n in 0 ... len) out[n] = buf.get_I_B(n);
+        if (DEBUG) trace([for (n in 0 ... out.length) out[n]]);
         return out;
     }
 
@@ -20,6 +23,7 @@ class HaxeLimeGdxApplication extends lime.app.Application {
         var len = buf.limit__I();
         var out = new lime.utils.Int16Array(len);
         for (n in 0 ... len) out[n] = buf.get_I_S(n);
+        if (DEBUG) trace([for (n in 0 ... out.length) out[n]]);
         return out;
     }
 
@@ -27,6 +31,7 @@ class HaxeLimeGdxApplication extends lime.app.Application {
         var len = buf.limit__I();
         var out = new lime.utils.Int32Array(len);
         for (n in 0 ... len) out[n] = buf.get_I_I(n);
+        if (DEBUG) trace([for (n in 0 ... out.length) out[n]]);
         return out;
     }
 
@@ -34,6 +39,7 @@ class HaxeLimeGdxApplication extends lime.app.Application {
         var len = buf.limit__I();
         var out = new lime.utils.Float32Array(len);
         for (n in 0 ... len) out[n] = buf.get_I_F(n);
+        if (DEBUG) trace([for (n in 0 ... out.length) out[n]]);
         return out;
     }
 
@@ -49,6 +55,7 @@ class HaxeLimeGdxApplication extends lime.app.Application {
         var len = buf.length;
         var out = new lime.utils.Int32Array(len);
         for (n in 0 ... len) out[n] = buf.get(n);
+        if (DEBUG) trace([for (n in 0 ... out.length) out[n]]);
         return out;
     }
 
@@ -56,6 +63,7 @@ class HaxeLimeGdxApplication extends lime.app.Application {
         var len = buf.length;
         var out = new lime.utils.Float32Array(len);
         for (n in 0 ... len) out[n] = buf.get(n);
+        if (DEBUG) trace([for (n in 0 ... out.length) out[n]]);
         return out;
     }
 
@@ -81,6 +89,9 @@ class HaxeLimeGdxApplication extends lime.app.Application {
                 initializedListener = true;
                 app.create__V();
             }
+            #if desktop
+            GL.enable(GL.TEXTURE_2D);
+            #end
             app.render__V();
         }
     }
@@ -94,6 +105,10 @@ class HaxeLimeGdxApplication extends lime.app.Application {
         HaxeLimeGdxApplication.instance = this;
         addModule(new JTranscModule());
     }
+
+	public override function onWindowResize(window:Window, width:Int, height:Int):Void {
+		app.resized_II_V(width, height);
+	}
 }
 
 class JTranscModule extends lime.app.Module {

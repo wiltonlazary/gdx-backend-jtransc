@@ -19,6 +19,8 @@ public class LimeGraphics implements Graphics {
 	private DisplayMode2[] displayModes = new DisplayMode2[]{
 			new DisplayMode2(640, 480, 60, 32)
 	};
+	public int width = 640;
+	public int height = 480;
 
 	class Monitor2 extends Monitor {
 		protected Monitor2(int virtualX, int virtualY, String name) {
@@ -61,22 +63,22 @@ public class LimeGraphics implements Graphics {
 
 	@Override
 	public int getWidth() {
-		return 640;
+		return width;
 	}
 
 	@Override
 	public int getHeight() {
-		return 480;
+		return height;
 	}
 
 	@Override
 	public int getBackBufferWidth() {
-		return 640;
+		return width;
 	}
 
 	@Override
 	public int getBackBufferHeight() {
-		return 480;
+		return height;
 	}
 
 	@Override

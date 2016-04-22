@@ -4,14 +4,20 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Clipboard;
 import com.jtransc.media.limelibgdx.util.GlUtils;
+import jtransc.JTranscSystem;
 import jtransc.annotation.haxe.HaxeAddFiles;
 import jtransc.annotation.haxe.HaxeAddLibraries;
 import jtransc.annotation.haxe.HaxeCustomMain;
 import jtransc.annotation.haxe.HaxeMethodBody;
+import jtransc.io.JTranscSyncIO;
+import jtransc.util.JTranscFiles;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 @HaxeAddFiles({
 	"HaxeLimeGdxApplication.hx"
@@ -34,7 +40,7 @@ import java.nio.ByteBuffer;
 	"    }\n" +
 	"}\n"
 )
-@HaxeAddLibraries({"lime:2.9.0"})
+@HaxeAddLibraries({"lime:2.9.1"})
 public class LimeApplication implements Application {
 	final private ApplicationListener applicationListener;
 	final private LimeGraphics graphics = new LimeGraphics();
@@ -43,6 +49,7 @@ public class LimeApplication implements Application {
 	final private LimeFiles files = new LimeFiles();
 	final private LimeNet net = new LimeNet();
 	private int logLevel = LOG_DEBUG;
+	private ApplicationType type = ApplicationType.WebGL;
 
 	public LimeApplication(ApplicationListener applicationListener, String title, int width, int height) {
 		this.applicationListener = applicationListener;
@@ -57,6 +64,13 @@ public class LimeApplication implements Application {
 		Gdx.gl = graphics.getGL20();
 		Gdx.gl20 = graphics.getGL20();
 		Gdx.gl30 = graphics.getGL30();
+
+		if (JTranscSystem.isJs()) {
+			type = ApplicationType.WebGL;
+		} else {
+			// @TODO: Check android and ios!
+			type = ApplicationType.Desktop;
+		}
 
 		setApplicationToLime(this);
 	}
@@ -142,7 +156,7 @@ public class LimeApplication implements Application {
 
 	@Override
 	public ApplicationType getType() {
-		return ApplicationType.WebGL;
+		return type;
 	}
 
 	@Override
@@ -162,7 +176,122 @@ public class LimeApplication implements Application {
 
 	@Override
 	public Preferences getPreferences(String name) {
-		return null;
+		return new Preferences() {
+			Map<String, Object> prefs = new HashMap<>();
+
+			@Override
+			public Preferences putBoolean(String key, boolean val) {
+				prefs.put(key, val);
+				return this;
+			}
+
+			@Override
+			public Preferences putInteger(String key, int val) {
+				prefs.put(key, val);
+				return this;
+			}
+
+			@Override
+			public Preferences putLong(String key, long val) {
+				prefs.put(key, val);
+				return this;
+			}
+
+			@Override
+			public Preferences putFloat(String key, float val) {
+				prefs.put(key, val);
+				return this;
+			}
+
+			@Override
+			public Preferences putString(String key, String val) {
+				prefs.put(key, val);
+				return this;
+			}
+
+			@Override
+			public Preferences put(Map<String, ?> vals) {
+				for (Map.Entry<String, ?> item : vals.entrySet()) {
+					prefs.put(item.getKey(), item.getValue());
+				}
+				return this;
+			}
+
+			@Override
+			public boolean getBoolean(String key) {
+				return getBoolean(key, false);
+			}
+
+			@Override
+			public int getInteger(String key) {
+				return getInteger(key, 0);
+			}
+
+			@Override
+			public long getLong(String key) {
+				return getLong(key, 0L);
+			}
+
+			@Override
+			public float getFloat(String key) {
+				return getFloat(key, 0f);
+			}
+
+			@Override
+			public String getString(String key) {
+				return getString(key, "");
+			}
+
+			@Override
+			public boolean getBoolean(String key, boolean defValue) {
+				return prefs.containsKey(key) ? (boolean) prefs.get(key) : defValue;
+			}
+
+			@Override
+			public int getInteger(String key, int defValue) {
+				return prefs.containsKey(key) ? (int) prefs.get(key) : defValue;
+			}
+
+			@Override
+			public long getLong(String key, long defValue) {
+				return prefs.containsKey(key) ? (long) prefs.get(key) : defValue;
+			}
+
+			@Override
+			public float getFloat(String key, float defValue) {
+				return prefs.containsKey(key) ? (float) prefs.get(key) : defValue;
+			}
+
+			@Override
+			public String getString(String key, String defValue) {
+				return prefs.containsKey(key) ? (String) prefs.get(key) : defValue;
+			}
+
+			@Override
+			public Map<String, ?> get() {
+				return new HashMap<>(prefs);
+			}
+
+			@Override
+			public boolean contains(String key) {
+				return prefs.containsKey(key);
+			}
+
+			@Override
+			public void clear() {
+				prefs.clear();
+			}
+
+			@Override
+			public void remove(String key) {
+				prefs.remove(key);
+			}
+
+			@Override
+			public void flush() {
+				// @TODO: write!
+			}
+		};
 	}
 
 	@Override
@@ -206,5 +335,11 @@ public class LimeApplication implements Application {
 		applicationListener.render();
 		LimeInput.lime_frame();
 		graphics.frame();
+	}
+
+	public void resized(int width, int height) {
+		graphics.width = width;
+		graphics.height = height;
+		Gdx.gl.glViewport(0, 0, width, height);
 	}
 }

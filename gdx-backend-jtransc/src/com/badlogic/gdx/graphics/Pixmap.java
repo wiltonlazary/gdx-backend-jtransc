@@ -19,6 +19,7 @@ package com.badlogic.gdx.graphics;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.jtransc.media.limelibgdx.LimeFiles;
 import com.jtransc.media.limelibgdx.util.ColorFormat8;
 import jtransc.annotation.haxe.HaxeAddMembers;
 import jtransc.annotation.haxe.HaxeMethodBody;
@@ -93,20 +94,26 @@ public class Pixmap implements Disposable {
 	static Blending blending;
 
 	public Pixmap(FileHandle file) {
-		loadImage(file.file().getPath());
+		loadImage(LimeFiles.fixpath(file.file().getPath()));
 	}
 
 	public Pixmap(int width, int height, Format format) {
 		create(width, height, format);
 	}
 
-	@HaxeMethodBody("this.image = lime.Assets.getImage('assets/' + p0._str); this.width = this.image.width; this.height = this.image.height;")
+	@HaxeMethodBody("this.image = lime.Assets.getImage(p0._str); this.width = this.image.width; this.height = this.image.height;")
 	native private void loadImage(String path);
+
+	@HaxeMethodBody("var width = p0; var height = p1; var buffer = new lime.graphics.ImageBuffer (new lime.utils.UInt8Array (width * height * 4), width, height); buffer.format = BGRA32; buffer.premultiplied = true; this.image = new lime.graphics.Image (buffer, 0, 0, width, height);")
+	native private void _createImage(int width, int height);
+
+
 
 	private void create(int width, int height, Format format2) {
 		this.width = 1;
 		this.height = 1;
 		this.format = Format.RGBA8888;
+		_createImage(width, height);
 	}
 
 	/**
@@ -247,7 +254,9 @@ public class Pixmap implements Disposable {
 	 * @param x      The target x-coordinate (top left corner)
 	 * @param y      The target y-coordinate (top left corner)
 	 */
-	native public void drawPixmap(Pixmap pixmap, int x, int y);
+	public void drawPixmap(Pixmap pixmap, int x, int y) {
+		drawPixmap(pixmap, x, y, 0, 0, pixmap.width, pixmap.height);
+	}
 
 	/**
 	 * Draws an area form another Pixmap to this Pixmap.
@@ -260,7 +269,16 @@ public class Pixmap implements Disposable {
 	 * @param srcWidth  The width of the area form the other Pixmap in pixels
 	 * @param srcHeight The height of the area form the other Pixmap in pixles
 	 */
-	native public void drawPixmap(Pixmap pixmap, int x, int y, int srcx, int srcy, int srcWidth, int srcHeight);
+	// copyPixels (sourceImage:Image, sourceRect:Rectangle, destPoint:Vector2, alphaImage:Image = null, alphaPoint:Vector2 = null, mergeAlpha:Bool = false):Void
+	public void drawPixmap(Pixmap pixmap, int x, int y, int srcx, int srcy, int srcWidth, int srcHeight) {
+		for (int my = 0; my < srcHeight; my++) {
+			for (int mx = 0; mx < srcWidth; mx++) {
+				this._setPixel(x + mx, y + my, pixmap._getPixel(srcx + mx, srcy + my));
+			}
+		}
+	}
+
+	//private void copyPixels(sourceImage:Image, sourceRect:Rectangle, destPoint:Vector2, alphaImage:Image = null, alphaPoint:Vector2 = null, mergeAlpha:Bool = false):Void
 
 	/**
 	 * Draws an area form another Pixmap to this Pixmap. This will automatically scale and stretch the source image to the

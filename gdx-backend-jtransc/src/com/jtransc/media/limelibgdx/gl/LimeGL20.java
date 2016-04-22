@@ -179,16 +179,41 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	native public void glStencilOp(int fail, int zfail, int zpass);
 
 	@HaxeMethodBody("GL.texImage2D(p0, p1, p2, p3, p4, p5, p6, p7, _buffer(p8));")
-	native public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, Buffer pixels);
+	native private void _glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, Buffer pixels);
+
+	public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, Buffer pixels) {
+		System.out.println("glTexImage2D:target=" + target + ",level=" + level + ",internalformat=" + internalformat + ",width=" + width + ",height=" + height + ",border=" + border + ",format=" + format + ",type=" + type + ",pixels=" + pixels.limit());
+		_glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
+		//_glTexImage2D(target, level, internalformat, 1, 1, border, format, type, ByteBuffer.wrap(new byte[] { -1, 0, 0, -1 }));
+	}
 
 	@HaxeMethodBody("GL.texParameterf(p0, p1, p2);")
-	native public void glTexParameterf(int target, int pname, float param);
+	native private void _glTexParameterf(int target, int pname, float param);
+
+	public void glTexParameterf(int target, int pname, float param) {
+		switch (pname) {
+			case GL_TEXTURE_MIN_FILTER:
+			case GL_TEXTURE_MAG_FILTER:
+			case GL_TEXTURE_WRAP_S:
+			case GL_TEXTURE_WRAP_T:
+				glTexParameteri(target, pname, (int) param);
+				break;
+			default:
+				_glTexParameterf(target, pname, param);
+				break;
+		}
+	}
 
 	@HaxeMethodBody("GL.texSubImage2D(p0, p1, p2, p3, p4, p5, p6, p7, _buffer(p8));")
 	native public void glTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format, int type, Buffer pixels);
 
 	@HaxeMethodBody("GL.viewport(p0, p1, p2, p3);")
-	native public void glViewport(int x, int y, int width, int height);
+	native private void _glViewport(int x, int y, int width, int height);
+
+	public void glViewport(int x, int y, int width, int height) {
+		System.out.printf("glViewport(%d, %d, %d, %d)\n", x, y, width, height);
+		_glViewport(x, y, width, height);
+	}
 
 	@HaxeMethodBody("GL.attachShader(programs.get(p0), shaders.get(p1));")
 	native public void glAttachShader(int program, int shader);
