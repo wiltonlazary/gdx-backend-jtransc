@@ -1,7 +1,7 @@
 package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.graphics.GL20;
-import jtransc.ds.IntPool;
+import com.jtransc.ds.IntPool;
 
 import java.nio.Buffer;
 import java.nio.FloatBuffer;

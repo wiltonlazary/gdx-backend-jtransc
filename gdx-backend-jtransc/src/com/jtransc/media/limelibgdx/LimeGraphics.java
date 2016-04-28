@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.jtransc.media.limelibgdx.dummy.DummyGL20;
 import com.jtransc.media.limelibgdx.gl.LimeGL20;
-import jtransc.JTranscSystem;
+import com.jtransc.JTranscSystem;
 
 public class LimeGraphics implements Graphics {
 	//final private GL20 gl = new DummyGL20();

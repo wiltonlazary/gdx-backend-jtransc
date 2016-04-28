@@ -2,9 +2,9 @@ package com.jtransc.media.limelibgdx.gl;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.jtransc.media.limelibgdx.dummy.DummyGL20;
-import jtransc.annotation.haxe.HaxeAddMembers;
-import jtransc.annotation.haxe.HaxeImports;
-import jtransc.annotation.haxe.HaxeMethodBody;
+import com.jtransc.annotation.haxe.HaxeAddMembers;
+import com.jtransc.annotation.haxe.HaxeImports;
+import com.jtransc.annotation.haxe.HaxeMethodBody;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;

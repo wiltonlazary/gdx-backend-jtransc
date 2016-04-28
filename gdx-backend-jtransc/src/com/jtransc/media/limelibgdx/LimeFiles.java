@@ -2,9 +2,9 @@ package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.files.FileHandle;
-import jtransc.JTranscWrapped;
-import jtransc.annotation.haxe.HaxeMethodBody;
-import jtransc.io.JTranscSyncIO;
+import com.jtransc.JTranscWrapped;
+import com.jtransc.annotation.haxe.HaxeMethodBody;
+import com.jtransc.io.JTranscSyncIO;
 
 public class LimeFiles implements Files {
 	public LimeFiles() {
