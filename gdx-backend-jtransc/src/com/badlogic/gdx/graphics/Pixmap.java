@@ -19,19 +19,19 @@ package com.badlogic.gdx.graphics;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.jtransc.JTranscArrays;
+import com.jtransc.JTranscBits;
 import com.jtransc.media.limelibgdx.LimeFiles;
 import com.jtransc.media.limelibgdx.util.ColorFormat8;
 import com.jtransc.annotation.haxe.HaxeAddMembers;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-@HaxeAddMembers({
-	"var image:lime.graphics.Image;"
-})
 public class Pixmap implements Disposable {
 	public static Map<Integer, Pixmap> pixmaps = new HashMap<Integer, Pixmap>();
 	static int nextId = 0;
@@ -89,31 +89,35 @@ public class Pixmap implements Disposable {
 	int height;
 	Format format;
 	int id;
-	IntBuffer buffer;
+	//IntBuffer buffer;
+	int[]data;
 	int color;
 	static Blending blending;
 
 	public Pixmap(FileHandle file) {
 		loadImage(LimeFiles.fixpath(file.file().getPath()));
+		//JTranscArrays.swizzle_inplace(data, 24, 16, 8, 0);
+		//JTranscArrays.swizzle_inplace(data, 0, 8, 16, 24);
+		JTranscArrays.swizzle_inplace_reverse(data);
 	}
 
 	public Pixmap(int width, int height, Format format) {
 		create(width, height, format);
 	}
 
-	@HaxeMethodBody("this.image = lime.Assets.getImage(p0._str); this.width = this.image.width; this.height = this.image.height;")
+	@HaxeMethodBody("" +
+		"var image = lime.Assets.getImage(p0._str);" +
+		"this.data = HaxeIntArray.fromBytes(image.getPixels(image.rect));" +
+		"this.width = image.width;" +
+		"this.height = image.height;"
+	)
 	native private void loadImage(String path);
 
-	@HaxeMethodBody("var width = p0; var height = p1; var buffer = new lime.graphics.ImageBuffer (new lime.utils.UInt8Array (width * height * 4), width, height); buffer.format = BGRA32; buffer.premultiplied = true; this.image = new lime.graphics.Image (buffer, 0, 0, width, height);")
-	native private void _createImage(int width, int height);
-
-
-
 	private void create(int width, int height, Format format2) {
-		this.width = 1;
-		this.height = 1;
+		this.width = width;
+		this.height = height;
+		this.data = new int[width * height];
 		this.format = Format.RGBA8888;
-		_createImage(width, height);
 	}
 
 	/**
@@ -168,11 +172,9 @@ public class Pixmap implements Disposable {
 	//  return buffer;
 	//}
 
-	@HaxeMethodBody("return HaxeByteArray.fromBytes(this.image.getPixels(this.image.rect));")
-	native private byte[] _getPixels();
-
 	public ByteBuffer getPixels() {
-		return ByteBuffer.wrap(this._getPixels());
+		//return ByteBuffer.wrap(this._getPixels());
+		return ByteBuffer.wrap(JTranscArrays.copyReinterpretReversed(this.data)).order(ByteOrder.BIG_ENDIAN);
 	}
 
 	@Override
@@ -254,7 +256,8 @@ public class Pixmap implements Disposable {
 	 * @param x      The target x-coordinate (top left corner)
 	 * @param y      The target y-coordinate (top left corner)
 	 */
-	public void drawPixmap(Pixmap pixmap, int x, int y) {
+	public void
+	Pixmap(Pixmap pixmap, int x, int y) {
 		drawPixmap(pixmap, x, y, 0, 0, pixmap.width, pixmap.height);
 	}
 
@@ -394,10 +397,12 @@ public class Pixmap implements Disposable {
 		FILL, STROKE
 	}
 
-	@HaxeMethodBody("return this.image.getPixel(p0, p1);")
-	native private int _getPixel(int x, int y);
+	private int _getPixel(int x, int y) {
+		return data[y * width + x];
+	}
 
-	@HaxeMethodBody("this.image.setPixel(p0, p1, p2);")
-	native private void _setPixel(int x, int y, int color);
+	private void _setPixel(int x, int y, int color) {
+		data[y * width + x] = color;
+	}
 
 }

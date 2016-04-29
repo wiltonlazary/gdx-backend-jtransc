@@ -51,7 +51,12 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	native public void glBlendFunc(int sfactor, int dfactor);
 
 	@HaxeMethodBody("GL.clear(p0);")
-	native public void glClear(int mask);
+	native private void _glClear(int mask);
+
+	public void glClear(int mask) {
+		//glClearColor(1f, 0f, 0f, 1f);
+		_glClear(mask);
+	}
 
 	@HaxeMethodBody("GL.clearColor(p0, p1, p2, p3);")
 	native public void glClearColor(float red, float green, float blue, float alpha);

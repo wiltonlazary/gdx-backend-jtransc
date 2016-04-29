@@ -31,13 +31,19 @@
 	<version>0.0.1</version>
 
 	<dependencies>
+		<!--
+		<dependency>
+			<groupId>com.badlogicgames.gdx</groupId>
+			<artifactId>gdx</artifactId>
+			<version>${gdx.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>com.badlogicgames.gdx</groupId>
 			<artifactId>gdx-platform</artifactId>
 			<version>${gdx.version}</version>
 			<scope>compile</scope>
-			<!-- natives-desktop -->
 		</dependency>
+		-->
 	</dependencies>
 
 	<build>
@@ -154,7 +160,7 @@
 							<targets>
 								<param>lime:windows</param>
 							</targets>
-							<release>true</release>
+							<release>false</release>
 							<assets>
 								<asset>assets</asset>
 							</assets>
@@ -188,10 +194,7 @@
 		<profile>
 			<id>desktop</id>
 			<activation>
-				<property>
-					<name>desktop</name>
-					<value>true</value>
-				</property>
+				<activeByDefault>true</activeByDefault>
 			</activation>
 			<dependencies>
 				<dependency>
