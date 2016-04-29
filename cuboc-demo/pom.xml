@@ -129,6 +129,63 @@
 			</build>
 		</profile>
 		<profile>
+			<id>build-jtransc-cpp</id>
+			<activation>
+				<property>
+					<name>jtransc-cpp</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>com.jtransc</groupId>
+					<artifactId>gdx-backend-jtransc</artifactId>
+					<version>${jtransc.version}</version>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.jtransc</groupId>
+						<artifactId>jtransc-maven-plugin</artifactId>
+						<version>${jtransc.version}</version>
+						<configuration>
+							<mainClass>CubocJTransc</mainClass>
+							<targets>
+								<param>lime:windows</param>
+							</targets>
+							<release>true</release>
+							<assets>
+								<asset>assets</asset>
+							</assets>
+							<embedResources>true</embedResources>
+						</configuration>
+						<executions><execution><goals><goal>jtransc</goal></goals></execution></executions>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<version>1.4</version>
+						<executions>
+							<execution>
+								<id>test</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>add-source</goal>
+								</goals>
+								<configuration>
+									<sources>
+										<source>${basedir}/src_jtransc</source>
+										<source>${basedir}/src</source>
+									</sources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
 			<id>desktop</id>
 			<activation>
 				<property>

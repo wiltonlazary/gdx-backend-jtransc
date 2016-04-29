@@ -8,10 +8,12 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.jtransc.media.limelibgdx.dummy.DummyGL20;
 import com.jtransc.media.limelibgdx.gl.LimeGL20;
 import com.jtransc.JTranscSystem;
+import com.jtransc.media.limelibgdx.logger.LoggerGL20;
 
 public class LimeGraphics implements Graphics {
 	//final private GL20 gl = new DummyGL20();
 	final private GL20 gl = new LimeGL20();
+	//final private GL20 gl = new LoggerGL20(new LimeGL20());
 	int frameId = 0;
 	private Monitor2[] monitors = new Monitor2[]{
 			new Monitor2(640, 480, "default")
