@@ -70,7 +70,7 @@ public class LimeFiles implements Files {
 
 	static public String fixpath(String path) {
 		if (!path.startsWith("assets")) path = "assets/" + path;
-		path = path.replace("//", "/");
+		path = path.replace("\\", "/").replace("//", "/");
 		return path;
 	}
 

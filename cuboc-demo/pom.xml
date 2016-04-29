@@ -16,64 +16,38 @@
   -->
 
 <project
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-        xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-    <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-    <properties>
-        <gdx.version>1.9.2</gdx.version>
-        <jtransc.version>0.1.5</jtransc.version>
-    </properties>
+	<properties>
+		<gdx.version>1.9.2</gdx.version>
+		<jtransc.version>0.2.1</jtransc.version>
+	</properties>
 
-    <groupId>com.jtransc</groupId>
-    <artifactId>cubocy-badlogicgames-demo</artifactId>
-    <version>0.0.1</version>
+	<groupId>com.jtransc</groupId>
+	<artifactId>cubocy-badlogicgames-demo</artifactId>
+	<version>0.0.1</version>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.jtransc</groupId>
-            <artifactId>jtransc-rt-core</artifactId>
-            <version>${jtransc.version}</version>
-        </dependency>
-		<!--
-        <dependency>
-            <groupId>com.jtransc</groupId>
-            <artifactId>gdx-backend-jtransc</artifactId>
-            <version>${jtransc.version}</version>
-        </dependency>
-        -->
+	<dependencies>
+		<dependency>
+			<groupId>com.badlogicgames.gdx</groupId>
+			<artifactId>gdx-platform</artifactId>
+			<version>${gdx.version}</version>
+			<scope>compile</scope>
+			<!-- natives-desktop -->
+		</dependency>
+	</dependencies>
 
-        <dependency>
-            <groupId>com.badlogicgames.gdx</groupId>
-            <artifactId>gdx-backend-lwjgl</artifactId>
-            <version>${gdx.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.badlogicgames.gdx</groupId>
-            <artifactId>gdx-platform</artifactId>
-            <version>${gdx.version}</version>
-            <classifier>natives-desktop</classifier>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.badlogicgames.gdx</groupId>
-            <artifactId>gdx-platform</artifactId>
-            <version>${gdx.version}</version>
-            <scope>compile</scope>
-            <!-- natives-desktop -->
-        </dependency>
-    </dependencies>
-
-    <build>
-        <resources>
-            <resource>
-                <directory>assets</directory>
-            </resource>
-        </resources>
-        <plugins>
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<resources>
+			<resource>
+				<directory>assets</directory>
+			</resource>
+		</resources>
+		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
@@ -94,23 +68,114 @@
 					</execution>
 				</executions>
 			</plugin>
-            <plugin>
-                <groupId>com.jtransc</groupId>
-                <artifactId>jtransc-maven-plugin</artifactId>
-                <version>0.1.5</version>
-                <configuration>
-                    <mainClass>CubocJTransc</mainClass>
-                    <targets>
-                        <param>lime:js</param>
-                    </targets>
-                    <release>true</release>
-                    <assets>
-                        <asset>assets</asset>
-                    </assets>
-					<embedResources>true</embedResources>
-                </configuration>
-                <executions><execution><goals><goal>jtransc</goal></goals></execution></executions>
-            </plugin>
-        </plugins>
-    </build>
+		</plugins>
+	</build>
+	<profiles>
+		<profile>
+			<id>build-jtransc</id>
+			<activation>
+				<property>
+					<name>jtransc</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>com.jtransc</groupId>
+					<artifactId>gdx-backend-jtransc</artifactId>
+					<version>${jtransc.version}</version>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.jtransc</groupId>
+						<artifactId>jtransc-maven-plugin</artifactId>
+						<version>${jtransc.version}</version>
+						<configuration>
+							<mainClass>CubocJTransc</mainClass>
+							<targets>
+								<param>lime:js</param>
+							</targets>
+							<release>true</release>
+							<assets>
+								<asset>assets</asset>
+							</assets>
+							<embedResources>true</embedResources>
+						</configuration>
+						<executions><execution><goals><goal>jtransc</goal></goals></execution></executions>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<version>1.4</version>
+						<executions>
+							<execution>
+								<id>test</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>add-source</goal>
+								</goals>
+								<configuration>
+									<sources>
+										<source>${basedir}/src_jtransc</source>
+										<source>${basedir}/src</source>
+									</sources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>desktop</id>
+			<activation>
+				<property>
+					<name>desktop</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>com.badlogicgames.gdx</groupId>
+					<artifactId>gdx-backend-lwjgl</artifactId>
+					<version>${gdx.version}</version>
+					<scope>compile</scope>
+				</dependency>
+
+				<dependency>
+					<groupId>com.badlogicgames.gdx</groupId>
+					<artifactId>gdx-platform</artifactId>
+					<version>${gdx.version}</version>
+					<classifier>natives-desktop</classifier>
+					<scope>compile</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<version>1.4</version>
+						<executions>
+							<execution>
+								<id>test</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>add-source</goal>
+								</goals>
+								<configuration>
+									<sources>
+										<source>${basedir}/src_desktop</source>
+										<source>${basedir}/src</source>
+									</sources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

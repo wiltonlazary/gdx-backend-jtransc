@@ -23,12 +23,12 @@
 
     <properties>
         <gdx.version>1.9.2</gdx.version>
-        <jtransc.version>0.2.1</jtransc.version>
+        <jtransc.version>${project.version}</jtransc.version>
     </properties>
 
     <groupId>com.jtransc</groupId>
     <artifactId>gdx-backend-jtransc</artifactId>
-    <version>0.2.0</version>
+    <version>0.2.1</version>
 
     <dependencies>
         <dependency>
