@@ -18,17 +18,23 @@
 <project
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<packaging>jar</packaging>
 
 	<modelVersion>4.0.0</modelVersion>
 
+	<parent>
+		<groupId>com.jtransc.gdx</groupId>
+		<artifactId>gdx-backend-jtransc-parent</artifactId>
+		<version>0.2.3</version>
+		<relativePath>..</relativePath>
+	</parent>
+
 	<properties>
 		<gdx.version>1.9.2</gdx.version>
-		<jtransc.version>0.2.1</jtransc.version>
+		<jtransc.version>0.2.3</jtransc.version>
 	</properties>
 
-	<groupId>com.jtransc</groupId>
-	<artifactId>cubocy-badlogicgames-demo</artifactId>
-	<version>0.0.1</version>
+	<artifactId>cuboc-badlogicgames-demo</artifactId>
 
 	<dependencies>
 		<!--
@@ -78,16 +84,16 @@
 	</build>
 	<profiles>
 		<profile>
-			<id>build-jtransc</id>
+			<id>jtransc-js</id>
 			<activation>
 				<property>
-					<name>jtransc</name>
+					<name>jtransc-js</name>
 					<value>true</value>
 				</property>
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>com.jtransc</groupId>
+					<groupId>com.jtransc.gdx</groupId>
 					<artifactId>gdx-backend-jtransc</artifactId>
 					<version>${jtransc.version}</version>
 				</dependency>
@@ -101,13 +107,14 @@
 						<configuration>
 							<mainClass>CubocJTransc</mainClass>
 							<targets>
-								<param>lime:js</param>
+								<param>haxe:js</param>
 							</targets>
 							<release>true</release>
 							<assets>
 								<asset>assets</asset>
 							</assets>
 							<embedResources>true</embedResources>
+							<minimizeNames>true</minimizeNames>
 						</configuration>
 						<executions><execution><goals><goal>jtransc</goal></goals></execution></executions>
 					</plugin>
@@ -135,7 +142,7 @@
 			</build>
 		</profile>
 		<profile>
-			<id>build-jtransc-cpp</id>
+			<id>jtransc-cpp</id>
 			<activation>
 				<property>
 					<name>jtransc-cpp</name>
@@ -144,7 +151,7 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>com.jtransc</groupId>
+					<groupId>com.jtransc.gdx</groupId>
 					<artifactId>gdx-backend-jtransc</artifactId>
 					<version>${jtransc.version}</version>
 				</dependency>
@@ -158,13 +165,14 @@
 						<configuration>
 							<mainClass>CubocJTransc</mainClass>
 							<targets>
-								<param>lime:windows</param>
+								<param>haxe:windows</param>
 							</targets>
 							<release>false</release>
 							<assets>
 								<asset>assets</asset>
 							</assets>
 							<embedResources>true</embedResources>
+							<minimizeNames>false</minimizeNames>
 						</configuration>
 						<executions><execution><goals><goal>jtransc</goal></goals></execution></executions>
 					</plugin>

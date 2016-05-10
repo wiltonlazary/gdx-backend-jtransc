@@ -44,7 +44,7 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 
 	static public int bindedTextureId = 0;
 
-	@HaxeMethodBody("bindedTextureId = p1; GL.bindTexture(p0, textures.get(p1));")
+	@HaxeMethodBody("{% FIELD com.jtransc.media.limelibgdx.gl.LimeGL20:bindedTextureId %} = p1; GL.bindTexture(p0, textures.get(p1));")
 	native public void glBindTexture(int target, int texture);
 
 	@HaxeMethodBody("GL.blendFunc(p0, p1);")
@@ -107,7 +107,7 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	@HaxeMethodBody("GL.drawArrays(p0, p1, p2);")
 	native public void glDrawArrays(int mode, int first, int count);
 
-	@HaxeMethodBody("GL.drawElements(p0, p1, p2, p3.position__I());")
+	@HaxeMethodBody("GL.drawElements(p0, p1, p2, p3.{% METHOD java.nio.Buffer:position:()I %}());")
 	native public void glDrawElements(int mode, int count, int type, Buffer indices);
 
 	@HaxeMethodBody("GL.enable(p0);")

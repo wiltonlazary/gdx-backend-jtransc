@@ -3,12 +3,9 @@ package com.jtransc.media.limelibgdx;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Clipboard;
+import com.jtransc.annotation.haxe.*;
 import com.jtransc.media.limelibgdx.util.GlUtils;
 import com.jtransc.JTranscSystem;
-import com.jtransc.annotation.haxe.HaxeAddFiles;
-import com.jtransc.annotation.haxe.HaxeAddLibraries;
-import com.jtransc.annotation.haxe.HaxeCustomMain;
-import com.jtransc.annotation.haxe.HaxeMethodBody;
 import com.jtransc.io.JTranscSyncIO;
 import com.jtransc.util.JTranscFiles;
 
@@ -19,28 +16,44 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-@HaxeAddFiles({
+@HaxeAddFilesTemplate({
 	"HaxeLimeGdxApplication.hx"
-	//"AGALMiniAssembler.hx",
-	//"HaxeLimeAudio.hx",
-	//"HaxeLimeJTranscApplication.hx",
-	//"HaxeLimeRender.hx",
-	//"HaxeLimeRenderFlash.hx",
-	//"HaxeLimeRenderGL.hx",
-	//"HaxeLimeRenderImpl.hx",
-	//"HaxeLimeIO.hx"
+})
+@HaxeAddFilesBeforeBuildTemplate({
+	"program.xml"
 })
 @HaxeCustomMain("" +
-	"package $entryPointPackage;\n" +
-	"class $entryPointSimpleName extends HaxeLimeGdxApplication {\n" +
+	"package {{ entryPointPackage }};\n" +
+	"class {{ entryPointSimpleName }} extends HaxeLimeGdxApplication {\n" +
 	"    public function new() {\n" +
 	"        super();\n" +
-	"        $inits\n" +
-	"        $mainClass.$mainMethod(HaxeNatives.strArray(HaxeNatives.args()));\n" +
+	"        {{ inits }}\n" +
+	"        {{ mainClass }}.{{ mainMethod }}(HaxeNatives.strArray(HaxeNatives.args()));\n" +
 	"    }\n" +
 	"}\n"
 )
-@HaxeAddLibraries({"lime:2.9.1"})
+@HaxeAddSubtargetList({
+	@HaxeAddSubtarget(name = "android"),
+	@HaxeAddSubtarget(name = "blackberry"),
+	@HaxeAddSubtarget(name = "desktop"),
+	@HaxeAddSubtarget(name = "emscripten"),
+	@HaxeAddSubtarget(name = "flash", alias = { "swf", "as3" }),
+	@HaxeAddSubtarget(name = "html5", alias = { "js" }),
+	@HaxeAddSubtarget(name = "ios"),
+	@HaxeAddSubtarget(name = "linux"),
+	@HaxeAddSubtarget(name = "mac"),
+	@HaxeAddSubtarget(name = "tizen"),
+	@HaxeAddSubtarget(name = "tvos"),
+	@HaxeAddSubtarget(name = "webos"),
+	@HaxeAddSubtarget(name = "windows"),
+	@HaxeAddSubtarget(name = "neko")
+})
+@HaxeCustomBuildCommandLine({
+	"@limebuild.cmd"
+})
+@HaxeAddLibraries({
+	"lime:2.9.1"
+})
 public class LimeApplication implements Application {
 	final private ApplicationListener applicationListener;
 	final private LimeGraphics graphics = new LimeGraphics();

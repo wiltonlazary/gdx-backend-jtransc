@@ -84,7 +84,7 @@ public class LimeFiles implements Files {
 			return new JTranscSyncIO.ByteStream(readBytes(fixpath(path), mode));
 		}
 
-		@HaxeMethodBody("return HaxeByteArray.fromBytes(lime.Assets.getBytes(p0._str));")
+		@HaxeMethodBody("return HaxeArrayByte.fromBytes(lime.Assets.getBytes(p0._str));")
 		private byte[] readBytes(String path, int mode) {
 			return new byte[0];
 		}

@@ -107,9 +107,9 @@ public class Pixmap implements Disposable {
 
 	@HaxeMethodBody("" +
 		"var image = lime.Assets.getImage(p0._str);" +
-		"this.data = HaxeIntArray.fromBytes(image.getPixels(image.rect));" +
-		"this.width = image.width;" +
-		"this.height = image.height;"
+		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:data %} = HaxeArrayInt.fromBytes(image.getPixels(image.rect));" +
+		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:width %} = image.width;" +
+		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:height %} = image.height;"
 	)
 	native private void loadImage(String path);
 
