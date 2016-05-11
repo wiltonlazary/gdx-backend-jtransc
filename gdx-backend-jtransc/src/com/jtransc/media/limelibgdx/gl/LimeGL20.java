@@ -1,6 +1,8 @@
 package com.jtransc.media.limelibgdx.gl;
 
 import com.badlogic.gdx.graphics.GL20;
+import com.jtransc.JTranscSystem;
+import com.jtransc.annotation.haxe.HaxeMethodBodyPre;
 import com.jtransc.media.limelibgdx.dummy.DummyGL20;
 import com.jtransc.annotation.haxe.HaxeAddMembers;
 import com.jtransc.annotation.haxe.HaxeImports;
@@ -107,8 +109,20 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	@HaxeMethodBody("GL.drawArrays(p0, p1, p2);")
 	native public void glDrawArrays(int mode, int first, int count);
 
-	@HaxeMethodBody("GL.drawElements(p0, p1, p2, p3.{% METHOD java.nio.Buffer:position:()I %}());")
-	native public void glDrawElements(int mode, int count, int type, Buffer indices);
+	//private int tempIndicesBuffer = -1;
+	public void glDrawElements(int mode, int count, int type, Buffer indices) {
+		/*
+		if (tempIndicesBuffer < 0) {
+			tempIndicesBuffer = glGenBuffer();
+		}
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tempIndicesBuffer);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.limit(), indices, GL_STATIC_DRAW);
+		*/
+		_glDrawElements(mode, count, type, indices.position());
+	}
+
+	@HaxeMethodBody("GL.drawElements(p0, p1, p2, p3);")
+	native private void _glDrawElements(int mode, int count, int type, int offset);
 
 	@HaxeMethodBody("GL.enable(p0);")
 	native public void glEnable(int cap);
@@ -368,14 +382,14 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	native private int glGetActiveUniformType(int program, int index);
 
 	public String glGetActiveAttrib(int program, int index, IntBuffer size, Buffer type) {
-		size.put(0, glGetActiveAttribSize(program, index));
-		//type.(0, glGetActiveAttribType(program, index));
+		size.put(glGetActiveAttribSize(program, index));
+		if (type instanceof IntBuffer) ((IntBuffer)type).put(glGetActiveAttribType(program, index));
 		return glGetActiveAttribName(program, index);
 	}
 
 	public String glGetActiveUniform(int program, int index, IntBuffer size, Buffer type) {
-		size.put(0, glGetActiveUniformSize(program, index));
-		//type.(0, glGetActiveUniformType(program, index));
+		size.put(glGetActiveUniformSize(program, index));
+		if (type instanceof IntBuffer) ((IntBuffer)type).put(glGetActiveUniformType(program, index));
 		return glGetActiveUniformName(program, index);
 	}
 
@@ -383,7 +397,12 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	native public void glGetAttachedShaders(int program, int maxcount, Buffer count, IntBuffer shaders);
 
 	@HaxeMethodBody("return GL.getAttribLocation(programs.get(p0), p1._str);")
-	native public int glGetAttribLocation(int program, String name);
+	native private int _glGetAttribLocation(int program, String name);
+
+	public int glGetAttribLocation(int program, String name) {
+		JTranscSystem.debugger();
+		return _glGetAttribLocation(program, name);
+	}
 
 	public void glGetBooleanv(int pname, Buffer params) {
 		((ByteBuffer) params).putInt(0, glGetBoolean(pname) ? 1 : 0);

@@ -492,8 +492,9 @@ public class LoggerGL20 extends ProxyGL20 {
 
 	@Override
 	public int glGenFramebuffer() {
-		log("glGenFramebuffer: ");
-		return super.glGenFramebuffer();
+		int result = super.glGenFramebuffer();
+		log("glGenFramebuffer: -> " + result);
+		return result;
 	}
 
 	@Override
@@ -504,8 +505,9 @@ public class LoggerGL20 extends ProxyGL20 {
 
 	@Override
 	public int glGenRenderbuffer() {
-		log("glGenRenderbuffer: ");
-		return super.glGenRenderbuffer();
+		int result = super.glGenRenderbuffer();
+		log("glGenRenderbuffer: -> " + result);
+		return result;
 	}
 
 	@Override
@@ -516,14 +518,16 @@ public class LoggerGL20 extends ProxyGL20 {
 
 	@Override
 	public String glGetActiveAttrib(int program, int index, IntBuffer size, Buffer type) {
-		log("glGetActiveAttrib: program = [" + program + "], index = [" + index + "], size = [" + size + "], type = [" + type + "]");
-		return super.glGetActiveAttrib(program, index, size, type);
+		String result = super.glGetActiveAttrib(program, index, size, type);
+		log("glGetActiveAttrib: program = [" + program + "], index = [" + index + "], size = [" + size + "], type = [" + type + "] -> " + result);
+		return result;
 	}
 
 	@Override
 	public String glGetActiveUniform(int program, int index, IntBuffer size, Buffer type) {
-		log("glGetActiveUniform: program = [" + program + "], index = [" + index + "], size = [" + size + "], type = [" + type + "]");
-		return super.glGetActiveUniform(program, index, size, type);
+		String result = super.glGetActiveUniform(program, index, size, type);
+		log("glGetActiveUniform: program = [" + program + "], index = [" + index + "], size = [" + size + "], type = [" + type + "] -> " + result);
+		return result;
 	}
 
 	@Override
@@ -535,7 +539,9 @@ public class LoggerGL20 extends ProxyGL20 {
 	@Override
 	public int glGetAttribLocation(int program, String name) {
 		log("glGetAttribLocation: program = [" + program + "], name = [" + name + "]");
-		return super.glGetAttribLocation(program, name);
+		int result = super.glGetAttribLocation(program, name);
+		log("   -> " + result);
+		return result;
 	}
 
 	@Override
