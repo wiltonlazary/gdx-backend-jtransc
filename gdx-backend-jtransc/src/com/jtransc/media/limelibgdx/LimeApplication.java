@@ -56,23 +56,27 @@ import java.util.Map;
 })
 public class LimeApplication implements Application {
 	final private ApplicationListener applicationListener;
-	final private LimeGraphics graphics = new LimeGraphics();
-	final private LimeAudio audio = new LimeAudio();
-	final private LimeInput input = new LimeInput();
-	final private LimeFiles files = new LimeFiles();
-	final private LimeNet net = new LimeNet();
+	final private LimeGraphics graphics;
+	final private LimeAudio audio;
+	final private LimeInput input;
+	final private LimeFiles files;
+	final private LimeNet net;
 	private int logLevel = LOG_DEBUG;
 	private ApplicationType type = ApplicationType.WebGL;
 
 	public LimeApplication(ApplicationListener applicationListener, String title, int width, int height) {
+		this(applicationListener, title, width, height, false);
+	}
+
+	public LimeApplication(ApplicationListener applicationListener, String title, int width, int height, boolean trace) {
 		this.applicationListener = applicationListener;
 
 		Gdx.app = this;
-		Gdx.graphics = graphics;
-		Gdx.audio = audio;
-		Gdx.input = input;
-		Gdx.files = files;
-		Gdx.net = net;
+		Gdx.graphics = graphics = new LimeGraphics(trace);
+		Gdx.audio = audio = new LimeAudio();;
+		Gdx.input = input = new LimeInput();
+		Gdx.files = files = new LimeFiles();
+		Gdx.net = net = new LimeNet();
 
 		Gdx.gl = graphics.getGL20();
 		Gdx.gl20 = graphics.getGL20();

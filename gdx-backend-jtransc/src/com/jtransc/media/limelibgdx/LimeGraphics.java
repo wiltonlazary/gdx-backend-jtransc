@@ -12,9 +12,18 @@ import com.jtransc.media.limelibgdx.logger.LoggerGL20;
 
 public class LimeGraphics implements Graphics {
 	//final private GL20 gl = new DummyGL20();
-	final private GL20 gl = new LimeGL20();
+	final private GL20 gl;
 	//final private GL20 gl = new LoggerGL20(new LimeGL20());
 	int frameId = 0;
+
+	public LimeGraphics(boolean trace) {
+		if (trace) {
+			gl = new LoggerGL20(new LimeGL20());
+		} else {
+			gl = new LimeGL20();
+		}
+	}
+
 	private Monitor2[] monitors = new Monitor2[]{
 			new Monitor2(640, 480, "default")
 	};
