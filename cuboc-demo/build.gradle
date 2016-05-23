@@ -61,6 +61,15 @@ jtransc {
 	// relooper = false
 	minimizeNames = false
 	// analyzer = false
+
+	customTarget("cpp", "haxe:cpp", "exe")
+	customTarget("windows", "haxe:windows", "exe")
+	customTarget("linux", "haxe:linux", "bin")
+	customTarget("mac", "haxe:mac", "app")
+	customTarget("html5", "haxe:html5", "js")
+	customTarget("android", "haxe:android", "apk")
+	customTarget("ios", "haxe:ios", "ipa")
+	customTarget("tizen", "haxe:tizen", "app")
 }
 
 // Defined tasks
@@ -82,29 +91,63 @@ jtransc {
 // - jtransc:distJtransc (must specify target and outputFile options)
 // - jtransc:runJtransc (must specify target and outputFile options)
 
+/*
 import com.jtransc.gradle.tasks.JTranscDistTask
 import com.jtransc.gradle.tasks.JTranscRunTask
 
 task distWindows(type: JTranscDistTask) {
-	target = "haxe:cpp"
+	target = "haxe:windows"
 	outputFile = "program.exe"
 	minimizedNames = false
+	debug = false
 }
 
 task runWindows(type: JTranscRunTask) {
-	target = "haxe:cpp"
-	//outputFile = "program.exe"
+	target = "haxe:windows"
+	outputFile = "program.exe"
 	minimizedNames = false
+	debug = true
 }
 
 task distHtml(type: JTranscDistTask) {
 	target = "haxe:js"
 	outputFile = "program.js"
 	minimizedNames = true
+	debug = false
 }
 
 task runHtml(type: JTranscRunTask) {
 	target = "haxe:js"
-	//outputFile = "program.js"
+	outputFile = "program.js"
 	minimizedNames = false
+	debug = true
 }
+
+task distAndroid(type: JTranscDistTask) {
+	target = "haxe:android"
+	outputFile = "program.apk"
+	minimizedNames = true
+	debug = false
+}
+
+task runAndroid(type: JTranscRunTask) {
+	target = "haxe:android"
+	outputFile = "program.apk"
+	minimizedNames = false
+	debug = true
+}
+
+task distIos(type: JTranscDistTask) {
+	target = "haxe:ios"
+	outputFile = "program.ipa"
+	minimizedNames = true
+	debug = false
+}
+
+task runIos(type: JTranscRunTask) {
+	target = "haxe:ios"
+	outputFile = "program.ipa"
+	minimizedNames = false
+	debug = true
+}
+*/
