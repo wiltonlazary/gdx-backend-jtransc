@@ -45,13 +45,13 @@ public class LimeGraphics implements Graphics {
 		}
 	}
 
-	int lastStamp = 0;
+	double lastStamp = 0.0;
 	float deltaTime = 0f;
 	public void frame() {
-		int currentStamp = JTranscSystem.stamp();
+		double currentStamp = JTranscSystem.stamp();
 		frameId++;
 
-		int ms = JTranscSystem.elapsedTime(lastStamp, currentStamp);
+		double ms = JTranscSystem.elapsedTime(lastStamp, currentStamp);
 		deltaTime = (float)ms / 1000f;
 
 		lastStamp = currentStamp;
