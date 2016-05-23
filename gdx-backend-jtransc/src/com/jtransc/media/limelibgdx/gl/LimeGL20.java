@@ -400,7 +400,7 @@ public class LimeGL20 extends DummyGL20 implements GL20 {
 	native private int _glGetAttribLocation(int program, String name);
 
 	public int glGetAttribLocation(int program, String name) {
-		JTranscSystem.debugger();
+		//JTranscSystem.debugger();
 		return _glGetAttribLocation(program, name);
 	}
 
