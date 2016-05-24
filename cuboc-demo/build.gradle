@@ -2,7 +2,7 @@ apply plugin: "java"
 apply plugin: 'application'
 apply plugin: "jtransc"
 
-ext.jtranscVersion = "0.2.5"
+ext.jtranscVersion = "0.2.6"
 
 mainClassName = "CubocJTransc"
 
@@ -21,7 +21,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath "com.jtransc:jtransc-gradle-plugin:0.2.5"
+		classpath "com.jtransc:jtransc-gradle-plugin:$jtranscVersion"
 	}
 }
 
