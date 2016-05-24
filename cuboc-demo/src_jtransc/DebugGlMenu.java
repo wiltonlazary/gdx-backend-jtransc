@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.jtransc.annotation.JTranscNativeClass;
 import com.jtransc.media.limelibgdx.gl.GL;
+import com.jtransc.media.limelibgdx.gl.LimeGL20;
 import com.jtransc.media.limelibgdx.gl.Wrapped;
 
 import java.nio.ByteBuffer;
@@ -82,10 +83,13 @@ class DebugProgramNative implements DebugProgram {
 class DebugProgramLibgdx implements DebugProgram {
 	int vertexBuffer;
 	int program;
-	GL20 gl = Gdx.gl;
+	LimeGL20 gl;
+	GL gl2;
 
 	@Override
 	public void init() {
+		gl = (LimeGL20)Gdx.gl;
+		gl2 = GL.HaxeLimeGdxApplication.gl;
 		initBuffer();
 		initShader();
 	}
@@ -96,17 +100,50 @@ class DebugProgramLibgdx implements DebugProgram {
 
 		ByteBuffer verticesData = ByteBuffer.allocate(9 * 4).order(ByteOrder.LITTLE_ENDIAN);
 		FloatBuffer vertices = verticesData.asFloatBuffer();
-		vertices.mark();
+		//vertices.mark();
 		vertices.put(new float[]{
 			0f, 1f, 0f,
 			-1f, -1f, 0f,
 			1f, -1f, 0f
 		});
-		vertices.reset();
+		vertices.rewind();
+
+		vertices.put(0, 0f);
+		vertices.put(1, 1f);
+		vertices.put(2, 0f);
+		vertices.put(3, -1f);
+		vertices.put(4, -1f);
+		vertices.put(5, 0f);
+		vertices.put(6, 1f);
+		vertices.put(7, -1f);
+		vertices.put(8, 0f);
+
+		for (int n = 0; n < 9; n++) {
+			System.out.println(vertices.get(n));
+		}
 
 		// @TODO: check size! since it is in bytes!
 		gl.glBufferData(GL20.GL_ARRAY_BUFFER, 9 * 4, vertices, GL20.GL_STATIC_DRAW);
 	}
+
+	//private void initBuffer() {
+	//	//vertexBuffer = gl2.createBuffer();
+	//	//gl2.bindBuffer(GL20.GL_ARRAY_BUFFER, vertexBuffer);
+//
+	//	vertexBuffer = gl.glGenBuffer();
+	//	gl.glBindBuffer(GL20.GL_ARRAY_BUFFER, vertexBuffer);
+//
+	//	// @TODO: check size! since it is in bytes!
+	//	gl2.bufferData(GL20.GL_ARRAY_BUFFER, createVertices(), GL20.GL_STATIC_DRAW);
+	//}
+//
+	//private GL.Float32Array createVertices() {
+	//	return GL.Float32Array.Utils.create(new float[]{
+	//		0f, 1f, 0f,
+	//		-1f, -1f, 0f,
+	//		1f, -1f, 0f
+	//	});
+	//}
 
 	private void initShader() {
 		program = compileProgram();

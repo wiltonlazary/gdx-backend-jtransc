@@ -45,8 +45,13 @@ class HaxeLimeGdxApplication extends lime.app.Application {
     static public function convertFloatBuffer(buf:{% CLASS java.nio.FloatBuffer %}, size = -1) {
         var len = buf.{% METHOD java.nio.FloatBuffer:limit:()I %}();
         var out = new lime.utils.Float32Array(len);
+        for (n in 0 ... len) {
+        	trace(buf.{% METHOD java.nio.FloatBuffer:get:(I)F %}(n));
+        }
         for (n in 0 ... len) out[n] = buf.{% METHOD java.nio.FloatBuffer:get:(I)F %}(n);
         if (DEBUG) trace([for (n in 0 ... out.length) out[n]]);
+
+        trace([for (n in 0 ... out.length) out[n]]);
         //trace(out);
         return out;
     }

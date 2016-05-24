@@ -1,13 +1,12 @@
 package com.jtransc.media.limelibgdx.gl;
 
 import com.jtransc.annotation.JTranscNativeClass;
-import com.jtransc.annotation.JTranscNativeName;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
-import com.jtransc.annotation.haxe.HaxeNativeConversion;
 
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.HashMap;
 
 @JTranscNativeClass("lime.graphics.GLRenderContext")
 public class GL {
@@ -16,11 +15,11 @@ public class GL {
 	// BUFFERS
 	native public Wrapped<GLBuffer> createBuffer();
 
-	native public boolean isBuffer(Wrapped<GLBuffer>  buffer);
+	native public boolean isBuffer(Wrapped<GLBuffer> buffer);
 
-	native public void bindBuffer(int target, Wrapped<GLBuffer>  buffer);
+	native public void bindBuffer(int target, Wrapped<GLBuffer> buffer);
 
-	native public void deleteBuffer(Wrapped<GLBuffer>  buffer);
+	native public void deleteBuffer(Wrapped<GLBuffer> buffer);
 
 	native public boolean isEnabled(int cap);
 
@@ -369,57 +368,78 @@ public class GL {
 		public HaxeString name;
 	}
 
-	@JTranscNativeClass("HaxeLimeGdxApplication.DynamicIntMap")
 	static public class BaseIntMap {
-		@JTranscNativeName("get")
-		native public Wrapped<GLShader> getShader(int key);
+		private HashMap<Integer, Object> map = new HashMap<>();
 
-		@JTranscNativeName("get")
-		native public Wrapped<GLProgram> getProgram(int key);
+		public Wrapped<GLShader> getShader(int key) {
+			return (Wrapped<GLShader>) map.get(key);
+		}
 
-		@JTranscNativeName("get")
-		native public Wrapped<GLBuffer> getBuffer(int buffer);
+		public Wrapped<GLProgram> getProgram(int key) {
+			return (Wrapped<GLProgram>) map.get(key);
+		}
 
-		@JTranscNativeName("get")
-		native public Wrapped<GLRenderbuffer> getRenderbuffer(int renderbuffer);
+		public Wrapped<GLBuffer> getBuffer(int buffer) {
+			return (Wrapped<GLBuffer>) map.get(buffer);
+		}
 
-		native public void set(int key, Wrapped<? extends Dynamic> value);
+		public Wrapped<GLRenderbuffer> getRenderbuffer(int renderbuffer) {
+			return (Wrapped<GLRenderbuffer>) map.get(renderbuffer);
+		}
 
-		@JTranscNativeName("set")
-		native public void setUniformlocation(int id, Wrapped<GLUniformLocation> location);
+		public void set(int key, Wrapped<? extends Dynamic> value) {
+			this.map.put(key, value);
+		}
 
-		native public void remove(int key);
+		public void setUniformlocation(int id, Wrapped<GLUniformLocation> location) {
+			this.map.put(id, location);
+		}
 
-		native public boolean exists(int key);
+		public void remove(int key) {
+			this.map.remove(key);
+		}
 
-		@JTranscNativeName("get")
-		native public Wrapped<GLTexture> getTexture(int texture);
+		public boolean exists(int key) {
+			return this.map.containsKey(key);
+		}
 
-		@JTranscNativeName("get")
-		native public Wrapped<GLFramebuffer> getFramebuffer(int framebuffer);
+		public Wrapped<GLTexture> getTexture(int texture) {
+			return (Wrapped<GLTexture>) map.get(texture);
+		}
 
-		@JTranscNativeName("get")
-		native public Wrapped<GLUniformLocation> getUniformlocation(int location);
+		public Wrapped<GLFramebuffer> getFramebuffer(int framebuffer) {
+			return (Wrapped<GLFramebuffer>) map.get(framebuffer);
+		}
 
-		@JTranscNativeName("set")
-		native public void setRenderbuffer(int id, Wrapped<GLRenderbuffer> renderbuffer);
+		public Wrapped<GLUniformLocation> getUniformlocation(int location) {
+			return (Wrapped<GLUniformLocation>) map.get(location);
+		}
 
-		@JTranscNativeName("set")
-		native public void setBuffer(int id, Wrapped<GLBuffer> buffer);
+		public void setRenderbuffer(int id, Wrapped<GLRenderbuffer> renderbuffer) {
+			this.map.put(id, renderbuffer);
+		}
 
-		@JTranscNativeName("set")
-		native public void setShader(int id, Wrapped<GLShader> shader);
+		public void setBuffer(int id, Wrapped<GLBuffer> buffer) {
+			this.map.put(id, buffer);
+		}
 
-		@JTranscNativeName("set")
-		native public void setProgram(int id, Wrapped<GLProgram> program);
+		public void setShader(int id, Wrapped<GLShader> shader) {
+			this.map.put(id, shader);
+		}
 
-		@JTranscNativeName("set")
-		native public void setTexture(int id, Wrapped<GLTexture> texture);
+		public void setProgram(int id, Wrapped<GLProgram> program) {
+			this.map.put(id, program);
+		}
+
+		public void setTexture(int id, Wrapped<GLTexture> texture) {
+			this.map.put(id, texture);
+		}
 
 
 		static public class Utils {
-			@HaxeMethodBody("return new HaxeLimeGdxApplication.DynamicIntMap();")
-			native static public BaseIntMap create();
+			static public BaseIntMap create() {
+				return new BaseIntMap();
+			}
 		}
 	}
 }
