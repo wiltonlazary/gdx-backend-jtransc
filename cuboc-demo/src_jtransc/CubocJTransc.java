@@ -1,8 +1,5 @@
 import com.badlogic.cubocy.Cubocy;
-import com.badlogic.cubocy.screens.DebugGlMenu;
-import com.badlogic.cubocy.screens.MainMenu;
 import com.badlogic.gdx.Application;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.jtransc.media.limelibgdx.LimeApplication;
 

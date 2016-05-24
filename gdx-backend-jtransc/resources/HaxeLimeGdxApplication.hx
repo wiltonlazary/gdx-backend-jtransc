@@ -105,9 +105,6 @@ class HaxeLimeGdxApplication extends lime.app.Application {
 				}
                 app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:create %}();
             }
-            #if desktop
-            //GL.enable(GL.TEXTURE_2D);
-            #end
             app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:render %}();
         }
     }
@@ -144,18 +141,11 @@ class HaxeLimeGdxApplication extends lime.app.Application {
 	static private function createTriangle() {
 		var vertexBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-
-		var vertices = new lime.utils.Float32Array(9);
-		vertices[0] =  0;
-		vertices[1] =  1;
-		vertices[2] =  0;
-		vertices[3] = -1;
-		vertices[4] = -1;
-		vertices[5] =  0;
-		vertices[6] =  1;
-		vertices[7] = -1;
-		vertices[8] =  0;
-
+		var vertices = new lime.utils.Float32Array([
+			0,1,0,
+			-1,-1,0,
+			1,-1,0
+		]);
 		gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 		return vertexBuffer;
 	}
@@ -177,36 +167,14 @@ class HaxeLimeGdxApplication extends lime.app.Application {
 	}
 
 	static public function testFrame() {
-		gl.enable(gl.BLEND);
-		gl.viewport(0, 0, 1280, 720);
-
 		gl.clearColor(1, 0, 1, 1);
-		gl.clearStencil(0);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-		gl.disable(gl.SCISSOR_TEST);
-		gl.disable(gl.STENCIL_TEST);
-		gl.depthMask(false);
-		gl.colorMask(true, true, true, true);
-		gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
-		gl.stencilFunc(gl.EQUAL, 0x00, 0x00);
-		gl.stencilMask(0x00);
-
+		gl.clear(gl.COLOR_BUFFER_BIT);
 		var pos = gl.getAttribLocation(program, "aVertexPosition");
-
 		gl.enableVertexAttribArray(pos);
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-
-		gl.vertexAttribPointer(
-			pos,               // attribute 0. No particular reason for 0, but must match the layout in the shader.
-			3,                 // size
-			gl.FLOAT,     // type
-			false,             // normalized?
-			0,                 // stride
-			0                  // array buffer offset
-		);
+		gl.vertexAttribPointer(pos, 3, gl.FLOAT, false, 0, 0);
 		gl.useProgram(program);
-		gl.drawArrays(gl.TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
+		gl.drawArrays(gl.TRIANGLES, 0, 3);
 		gl.disableVertexAttribArray(pos);
 	}
 }
@@ -228,3 +196,5 @@ class JTranscModule extends lime.app.Module {
 		LimeInput.{% METHOD com.jtransc.media.limelibgdx.LimeInput:lime_onKeyUp %}(keyCode, modifier);
 	}
 }
+
+typedef DynamicIntMap = haxe.ds.IntMap<Dynamic>;
