@@ -29,8 +29,8 @@ public class DebugGlMenu extends CubocScreen {
 	}
 
 	//DebugProgram debugProgram = new DebugProgramNative();
-	DebugProgram debugProgram = new DebugProgramGL();
-	//DebugProgram debugProgram = new DebugProgramLibgdx();
+	//DebugProgram debugProgram = new DebugProgramGL();
+	DebugProgram debugProgram = new DebugProgramLibgdx();
 
 	private void init() {
 		debugProgram.init();
@@ -163,14 +163,16 @@ class DebugProgramGL implements DebugProgram {
 		vertexBuffer = gl.createBuffer();
 		gl.bindBuffer(GL20.GL_ARRAY_BUFFER, vertexBuffer);
 
-		GL.Float32Array vertices = GL.Float32Array.Utils.create(new float[]{
+		// @TODO: check size! since it is in bytes!
+		gl.bufferData(GL20.GL_ARRAY_BUFFER, createVertices(), GL20.GL_STATIC_DRAW);
+	}
+
+	private GL.Float32Array createVertices() {
+		return GL.Float32Array.Utils.create(new float[]{
 			0f, 1f, 0f,
 			-1f, -1f, 0f,
 			1f, -1f, 0f
 		});
-
-		// @TODO: check size! since it is in bytes!
-		gl.bufferData(GL20.GL_ARRAY_BUFFER, vertices, GL20.GL_STATIC_DRAW);
 	}
 
 	private void initShader() {
