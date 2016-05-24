@@ -390,11 +390,11 @@ public class LimeInput implements Input {
 		}
 
 		public double getX() {
-			return currentX - lastX;
+			return currentX;
 		}
 
 		public double getY() {
-			return currentY - lastY;
+			return currentY;
 		}
 
 		public double getDeltaX() {
