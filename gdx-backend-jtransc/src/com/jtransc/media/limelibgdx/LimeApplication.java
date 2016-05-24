@@ -82,15 +82,19 @@ public class LimeApplication implements Application {
 		Gdx.gl20 = graphics.getGL20();
 		Gdx.gl30 = graphics.getGL30();
 
-		if (JTranscSystem.isJs()) {
+		if (LimeDevice.isJs()) {
 			type = ApplicationType.WebGL;
+		} else if (LimeDevice.isIos()) {
+			type = ApplicationType.iOS;
+		} else if (LimeDevice.isAndroid()) {
+			type = ApplicationType.Android;
 		} else {
-			// @TODO: Check android and ios!
 			type = ApplicationType.Desktop;
 		}
 
 		setApplicationToLime(this);
 	}
+
 
 	@HaxeMethodBody("HaxeLimeGdxApplication.app = p0;")
 	native private void setApplicationToLime(LimeApplication app);

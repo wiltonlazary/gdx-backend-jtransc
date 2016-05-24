@@ -58,18 +58,18 @@ jtransc {
 	// fullscreen = false
 	// icon: String? = null
 	// orientation = "auto"
-	// relooper = false
+	relooper = true
 	minimizeNames = false
-	// analyzer = false
+	analyzer = true
 
 	customTarget("cpp", "haxe:cpp", "exe")
 	customTarget("windows", "haxe:windows", "exe")
 	customTarget("linux", "haxe:linux", "bin")
 	customTarget("mac", "haxe:mac", "app")
-	customTarget("html5", "haxe:html5", "js")
 	customTarget("android", "haxe:android", "apk")
 	customTarget("ios", "haxe:ios", "ipa")
 	customTarget("tizen", "haxe:tizen", "app")
+	customTargetMinimized("html5", "haxe:html5", "js")
 }
 
 // Defined tasks
