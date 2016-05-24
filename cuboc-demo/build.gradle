@@ -38,21 +38,21 @@ dependencies {
 
 jtransc {
 	// Optional properties (https://github.com/jtransc/jtransc/blob/master/jtransc-gradle-plugin/src/com/jtransc/gradle/JTranscExtension.kt)
-	// title = "App Title"
-	// name = "AppName"
-	// version = "0.0.1"
+	title = "Cuboc"
+	name = "Cuboc"
+	version = "0.0.1"
+	company = "Badlogic"
+	package_ = "com.jtransc.gdx.examples"
 	// target = "haxe:js"
 	// output: String? = null
 	// extra = hashMapOf<String?, String?>()
-	// company = "MyCompany"
-	// package_ = "com.test"
 	embedResources = true
 	// libraries = arrayListOf<String>()
 	assets = ["assets"]
 	// debug = true
 	// initialWidth = 1280
 	// initialHeight = 720
-	// vsync = true
+	vsync = true
 	// resizable = true
 	// borderless = false
 	// fullscreen = false

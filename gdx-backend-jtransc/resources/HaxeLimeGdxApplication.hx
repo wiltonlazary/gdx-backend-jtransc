@@ -1,5 +1,6 @@
 import lime.graphics.opengl.GL;
 import lime.ui.Window;
+import lime.ui.Touch;
 import lime.ui.KeyCode;
 import lime.graphics.Renderer;
 
@@ -221,10 +222,25 @@ class JTranscModule extends lime.app.Module {
     override public function onMouseMove (window:Window, x:Float, y:Float):Void {
     	LimeInput.{% METHOD com.jtransc.media.limelibgdx.LimeInput:lime_onMouseMove %}(x, y);
     }
+
+
 	override public function onKeyDown(window:Window, keyCode:KeyCode, modifier:lime.ui.KeyModifier):Void {
 		LimeInput.{% METHOD com.jtransc.media.limelibgdx.LimeInput:lime_onKeyDown %}(keyCode, modifier);
 	}
 	override public function onKeyUp(window:Window, keyCode:KeyCode, modifier:lime.ui.KeyModifier):Void {
 		LimeInput.{% METHOD com.jtransc.media.limelibgdx.LimeInput:lime_onKeyUp %}(keyCode, modifier);
 	}
+
+
+	override public function onTouchEnd(touch:Touch):Void {
+		LimeInput.{% METHOD com.jtransc.media.limelibgdx.LimeInput:lime_onTouchEnd %}(touch.id, touch.x, touch.y);
+	}
+
+	override public function onTouchMove(touch:Touch):Void {
+		LimeInput.{% METHOD com.jtransc.media.limelibgdx.LimeInput:lime_onTouchMove %}(touch.id, touch.x, touch.y);
+	}
+
+   	override public function onTouchStart(touch:Touch):Void {
+		LimeInput.{% METHOD com.jtransc.media.limelibgdx.LimeInput:lime_onTouchStart %}(touch.id, touch.x, touch.y);
+   	}
 }
