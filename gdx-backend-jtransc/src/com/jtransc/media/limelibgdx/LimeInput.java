@@ -1,6 +1,7 @@
 package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
 
 public class LimeInput implements Input {
@@ -9,6 +10,8 @@ public class LimeInput implements Input {
 	static public boolean[] justReleased = new boolean[0x200];
 
 	static Pointer[] pointers;
+
+	static private InputProcessor inputProcessor = new InputAdapter();
 
 	static {
 		pointers = new Pointer[16];
@@ -20,6 +23,7 @@ public class LimeInput implements Input {
 		pointers[0].setXY(x, y);
 		pointers[0].releaseButton(button);
 		//System.out.println("lime_onMouseUp:" + x + "," + y + "," + button);
+		inputProcessor.touchUp((int)x, (int)y, 0, button);
 	}
 
 	@SuppressWarnings("unused")
@@ -27,11 +31,14 @@ public class LimeInput implements Input {
 		pointers[0].setXY(x, y);
 		pointers[0].pressButton(button);
 		//System.out.println("lime_onMouseDown:" + x + "," + y + "," + button);
+
+		inputProcessor.touchDown((int)x, (int)y, 0, button);
 	}
 
 	@SuppressWarnings("unused")
 	static public void lime_onMouseMove(double x, double y) {
 		pointers[0].setXY(x, y);
+		inputProcessor.mouseMoved((int)x, (int)y);
 	}
 
 	@SuppressWarnings("unused")
@@ -39,6 +46,8 @@ public class LimeInput implements Input {
 		//System.out.println("lime_onKeyUp:" + keyCode + "," + modifier);
 		keys[keyCode & 0x1FF] = false;
 		justReleased[keyCode & 0x1FF] = true;
+
+		inputProcessor.keyUp(convertKeyCode(keyCode));
 	}
 
 	@SuppressWarnings("unused")
@@ -46,23 +55,33 @@ public class LimeInput implements Input {
 		//System.out.println("lime_onKeyDown:" + keyCode + "," + modifier);
 		keys[keyCode & 0x1FF] = true;
 		justPressed[keyCode & 0x1FF] = true;
+
+		inputProcessor.keyDown(convertKeyCode(keyCode));
+	}
+
+	@SuppressWarnings("unused")
+	static public void lime_onKeyTyped(char character) {
+		inputProcessor.keyTyped(character);
 	}
 
 	@SuppressWarnings("unused")
 	static public void lime_onTouchStart(int id, double x, double y) {
 		pointers[id].setXY(x, y);
 		pointers[id].pressButton(0);
+		inputProcessor.touchDown((int)x, (int)y, id, 0);
 	}
 
 	@SuppressWarnings("unused")
 	static public void lime_onTouchMove(int id, double x, double y) {
 		pointers[id].setXY(x, y);
+		inputProcessor.touchDragged((int)x, (int)y, id);
 	}
 
 	@SuppressWarnings("unused")
 	static public void lime_onTouchEnd(int id, double x, double y) {
 		pointers[id].setXY(x, y);
 		pointers[id].releaseButton(0);
+		inputProcessor.touchUp((int)x, (int)y, id, 0);
 	}
 
 	// Called once per frame1
@@ -165,7 +184,7 @@ public class LimeInput implements Input {
 		return pointers[0].isPressingButton(i);
 	}
 
-	private int convertKeyCode(int i) {
+	static private int convertKeyCode(int i) {
 		// https://github.com/openfl/lime/blob/develop/lime/ui/KeyCode.hx
 		switch (i) {
 			case Keys.ENTER:
@@ -318,7 +337,6 @@ public class LimeInput implements Input {
 
 	@Override
 	public void setCatchMenuKey(boolean b) {
-
 	}
 
 	@Override
@@ -328,12 +346,12 @@ public class LimeInput implements Input {
 
 	@Override
 	public void setInputProcessor(InputProcessor inputProcessor) {
-		System.out.println("Not implemented setInputProcessor!");
+		this.inputProcessor = inputProcessor;
 	}
 
 	@Override
 	public InputProcessor getInputProcessor() {
-		return null;
+		return this.inputProcessor;
 	}
 
 	@Override
