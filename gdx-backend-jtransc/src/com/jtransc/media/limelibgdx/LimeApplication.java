@@ -3,6 +3,7 @@ package com.jtransc.media.limelibgdx;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Clipboard;
+import com.jtransc.annotation.JTranscNativeClass;
 import com.jtransc.annotation.haxe.*;
 import com.jtransc.media.limelibgdx.util.GlUtils;
 import com.jtransc.JTranscSystem;
@@ -351,20 +352,31 @@ public class LimeApplication implements Application {
 		System.err.println("ERROR! removeLifecycleListener: " + listener);
 	}
 
+	@SuppressWarnings("unused")
 	public void create() {
 		applicationListener.create();
+		resized(HaxeLimeGdxApplication.instance.getWidth(), HaxeLimeGdxApplication.instance.getHeight());
 	}
 
+	@SuppressWarnings("unused")
 	public void render() {
 		applicationListener.render();
 		LimeInput.lime_frame();
 		graphics.frame();
 	}
 
+	@SuppressWarnings("unused")
 	public void resized(int width, int height) {
 		graphics.width = width;
 		graphics.height = height;
 		Gdx.gl.glViewport(0, 0, width, height);
 		applicationListener.resize(width, height);
+	}
+
+	@JTranscNativeClass("HaxeLimeGdxApplication")
+	static private class HaxeLimeGdxApplication {
+		static public HaxeLimeGdxApplication instance;
+		native public int getWidth();
+		native public int getHeight();
 	}
 }

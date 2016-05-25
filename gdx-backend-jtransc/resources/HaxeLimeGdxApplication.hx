@@ -19,6 +19,9 @@ class HaxeLimeGdxApplication extends lime.app.Application {
 	static public var gl: lime.graphics.GLRenderContext;
 	#end
 
+	public function getWidth() return window.width;
+	public function getHeight() return window.height;
+
     static public function convertByteBuffer(buf:{% CLASS java.nio.ByteBuffer %}, size = -1) {
         var len = buf.{% METHOD java.nio.ByteBuffer:limit:()I %}();
         var out = new lime.utils.UInt8Array(len);
@@ -106,9 +109,7 @@ class HaxeLimeGdxApplication extends lime.app.Application {
 				}
                 app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:create %}();
             }
-            #if desktop
-            //GL.enable(GL.TEXTURE_2D);
-            #end
+            //#if desktop GL.enable(GL.TEXTURE_2D); #end
             app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:render %}();
         }
     }
