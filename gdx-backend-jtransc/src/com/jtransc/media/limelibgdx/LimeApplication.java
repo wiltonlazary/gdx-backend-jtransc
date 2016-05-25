@@ -74,7 +74,6 @@ public class LimeApplication implements Application {
 		Gdx.app = this;
 		Gdx.graphics = graphics = new LimeGraphics(trace);
 		Gdx.audio = audio = new LimeAudio();
-		;
 		Gdx.input = input = new LimeInput();
 		Gdx.files = files = new LimeFiles();
 		Gdx.net = net = new LimeNet();
