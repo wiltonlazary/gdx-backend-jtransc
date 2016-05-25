@@ -51,6 +51,9 @@ import java.util.Map;
 @HaxeCustomBuildCommandLine({
 	"@limebuild.cmd"
 })
+@HaxeCustomBuildAndRunCommandLine({
+	"@limetest.cmd"
+})
 @HaxeAddLibraries({
 	"lime:2.9.1"
 })
