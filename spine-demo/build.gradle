@@ -2,7 +2,8 @@ apply plugin: "java"
 apply plugin: 'application'
 apply plugin: "jtransc"
 
-mainClassName = "com.esotericsoftware.spine.SimpleTest1"
+//mainClassName = "com.esotericsoftware.spine.SimpleTest1"
+mainClassName = "com.esotericsoftware.spine.NormalMapTest"
 
 sourceSets.main {
 	java {

@@ -33,14 +33,14 @@ public class LimeGraphics implements Graphics {
 	public int width = 640;
 	public int height = 480;
 
-	class Monitor2 extends Monitor {
-		protected Monitor2(int virtualX, int virtualY, String name) {
+	static public class Monitor2 extends Monitor {
+		public Monitor2(int virtualX, int virtualY, String name) {
 			super(virtualX, virtualY, name);
 		}
 	}
 
-	class DisplayMode2 extends DisplayMode {
-		protected DisplayMode2(int width, int height, int refreshRate, int bitsPerPixel) {
+	static public class DisplayMode2 extends DisplayMode {
+		public DisplayMode2(int width, int height, int refreshRate, int bitsPerPixel) {
 			super(width, height, refreshRate, bitsPerPixel);
 		}
 	}
