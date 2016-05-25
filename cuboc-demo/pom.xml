@@ -25,13 +25,13 @@
 	<parent>
 		<groupId>com.jtransc.gdx</groupId>
 		<artifactId>gdx-backend-jtransc-parent</artifactId>
-		<version>0.2.6</version>
+		<version>0.2.7</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<properties>
 		<gdx.version>1.9.2</gdx.version>
-		<jtransc.version>0.2.6</jtransc.version>
+		<jtransc.version>0.2.7</jtransc.version>
 	</properties>
 
 	<artifactId>cuboc-badlogicgames-demo</artifactId>
