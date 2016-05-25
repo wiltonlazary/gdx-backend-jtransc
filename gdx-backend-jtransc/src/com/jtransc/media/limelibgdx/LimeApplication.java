@@ -365,5 +365,6 @@ public class LimeApplication implements Application {
 		graphics.width = width;
 		graphics.height = height;
 		Gdx.gl.glViewport(0, 0, width, height);
+		applicationListener.resize(width, height);
 	}
 }

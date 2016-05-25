@@ -32,7 +32,9 @@ repositories {
 }
 
 dependencies {
-	jtransc "com.jtransc.gdx:gdx-backend-jtransc:$jtranscVersion"
+	jtransc "com.jtransc.gdx:gdx-backend-jtransc:$jtranscVersion" // just included when compiling using jtransc and before other dependencies
+
+	compile "com.jtransc:jtransc-rt-core:$jtranscVersion"
 	compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$libgdxVersion"
 	compile "com.badlogicgames.gdx:gdx-platform:$libgdxVersion:natives-desktop"
 	compile "com.badlogicgames.gdx:gdx-box2d:$libgdxVersion"
@@ -41,31 +43,18 @@ dependencies {
 }
 
 jtransc {
-	// Optional properties (https://github.com/jtransc/jtransc/blob/master/jtransc-gradle-plugin/src/com/jtransc/gradle/JTranscExtension.kt)
 	title = "SpineSimpleTest1"
 	name = "SpineSimpleTest1"
 	version = "0.0.1"
 	company = "jtransc"
 	package_ = "com.jtransc.gdx.examples"
-	// target = "haxe:js"
-	// output: String? = null
-	// extra = hashMapOf<String?, String?>()
 	embedResources = true
-	// libraries = arrayListOf<String>()
 	assets = [
 		// @TODO: fix this!
 		//"../../../spine-runtimes/spine-libgdx/spine-libgdx-tests/assets"
 		"C:\\projects\\spine-runtimes\\spine-libgdx\\spine-libgdx-tests\\assets"
 	]
-	// debug = true
-	// initialWidth = 1280
-	// initialHeight = 720
 	vsync = true
-	// resizable = true
-	// borderless = false
-	// fullscreen = false
-	// icon: String? = null
-	// orientation = "auto"
 	relooper = true
 	minimizeNames = false
 	analyzer = false
@@ -79,83 +68,3 @@ jtransc {
 	customTarget("tizen", "haxe:tizen", "app")
 	customTargetMinimized("html5", "haxe:html5", "js")
 }
-
-// Defined tasks
-
-// Building tasks:
-// - distribution:distCpp
-// - distribution:distJs
-// - distribution:distNeko
-// - distribution:distPhp
-
-// Building and running tasks:
-// - distribution:runCpp
-// - distribution:runNeko
-// - distribution:runNodeJs
-// - distribution:runPhp
-// - distribution:runSwd
-
-// Custom Building/running tasks:
-// - jtransc:distJtransc (must specify target and outputFile options)
-// - jtransc:runJtransc (must specify target and outputFile options)
-
-/*
-import com.jtransc.gradle.tasks.JTranscDistTask
-import com.jtransc.gradle.tasks.JTranscRunTask
-
-task distWindows(type: JTranscDistTask) {
-	target = "haxe:windows"
-	outputFile = "program.exe"
-	minimizedNames = false
-	debug = false
-}
-
-task runWindows(type: JTranscRunTask) {
-	target = "haxe:windows"
-	outputFile = "program.exe"
-	minimizedNames = false
-	debug = true
-}
-
-task distHtml(type: JTranscDistTask) {
-	target = "haxe:js"
-	outputFile = "program.js"
-	minimizedNames = true
-	debug = false
-}
-
-task runHtml(type: JTranscRunTask) {
-	target = "haxe:js"
-	outputFile = "program.js"
-	minimizedNames = false
-	debug = true
-}
-
-task distAndroid(type: JTranscDistTask) {
-	target = "haxe:android"
-	outputFile = "program.apk"
-	minimizedNames = true
-	debug = false
-}
-
-task runAndroid(type: JTranscRunTask) {
-	target = "haxe:android"
-	outputFile = "program.apk"
-	minimizedNames = false
-	debug = true
-}
-
-task distIos(type: JTranscDistTask) {
-	target = "haxe:ios"
-	outputFile = "program.ipa"
-	minimizedNames = true
-	debug = false
-}
-
-task runIos(type: JTranscRunTask) {
-	target = "haxe:ios"
-	outputFile = "program.ipa"
-	minimizedNames = false
-	debug = true
-}
-*/
