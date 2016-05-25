@@ -60,7 +60,7 @@ jtransc {
 	// orientation = "auto"
 	relooper = true
 	minimizeNames = false
-	analyzer = true
+	analyzer = false
 
 	customTarget("cpp", "haxe:cpp", "exe")
 	customTarget("windows", "haxe:windows", "exe")
