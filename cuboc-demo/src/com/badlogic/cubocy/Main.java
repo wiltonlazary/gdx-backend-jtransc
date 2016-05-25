@@ -1,9 +1,11 @@
+package com.badlogic.cubocy;
+
 import com.badlogic.cubocy.Cubocy;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 
-public class CubocDesktop {
+public class Main {
 	public static void main(String[] argv) {
 		new LwjglApplication(new Cubocy(), "Cubocy", 480, 320);
 

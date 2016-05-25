@@ -1,4 +1,3 @@
-
 package com.badlogic.cubocy;
 
 import com.badlogic.gdx.Gdx;
