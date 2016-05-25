@@ -366,12 +366,12 @@ public class LimeApplication implements Application {
 
 	@Override
 	public void addLifecycleListener(LifecycleListener listener) {
-		System.err.println("ERROR! addLifecycleListener: " + listener);
+		System.err.println("WARNING NOT IMPLEMENTED! addLifecycleListener: " + listener);
 	}
 
 	@Override
 	public void removeLifecycleListener(LifecycleListener listener) {
-		System.err.println("ERROR! removeLifecycleListener: " + listener);
+		System.err.println("WARNING NOT IMPLEMENTED! removeLifecycleListener: " + listener);
 	}
 
 	@SuppressWarnings("unused")

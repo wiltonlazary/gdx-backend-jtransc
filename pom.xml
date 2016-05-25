@@ -20,10 +20,8 @@
 
 	<modules>
 		<module>gdx-backend-jtransc</module>
-    <module>gdx-box2d-jtransc</module>
-		<!--
-		<module>cuboc-demo</module>
-		-->
+		<module>gdx-box2d-jtransc</module>
+		<module>gdx-controllers-jtransc</module>
 	</modules>
 
 	<!--https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)-->
