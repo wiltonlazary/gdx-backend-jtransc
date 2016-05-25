@@ -20,6 +20,7 @@
 
 	<modules>
 		<module>gdx-backend-jtransc</module>
+    <module>gdx-box2d-jtransc</module>
 		<!--
 		<module>cuboc-demo</module>
 		-->
