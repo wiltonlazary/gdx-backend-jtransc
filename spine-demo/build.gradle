@@ -2,14 +2,17 @@ apply plugin: "java"
 apply plugin: 'application'
 apply plugin: "jtransc"
 
-mainClassName = "com.badlogic.cubocy.Main"
+mainClassName = "com.esotericsoftware.spine.SimpleTest1"
 
 sourceSets.main {
 	java {
-		srcDirs = ['src']
+		srcDirs = [
+			'../../../spine-runtimes/spine-libgdx/spine-libgdx/src',
+			'../../../spine-runtimes/spine-libgdx/spine-libgdx-tests/src'
+		]
 	}
 	resources {
-		srcDir 'assets'
+		srcDir '../../../spine-runtimes/spine-libgdx/spine-libgdx-tests/assets'
 	}
 }
 
@@ -32,22 +35,28 @@ dependencies {
 	jtransc "com.jtransc.gdx:gdx-backend-jtransc:$jtranscVersion"
 	compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$libgdxVersion"
 	compile "com.badlogicgames.gdx:gdx-platform:$libgdxVersion:natives-desktop"
+	compile "com.badlogicgames.gdx:gdx-box2d:$libgdxVersion"
+
 	testCompile group: 'junit', name: 'junit', version: '4.+'
 }
 
 jtransc {
 	// Optional properties (https://github.com/jtransc/jtransc/blob/master/jtransc-gradle-plugin/src/com/jtransc/gradle/JTranscExtension.kt)
-	title = "Cuboc"
-	name = "Cuboc"
+	title = "SpineSimpleTest1"
+	name = "SpineSimpleTest1"
 	version = "0.0.1"
-	company = "Badlogic"
+	company = "jtransc"
 	package_ = "com.jtransc.gdx.examples"
 	// target = "haxe:js"
 	// output: String? = null
 	// extra = hashMapOf<String?, String?>()
 	embedResources = true
 	// libraries = arrayListOf<String>()
-	assets = ["assets"]
+	assets = [
+		// @TODO: fix this!
+		//"../../../spine-runtimes/spine-libgdx/spine-libgdx-tests/assets"
+		"C:\\projects\\spine-runtimes\\spine-libgdx\\spine-libgdx-tests\\assets"
+	]
 	// debug = true
 	// initialWidth = 1280
 	// initialHeight = 720
