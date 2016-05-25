@@ -1,19 +1,11 @@
 package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Clipboard;
 import com.jtransc.annotation.JTranscNativeClass;
 import com.jtransc.annotation.haxe.*;
-import com.jtransc.media.limelibgdx.util.GlUtils;
-import com.jtransc.JTranscSystem;
-import com.jtransc.io.JTranscSyncIO;
-import com.jtransc.util.JTranscFiles;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,8 +30,8 @@ import java.util.Map;
 	@HaxeAddSubtarget(name = "blackberry"),
 	@HaxeAddSubtarget(name = "desktop"),
 	@HaxeAddSubtarget(name = "emscripten"),
-	@HaxeAddSubtarget(name = "flash", alias = { "swf", "as3" }),
-	@HaxeAddSubtarget(name = "html5", alias = { "js" }),
+	@HaxeAddSubtarget(name = "flash", alias = {"swf", "as3"}),
+	@HaxeAddSubtarget(name = "html5", alias = {"js"}),
 	@HaxeAddSubtarget(name = "ios"),
 	@HaxeAddSubtarget(name = "linux"),
 	@HaxeAddSubtarget(name = "mac"),
@@ -57,6 +49,10 @@ import java.util.Map;
 })
 @HaxeAddLibraries({
 	"lime:2.9.1"
+})
+@HaxeAddAssets({
+	"com/badlogic/gdx/utils/arial-15.fnt",
+	"com/badlogic/gdx/utils/arial-15.png"
 })
 public class LimeApplication implements Application {
 	final private ApplicationListener applicationListener;
@@ -77,7 +73,8 @@ public class LimeApplication implements Application {
 
 		Gdx.app = this;
 		Gdx.graphics = graphics = new LimeGraphics(trace);
-		Gdx.audio = audio = new LimeAudio();;
+		Gdx.audio = audio = new LimeAudio();
+		;
 		Gdx.input = input = new LimeInput();
 		Gdx.files = files = new LimeFiles();
 		Gdx.net = net = new LimeNet();
@@ -97,6 +94,31 @@ public class LimeApplication implements Application {
 		}
 
 		setApplicationToLime(this);
+
+		referenceClasses();
+	}
+
+	// @TODO: mark package to include!
+	static private void referenceClasses() {
+		//new com.badlogic.gdx.graphics.g2d.BitmapFont();
+		new com.badlogic.gdx.graphics.Color(0xFFFFFFFF);
+		new com.badlogic.gdx.scenes.scene2d.ui.Skin.TintedDrawable();
+		new com.badlogic.gdx.scenes.scene2d.ui.Button.ButtonStyle();
+		new com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle();
+		new com.badlogic.gdx.scenes.scene2d.ui.ScrollPane.ScrollPaneStyle();
+		new com.badlogic.gdx.scenes.scene2d.ui.SelectBox.SelectBoxStyle();
+		new com.badlogic.gdx.scenes.scene2d.ui.SplitPane.SplitPaneStyle();
+		new com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle();
+		new com.badlogic.gdx.scenes.scene2d.ui.ProgressBar.ProgressBarStyle();
+		new com.badlogic.gdx.scenes.scene2d.ui.Slider.SliderStyle();
+		new com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle();
+		new com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle();
+		new com.badlogic.gdx.scenes.scene2d.ui.CheckBox.CheckBoxStyle();
+		new com.badlogic.gdx.scenes.scene2d.ui.List.ListStyle();
+		new com.badlogic.gdx.scenes.scene2d.ui.Touchpad.TouchpadStyle();
+		new com.badlogic.gdx.scenes.scene2d.ui.Tree.TreeStyle();
+		new com.badlogic.gdx.scenes.scene2d.ui.TextTooltip.TextTooltipStyle();
+		new GlyphLayout.GlyphRun();
 	}
 
 
@@ -374,9 +396,11 @@ public class LimeApplication implements Application {
 	}
 
 	@JTranscNativeClass("HaxeLimeGdxApplication")
-	static private class HaxeLimeGdxApplication {
+	static public class HaxeLimeGdxApplication {
 		static public HaxeLimeGdxApplication instance;
+
 		native public int getWidth();
+
 		native public int getHeight();
 	}
 }

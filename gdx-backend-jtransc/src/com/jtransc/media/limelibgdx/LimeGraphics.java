@@ -74,22 +74,22 @@ public class LimeGraphics implements Graphics {
 
 	@Override
 	public int getWidth() {
-		return width;
+		return LimeApplication.HaxeLimeGdxApplication.instance.getWidth();
 	}
 
 	@Override
 	public int getHeight() {
-		return height;
+		return LimeApplication.HaxeLimeGdxApplication.instance.getHeight();
 	}
 
 	@Override
 	public int getBackBufferWidth() {
-		return width;
+		return getWidth();
 	}
 
 	@Override
 	public int getBackBufferHeight() {
-		return height;
+		return getHeight();
 	}
 
 	@Override

@@ -6,6 +6,8 @@ import com.jtransc.JTranscWrapped;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
 import com.jtransc.io.JTranscSyncIO;
 
+import java.io.FileNotFoundException;
+
 public class LimeFiles implements Files {
 	public LimeFiles() {
 		JTranscSyncIO.impl = new JTranscSyncIOLimeImpl(JTranscSyncIO.impl);
@@ -69,8 +71,9 @@ public class LimeFiles implements Files {
 	}
 
 	static public String fixpath(String path) {
-		if (!path.startsWith("assets")) path = "assets/" + path;
+		if (!path.startsWith("assets") && !path.startsWith("/assets")) path = "assets/" + path;
 		path = path.replace("\\", "/").replace("//", "/");
+		while (path.startsWith("/")) path = path.substring(1);
 		return path;
 	}
 
@@ -81,12 +84,35 @@ public class LimeFiles implements Files {
 
 		@Override
 		public JTranscSyncIO.ImplStream open(String path, int mode) {
-			return new JTranscSyncIO.ByteStream(readBytes(fixpath(path), mode));
+			String pathFixed = fixpath(path);
+			System.out.println("JTranscSyncIOLimeImpl.open: " + pathFixed);
+			byte[] bytes = readBytes(pathFixed, mode);
+			if (bytes == null) {
+				System.out.println("Can't find: " + pathFixed);
+				throw new RuntimeException(new FileNotFoundException(path));
+			}
+			return new JTranscSyncIO.ByteStream(bytes);
 		}
 
-		@HaxeMethodBody("return HaxeArrayByte.fromBytes(lime.Assets.getBytes(p0._str));")
-		private byte[] readBytes(String path, int mode) {
-			return new byte[0];
+		@Override
+		public int getBooleanAttributes(String path) {
+			String pathFixed = fixpath(path);
+			System.out.println("JTranscSyncIOLimeImpl.getBooleanAttributes: " + pathFixed + " || " + path);
+			int result = 0;
+			result |= BA_REGULAR;
+			if (exists(pathFixed)) result |= BA_EXISTS;
+			return result;
 		}
+
+		static private final int BA_EXISTS    = 0x01;
+		static private final int BA_REGULAR   = 0x02;
+		static private final int BA_DIRECTORY = 0x04;
+		static private final int BA_HIDDEN    = 0x08;
+
+		@HaxeMethodBody("return lime.Assets.exists(p0._str);")
+		native private boolean exists(String path);
+
+		@HaxeMethodBody("return HaxeArrayByte.fromBytes(lime.Assets.getBytes(p0._str));")
+		native private byte[] readBytes(String path, int mode);
 	}
 }
