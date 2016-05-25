@@ -8,3 +8,7 @@ This backend for GDX uses:
 * [JTransc](https://github.com/jtransc/jtransc/) for converting JVM bytecode into Haxe
 * [Haxe](http://haxe.org/) as intermediate language
 * [Lime](https://github.com/openfl/lime) as cross-platform multimedia Haxe library
+
+Examples and demos:
+* [Libgdx Demos](https://github.com/jtransc/jtransc-examples/tree/master/libgdx)
+* [Libgdx + Spine](https://github.com/jtransc/jtransc-examples/tree/master/spine-demo)
