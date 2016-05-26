@@ -11,7 +11,7 @@
 
 	<groupId>com.jtransc.gdx</groupId>
 	<artifactId>gdx-backend-jtransc-parent</artifactId>
-	<version>0.2.7</version>
+	<version>0.2.8</version>
 	<packaging>pom</packaging>
 
 	<name>gdx backend jtransc parent</name>

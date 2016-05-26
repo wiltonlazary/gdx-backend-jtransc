@@ -38,7 +38,11 @@ public class LimeInput implements Input {
 	@SuppressWarnings("unused")
 	static public void lime_onMouseMove(double x, double y) {
 		pointers[0].setXY(x, y);
-		inputProcessor.mouseMoved((int)x, (int)y);
+		if (pointers[0].isPressingAnyButton()) {
+			inputProcessor.touchDragged((int)x, (int)y, 0);
+		} else {
+			inputProcessor.mouseMoved((int)x, (int)y);
+		}
 	}
 
 	@SuppressWarnings("unused")
@@ -66,6 +70,7 @@ public class LimeInput implements Input {
 
 	@SuppressWarnings("unused")
 	static public void lime_onTouchStart(int id, double x, double y) {
+		System.out.println("lime_onTouchStart:" + id + "," + x + "," + y);
 		pointers[id].setXY(x, y);
 		pointers[id].pressButton(0);
 		inputProcessor.touchDown((int)x, (int)y, id, 0);
@@ -73,12 +78,14 @@ public class LimeInput implements Input {
 
 	@SuppressWarnings("unused")
 	static public void lime_onTouchMove(int id, double x, double y) {
+		System.out.println("lime_onTouchMove:" + id + "," + x + "," + y);
 		pointers[id].setXY(x, y);
 		inputProcessor.touchDragged((int)x, (int)y, id);
 	}
 
 	@SuppressWarnings("unused")
 	static public void lime_onTouchEnd(int id, double x, double y) {
+		System.out.println("lime_onTouchEnd:" + id + "," + x + "," + y);
 		pointers[id].setXY(x, y);
 		pointers[id].releaseButton(0);
 		inputProcessor.touchUp((int)x, (int)y, id, 0);

@@ -6,6 +6,7 @@ import com.jtransc.JTranscWrapped;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
 import com.jtransc.io.JTranscSyncIO;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 
 public class LimeFiles implements Files {
@@ -71,9 +72,11 @@ public class LimeFiles implements Files {
 	}
 
 	static public String fixpath(String path) {
-		if (!path.startsWith("assets") && !path.startsWith("/assets")) path = "assets/" + path;
-		path = path.replace("\\", "/").replace("//", "/");
 		while (path.startsWith("/")) path = path.substring(1);
+		if (!path.startsWith("assets") && !path.startsWith("/assets")) {
+			path = "assets/" + path;
+		}
+		path = path.replace("\\", "/").replace("//", "/");
 		return path;
 	}
 
@@ -85,13 +88,18 @@ public class LimeFiles implements Files {
 		@Override
 		public JTranscSyncIO.ImplStream open(String path, int mode) {
 			String pathFixed = fixpath(path);
-			System.out.println("JTranscSyncIOLimeImpl.open: " + pathFixed);
+			System.out.println("JTranscSyncIOLimeImpl.open: " + pathFixed + " || " + path);
 			byte[] bytes = readBytes(pathFixed, mode);
 			if (bytes == null) {
 				System.out.println("Can't find: " + pathFixed);
 				throw new RuntimeException(new FileNotFoundException(path));
 			}
 			return new JTranscSyncIO.ByteStream(bytes);
+		}
+
+		@Override
+		public String getCwd() {
+			return "";
 		}
 
 		@Override
