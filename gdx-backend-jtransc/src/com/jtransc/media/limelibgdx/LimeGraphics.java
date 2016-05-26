@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.jtransc.annotation.haxe.HaxeMethodBody;
 import com.jtransc.media.limelibgdx.dummy.DummyGL20;
 import com.jtransc.media.limelibgdx.gl.LimeGL20;
 import com.jtransc.JTranscSystem;
@@ -117,29 +118,39 @@ public class LimeGraphics implements Graphics {
 		return GraphicsType.WebGL;
 	}
 
+	// https://github.com/openfl/lime/blob/develop/lime/system/System.hx
+	// https://github.com/openfl/lime/blob/develop/lime/system/Display.hx
+	@HaxeMethodBody("return lime.system.System.getDisplay(0).dpi;")
+	private float getPpi() {
+		return 96;
+	}
+
 	@Override
 	public float getPpiX() {
-		return 160;
+		return getPpi();
 	}
 
 	@Override
 	public float getPpiY() {
-		return 160;
+		return getPpi();
 	}
+
+	static private final float CENTIMETERS_PER_INCH = 2.54f;
+	static private final float DENSITY_FACTOR = 160f;
 
 	@Override
 	public float getPpcX() {
-		return 160;
+		return getPpiX() / CENTIMETERS_PER_INCH;
 	}
 
 	@Override
 	public float getPpcY() {
-		return 160;
+		return getPpiY() / CENTIMETERS_PER_INCH;
 	}
 
 	@Override
 	public float getDensity() {
-		return 160;
+		return getPpi() / DENSITY_FACTOR;
 	}
 
 	@Override
