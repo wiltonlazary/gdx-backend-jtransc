@@ -66,9 +66,29 @@ public class StateGL20 implements GL20Ext {
 	}
 
 	public interface Program extends Disposable {
+		void link();
+
+		void attach(Shader shader);
+
+		void detach(Shader shader);
+
+		String getInfoLog();
+
+		boolean linked();
 	}
 
 	public interface Shader extends Disposable {
+		void setSource(String string);
+		void compile();
+	}
+
+	public interface RenderBuffer extends Disposable {
+	}
+
+	public interface FrameBuffer extends Disposable {
+	}
+
+	public interface GLBuffer extends Disposable {
 	}
 
 	public static abstract class Impl {
@@ -78,7 +98,7 @@ public class StateGL20 implements GL20Ext {
 
 		public abstract Program createProgram();
 
-		public abstract Shader createShader();
+		public abstract Shader createShader(int type);
 
 		public abstract void render(StateGL20.State state);
 	}
@@ -90,6 +110,12 @@ public class StateGL20 implements GL20Ext {
 
 	public StateGL20(Impl impl) {
 		this.impl = impl;
+	}
+
+	private int allocateObject(Disposable obj) {
+		int id = availableIds.alloc();
+		objects[id] = obj;
+		return id;
 	}
 
 	private void deleteObject(int id) {
@@ -201,20 +227,22 @@ public class StateGL20 implements GL20Ext {
 	}
 
 	private void glEnableDisable(int cap, boolean set) {
-		if ((cap & GL20.GL_BLEND) != 0) {
-			state.blendEnabled = set;
-		}
-		if ((cap & GL20.GL_CULL_FACE) != 0) {
-			state.cullFaceEnabled = set;
-		}
-		if ((cap & GL20.GL_DEPTH_TEST) != 0) {
-			state.depthTestEnabled = set;
-		}
-		if ((cap & GL20.GL_STENCIL_TEST) != 0) {
-			state.stencilTestEnabled = set;
-		}
-		if ((cap & GL20.GL_SCISSOR_TEST) != 0) {
-			state.scissorTestEnabled = set;
+		switch (cap) {
+			case GL20.GL_BLEND:
+				state.blendEnabled = set;
+				break;
+			case GL20.GL_CULL_FACE:
+				state.cullFaceEnabled = set;
+				break;
+			case GL20.GL_DEPTH_TEST:
+				state.depthTestEnabled = set;
+				break;
+			case GL20.GL_STENCIL_TEST:
+				state.stencilTestEnabled = set;
+				break;
+			case GL20.GL_SCISSOR_TEST:
+				state.scissorTestEnabled = set;
+				break;
 		}
 	}
 
@@ -259,9 +287,7 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public int glGenTexture() {
-		int id = availableIds.alloc();
-		objects[id] = impl.createTexture();
-		return id;
+		return allocateObject(impl.createTexture());
 	}
 
 	@Override
@@ -382,7 +408,7 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glAttachShader(int program, int shader) {
-
+		((Program)objects[program]).attach((Shader)objects[shader]);
 	}
 
 	@Override
@@ -442,42 +468,42 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glCompileShader(int shader) {
-
+		((Shader)objects[shader]).compile();
 	}
 
 	@Override
 	public int glCreateProgram() {
-		return 0;
+		return allocateObject(impl.createProgram());
 	}
 
 	@Override
 	public int glCreateShader(int type) {
-		return 0;
+		return allocateObject(impl.createShader(type));
 	}
 
 	@Override
 	public void glDeleteBuffer(int buffer) {
-
+		deleteObject(buffer);
 	}
 
 	@Override
 	public void glDeleteBuffers(int n, IntBuffer buffers) {
-
+		for (int i = 0; i < n; i++) glDeleteBuffer(buffers.get(i));
 	}
 
 	@Override
 	public void glDeleteFramebuffer(int framebuffer) {
-
+		deleteObject(framebuffer);
 	}
 
 	@Override
 	public void glDeleteFramebuffers(int n, IntBuffer framebuffers) {
-
+		for (int i = 0; i < n; i++) glDeleteFramebuffer(framebuffers.get(i));
 	}
 
 	@Override
 	public void glDeleteProgram(int program) {
-
+		deleteObject(program);
 	}
 
 	@Override
@@ -497,7 +523,7 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glDetachShader(int program, int shader) {
-
+		((Program)objects[program]).detach((Shader)objects[shader]);
 	}
 
 	@Override
@@ -603,11 +629,18 @@ public class StateGL20 implements GL20Ext {
 	@Override
 	public void glGetProgramiv(int program, int pname, IntBuffer params) {
 
+		switch (pname) {
+			case GL20.GL_LINK_STATUS:
+				params.put(((Program)objects[program]).linked() ? 1 : 0);
+				break;
+			default:
+				throw new RuntimeException("");
+		}
 	}
 
 	@Override
 	public String glGetProgramInfoLog(int program) {
-		return null;
+		return ((Program)objects[program]).getInfoLog();
 	}
 
 	@Override
@@ -672,42 +705,55 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public boolean glIsBuffer(int buffer) {
-		return false;
+		return objects[buffer] instanceof GLBuffer;
 	}
 
 	@Override
 	public boolean glIsEnabled(int cap) {
-		return false;
+		switch (cap) {
+			case GL20.GL_BLEND:
+				return state.blendEnabled;
+			case GL20.GL_CULL_FACE:
+				return state.cullFaceEnabled;
+			case GL20.GL_DEPTH_TEST:
+				return state.depthTestEnabled;
+			case GL20.GL_STENCIL_TEST:
+				return state.stencilTestEnabled;
+			case GL20.GL_SCISSOR_TEST:
+				return state.scissorTestEnabled;
+			default:
+				return false;
+		}
 	}
 
 	@Override
 	public boolean glIsFramebuffer(int framebuffer) {
-		return false;
+		return objects[framebuffer] instanceof FrameBuffer;
 	}
 
 	@Override
 	public boolean glIsProgram(int program) {
-		return false;
+		return objects[program] instanceof Program;
 	}
 
 	@Override
 	public boolean glIsRenderbuffer(int renderbuffer) {
-		return false;
+		return objects[renderbuffer] instanceof RenderBuffer;
 	}
 
 	@Override
 	public boolean glIsShader(int shader) {
-		return false;
+		return objects[shader] instanceof Shader;
 	}
 
 	@Override
 	public boolean glIsTexture(int texture) {
-		return false;
+		return objects[texture] instanceof Texture;
 	}
 
 	@Override
 	public void glLinkProgram(int program) {
-
+		((Program)objects[program]).link();
 	}
 
 	@Override
@@ -732,7 +778,7 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glShaderSource(int shader, String string) {
-
+		((Shader)objects[shader]).setSource(string);
 	}
 
 	@Override

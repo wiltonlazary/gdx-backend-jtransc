@@ -29,14 +29,16 @@
  */
 package com.jtransc.media.limelibgdx.imaging;
 
+import com.jtransc.FastMemory;
+import com.jtransc.compression.JTranscZlib;
+
+import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.zip.CRC32;
-import java.util.zip.DataFormatException;
-import java.util.zip.Inflater;
 
 /**
  * A PNGDecoder. The slick PNG decoder is based on this class :)
@@ -101,6 +103,7 @@ public class PNGDecoder {
 	private byte[] palette;
 	private byte[] paletteA;
 	private byte[] transPixel;
+	ByteArrayOutputStream idat = new ByteArrayOutputStream();
 
 	public PNGDecoder(InputStream input) throws IOException {
 		this.input = input;
@@ -116,18 +119,28 @@ public class PNGDecoder {
 		readIHDR();
 		closeChunk();
 
-		searchIDAT:
-		for (; ; ) {
+		while (input.available() > 0) {
 			openChunk();
 			switch (chunkType) {
-				case IDAT:
-					break searchIDAT;
-				case PLTE:
+				case IDAT: {
+					byte[] compressedData = new byte[chunkLength];
+					readFully(compressedData, 0, compressedData.length);
+					idat.write(compressedData);
+					break;
+				}
+				case PLTE: {
 					readPLTE();
 					break;
-				case tRNS:
+				}
+				case tRNS: {
 					readtRNS();
 					break;
+				}
+				case IEND: {
+					byte[] compressedData = new byte[chunkLength];
+					readFully(compressedData, 0, compressedData.length);
+					break;
+				}
 			}
 			closeChunk();
 		}
@@ -275,111 +288,108 @@ public class PNGDecoder {
 		byte[] prevLine = new byte[lineSize + 1];
 		byte[] palLine = (bitdepth < 8) ? new byte[width + 1] : null;
 
-		final Inflater inflater = new Inflater();
-		try {
-			for (int y = 0; y < height; y++) {
-				readChunkUnzip(inflater, curLine, 0, curLine.length);
-				unfilter(curLine, prevLine);
+		byte[] data = JTranscZlibTemp.uncompress(idat.toByteArray(), (lineSize + 1) * height);
 
-				buffer.position(offset + y * stride);
+		for (int y = 0; y < height; y++) {
+			FastMemory.copy(data, y * (lineSize + 1), curLine, 0, (lineSize + 1));
+			unfilter(curLine, prevLine);
 
-				switch (colorType) {
-					case COLOR_TRUECOLOR:
-						switch (fmt) {
-							case ABGR:
-								copyRGBtoABGR(buffer, curLine);
-								break;
-							case RGBA:
-								copyRGBtoRGBA(buffer, curLine);
-								break;
-							case BGRA:
-								copyRGBtoBGRA(buffer, curLine);
-								break;
-							case RGB:
-								copy(buffer, curLine);
-								break;
-							default:
-								throw new UnsupportedOperationException("Unsupported format for this image");
-						}
-						break;
-					case COLOR_TRUEALPHA:
-						switch (fmt) {
-							case ABGR:
-								copyRGBAtoABGR(buffer, curLine);
-								break;
-							case RGBA:
-								copy(buffer, curLine);
-								break;
-							case BGRA:
-								copyRGBAtoBGRA(buffer, curLine);
-								break;
-							case RGB:
-								copyRGBAtoRGB(buffer, curLine);
-								break;
-							default:
-								throw new UnsupportedOperationException("Unsupported format for this image");
-						}
-						break;
-					case COLOR_GREYSCALE:
-						switch (fmt) {
-							case LUMINANCE:
-							case ALPHA:
-								copy(buffer, curLine);
-								break;
-							default:
-								throw new UnsupportedOperationException("Unsupported format for this image");
-						}
-						break;
-					case COLOR_GREYALPHA:
-						switch (fmt) {
-							case LUMINANCE_ALPHA:
-								copy(buffer, curLine);
-								break;
-							default:
-								throw new UnsupportedOperationException("Unsupported format for this image");
-						}
-						break;
-					case COLOR_INDEXED:
-						switch (bitdepth) {
-							case 8:
-								palLine = curLine;
-								break;
-							case 4:
-								expand4(curLine, palLine);
-								break;
-							case 2:
-								expand2(curLine, palLine);
-								break;
-							case 1:
-								expand1(curLine, palLine);
-								break;
-							default:
-								throw new UnsupportedOperationException("Unsupported bitdepth for this image");
-						}
-						switch (fmt) {
-							case ABGR:
-								copyPALtoABGR(buffer, palLine);
-								break;
-							case RGBA:
-								copyPALtoRGBA(buffer, palLine);
-								break;
-							case BGRA:
-								copyPALtoBGRA(buffer, palLine);
-								break;
-							default:
-								throw new UnsupportedOperationException("Unsupported format for this image");
-						}
-						break;
-					default:
-						throw new UnsupportedOperationException("Not yet implemented");
-				}
+			buffer.position(offset + y * stride);
 
-				byte[] tmp = curLine;
-				curLine = prevLine;
-				prevLine = tmp;
+			switch (colorType) {
+				case COLOR_TRUECOLOR:
+					switch (fmt) {
+						case ABGR:
+							copyRGBtoABGR(buffer, curLine);
+							break;
+						case RGBA:
+							copyRGBtoRGBA(buffer, curLine);
+							break;
+						case BGRA:
+							copyRGBtoBGRA(buffer, curLine);
+							break;
+						case RGB:
+							copy(buffer, curLine);
+							break;
+						default:
+							throw new UnsupportedOperationException("Unsupported format for this image");
+					}
+					break;
+				case COLOR_TRUEALPHA:
+					switch (fmt) {
+						case ABGR:
+							copyRGBAtoABGR(buffer, curLine);
+							break;
+						case RGBA:
+							copy(buffer, curLine);
+							break;
+						case BGRA:
+							copyRGBAtoBGRA(buffer, curLine);
+							break;
+						case RGB:
+							copyRGBAtoRGB(buffer, curLine);
+							break;
+						default:
+							throw new UnsupportedOperationException("Unsupported format for this image");
+					}
+					break;
+				case COLOR_GREYSCALE:
+					switch (fmt) {
+						case LUMINANCE:
+						case ALPHA:
+							copy(buffer, curLine);
+							break;
+						default:
+							throw new UnsupportedOperationException("Unsupported format for this image");
+					}
+					break;
+				case COLOR_GREYALPHA:
+					switch (fmt) {
+						case LUMINANCE_ALPHA:
+							copy(buffer, curLine);
+							break;
+						default:
+							throw new UnsupportedOperationException("Unsupported format for this image");
+					}
+					break;
+				case COLOR_INDEXED:
+					switch (bitdepth) {
+						case 8:
+							palLine = curLine;
+							break;
+						case 4:
+							expand4(curLine, palLine);
+							break;
+						case 2:
+							expand2(curLine, palLine);
+							break;
+						case 1:
+							expand1(curLine, palLine);
+							break;
+						default:
+							throw new UnsupportedOperationException("Unsupported bitdepth for this image");
+					}
+					switch (fmt) {
+						case ABGR:
+							copyPALtoABGR(buffer, palLine);
+							break;
+						case RGBA:
+							copyPALtoRGBA(buffer, palLine);
+							break;
+						case BGRA:
+							copyPALtoBGRA(buffer, palLine);
+							break;
+						default:
+							throw new UnsupportedOperationException("Unsupported format for this image");
+					}
+					break;
+				default:
+					throw new UnsupportedOperationException("Not yet implemented");
 			}
-		} finally {
-			inflater.end();
+
+			byte[] tmp = curLine;
+			curLine = prevLine;
+			prevLine = tmp;
 		}
 	}
 
@@ -695,27 +705,19 @@ public class PNGDecoder {
 
 		switch (colorType) {
 			case COLOR_GREYSCALE:
-				if (bitdepth != 8) {
-					throw new IOException("Unsupported bit depth: " + bitdepth);
-				}
+				if (bitdepth != 8) throw new IOException("Unsupported bit depth: " + bitdepth);
 				bytesPerPixel = 1;
 				break;
 			case COLOR_GREYALPHA:
-				if (bitdepth != 8) {
-					throw new IOException("Unsupported bit depth: " + bitdepth);
-				}
+				if (bitdepth != 8) throw new IOException("Unsupported bit depth: " + bitdepth);
 				bytesPerPixel = 2;
 				break;
 			case COLOR_TRUECOLOR:
-				if (bitdepth != 8) {
-					throw new IOException("Unsupported bit depth: " + bitdepth);
-				}
+				if (bitdepth != 8) throw new IOException("Unsupported bit depth: " + bitdepth);
 				bytesPerPixel = 3;
 				break;
 			case COLOR_TRUEALPHA:
-				if (bitdepth != 8) {
-					throw new IOException("Unsupported bit depth: " + bitdepth);
-				}
+				if (bitdepth != 8) throw new IOException("Unsupported bit depth: " + bitdepth);
 				bytesPerPixel = 4;
 				break;
 			case COLOR_INDEXED:
@@ -734,15 +736,9 @@ public class PNGDecoder {
 				throw new IOException("unsupported color format: " + colorType);
 		}
 
-		if (buffer[10] != 0) {
-			throw new IOException("unsupported compression method");
-		}
-		if (buffer[11] != 0) {
-			throw new IOException("unsupported filtering method");
-		}
-		if (buffer[12] != 0) {
-			throw new IOException("unsupported interlace method");
-		}
+		if (buffer[10] != 0) throw new IOException("unsupported compression method");
+		if (buffer[11] != 0) throw new IOException("unsupported filtering method");
+		if (buffer[12] != 0) throw new IOException("unsupported interlace method");
 	}
 
 	private void readPLTE() throws IOException {
@@ -828,38 +824,6 @@ public class PNGDecoder {
 		return length;
 	}
 
-	private void refillInflater(Inflater inflater) throws IOException {
-		while (chunkRemaining == 0) {
-			closeChunk();
-			openChunk(IDAT);
-		}
-		int read = readChunk(buffer, 0, buffer.length);
-		inflater.setInput(buffer, 0, read);
-	}
-
-	private void readChunkUnzip(Inflater inflater, byte[] buffer, int offset, int length) throws IOException {
-		assert (buffer != this.buffer);
-		try {
-			do {
-				int read = inflater.inflate(buffer, offset, length);
-				if (read <= 0) {
-					if (inflater.finished()) {
-						throw new EOFException();
-					}
-					if (inflater.needsInput()) {
-						refillInflater(inflater);
-					} else {
-						throw new IOException("Can't inflate " + length + " bytes");
-					}
-				} else {
-					offset += read;
-					length -= read;
-				}
-			} while (length > 0);
-		} catch (DataFormatException ex) {
-			throw (IOException) (new IOException("inflate error").initCause(ex));
-		}
-	}
 
 	private void readFully(byte[] buffer, int offset, int length) throws IOException {
 		do {
@@ -887,6 +851,9 @@ public class PNGDecoder {
 				throw new EOFException();
 			}
 			amount -= skipped;
+			if (skipped == 0) {
+				break;
+			}
 		}
 	}
 

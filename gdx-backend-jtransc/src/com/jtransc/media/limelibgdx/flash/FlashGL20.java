@@ -1,10 +1,7 @@
 package com.jtransc.media.limelibgdx.flash;
 
-import com.jtransc.JTranscWrapped;
-import com.jtransc.annotation.JTranscNativeClass;
 import com.jtransc.annotation.haxe.HaxeAddMembers;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
-import com.jtransc.experimental.Wrapped;
 import com.jtransc.media.limelibgdx.GL20Ext;
 import com.jtransc.media.limelibgdx.StateGL20;
 
@@ -52,8 +49,8 @@ public class FlashGL20 {
 		}
 
 		@Override
-		public Shader createShader() {
-			return new FlashShader();
+		public Shader createShader(int type) {
+			return new FlashShader(type);
 		}
 
 		@Override
@@ -66,11 +63,52 @@ public class FlashGL20 {
 		@Override
 		public void dispose() {
 		}
+
+		@Override
+		public void link() {
+
+		}
+
+		@Override
+		public void attach(Shader shader) {
+
+		}
+
+		@Override
+		public void detach(Shader shader) {
+
+		}
+
+		@Override
+		public String getInfoLog() {
+			return "successful compiled";
+		}
+
+		@Override
+		public boolean linked() {
+			return true;
+		}
 	}
 
 	static class FlashShader implements Shader {
+		private int type;
+
+		public FlashShader(int type) {
+			this.type = type;
+		}
+
 		@Override
 		public void dispose() {
+		}
+
+		@Override
+		public void setSource(String string) {
+
+		}
+
+		@Override
+		public void compile() {
+
 		}
 	}
 
