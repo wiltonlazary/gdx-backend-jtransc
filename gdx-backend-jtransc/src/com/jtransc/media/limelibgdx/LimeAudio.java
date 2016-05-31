@@ -10,12 +10,52 @@ import com.badlogic.gdx.files.FileHandle;
 public class LimeAudio implements Audio {
 	@Override
 	public AudioDevice newAudioDevice(int i, boolean b) {
-		throw new RuntimeException("Not implemented AudioDevice");
+		return new AudioDevice() {
+			@Override
+			public boolean isMono() {
+				return false;
+			}
+
+			@Override
+			public void writeSamples(short[] samples, int offset, int numSamples) {
+
+			}
+
+			@Override
+			public void writeSamples(float[] samples, int offset, int numSamples) {
+
+			}
+
+			@Override
+			public int getLatency() {
+				return 0;
+			}
+
+			@Override
+			public void dispose() {
+
+			}
+
+			@Override
+			public void setVolume(float volume) {
+
+			}
+		};
 	}
 
 	@Override
 	public AudioRecorder newAudioRecorder(int i, boolean b) {
-		throw new RuntimeException("Not implemented AudioRecorder");
+		return new AudioRecorder() {
+			@Override
+			public void read(short[] samples, int offset, int numSamples) {
+
+			}
+
+			@Override
+			public void dispose() {
+
+			}
+		};
 	}
 
 	@Override

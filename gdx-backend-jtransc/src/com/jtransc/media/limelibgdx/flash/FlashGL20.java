@@ -1,52 +1,182 @@
 package com.jtransc.media.limelibgdx.flash;
 
-import com.badlogic.gdx.graphics.GL20;
+import com.jtransc.JTranscWrapped;
+import com.jtransc.annotation.JTranscNativeClass;
+import com.jtransc.annotation.haxe.HaxeAddMembers;
+import com.jtransc.annotation.haxe.HaxeMethodBody;
+import com.jtransc.experimental.Wrapped;
 import com.jtransc.media.limelibgdx.GL20Ext;
 import com.jtransc.media.limelibgdx.StateGL20;
+
+import java.nio.Buffer;
 
 import static com.jtransc.media.limelibgdx.StateGL20.*;
 
 public class FlashGL20 {
 	static public GL20Ext create() {
-		return new StateGL20(new StateGL20.Impl() {
-			@Override
-			public void clear(StateGL20.State state, boolean color, boolean depth, boolean stencil) {
-				//context.clear(
-				//	state.clearRed,
-				//	state.clearGreen,
-				//	state.clearBlue,
-				//	state.clearAlpha,
-				//	state.clearDepth,
-				//	state.clearStencil,
-				//	color ? Stage3d
-				//);
-			}
+		return new StateGL20(new FlashImpl());
+	}
 
-			@Override
-			public Texture createTexture() {
-				return null;
-			}
+	static private class FlashImpl extends StateGL20.Impl {
+		Context3D context;
 
-			@Override
-			public Program createProgram() {
-				return null;
-			}
+		@Override
+		public void clear(StateGL20.State state, boolean color, boolean depth, boolean stencil) {
+			int mask = 0;
 
-			@Override
-			public Shader createShader() {
-				return null;
-			}
+			if (color) mask |= Context3DClearMask.COLOR;
+			if (depth) mask |= Context3DClearMask.DEPTH;
+			if (stencil) mask |= Context3DClearMask.STENCIL;
 
-			@Override
-			public void render(StateGL20.State state) {
-				/*
-				context.setCulling(
-					state.cullFaceEnabled ? (
-						state.cullFaceClockWise ? Context3DTriangleFace.FRONT : Context3DTriangleFace.BACK
-					) : Context3DTriangleFace.FRONT_AND_BACK
+			if (context != null) {
+				context.clear(
+					state.clearRed,
+					state.clearGreen,
+					state.clearBlue,
+					state.clearAlpha,
+					state.clearDepth,
+					state.clearStencil,
+					mask
 				);
-				*/
 			}
-		});
+		}
+
+		@Override
+		public Texture createTexture() {
+			return new FlashTexture(context);
+		}
+
+		@Override
+		public Program createProgram() {
+			return new FlashProgram();
+		}
+
+		@Override
+		public Shader createShader() {
+			return new FlashShader();
+		}
+
+		@Override
+		public void render(StateGL20.State state) {
+
+		}
+	}
+
+	static class FlashProgram implements Program {
+		@Override
+		public void dispose() {
+		}
+	}
+
+	static class FlashShader implements Shader {
+		@Override
+		public void dispose() {
+		}
+	}
+
+	static class FlashTexture implements Texture {
+		final Context3D context;
+		//Textures.Texture internal;
+
+		public FlashTexture(Context3D context) {
+			this.context = context;
+		}
+
+		@Override
+		public void uploadData(Buffer data, int width, int height) {
+			//context.crea
+		}
+
+		@Override
+		public void dispose() {
+		}
+	}
+
+	/*
+	@JTranscNativeClass("flash.display3D.Context3D")
+	static class Context3D {
+		native public void clear(double red, double green, double blue, double alpha, double depth, int stencil, int mask);
+		//native public void configureBackBuffer(int width, int height, int antiAlias, boolean enableDepthAndStencil, boolean wantsBestResolution, boolean wantsBestResolutionOnBrowserZoom);
+		//native public Textures.CubeTexture createCubeTexture(int size, String format, boolean optimizeForRenderToTexture, int streamingLevels);
+		//native public IndexBuffer3D createIndexBuffer(int numIndices, String bufferUsage);
+		//native public Program3D createProgram();
+		//native public RectangleTexture createRectangleTexture(int width, int height, String format, boolean optimizeForRenderToTexture);
+		//native public Textures.Texture createTexture(int width, int height, String format, boolean optimizeForRenderToTexture, int streamingLevels);
+		//native public VertexBuffer3D createVertexBuffer(int numVertices, int data32PerVertex, String bufferUsage);
+		//native public VertexBuffer3D createVertexBufferForInstances(int numVertices, int data32PerVertex, int instancesPerElement, String bufferUsage);
+		//native public VideoTexture createVideoTexture();
+		//native public void dispose(boolean recreate);
+		//native public void drawToBitmapData(BitmapData destination);
+		//native public void drawTriangles(IndexBuffer3D indexBuffer, int firstIndex, int numTriangles);
+		//native public void drawTrianglesInstanced(IndexBuffer3D indexBuffer, int numInstances, int firstIndex, int numTriangles);
+		//native public void present();
+		//native public void setBlendFactors(String sourceFactor, String destinationFactor);
+		//native public void setColorMask(boolean red, boolean green, boolean blue, boolean alpha);
+		//native public void setCulling(String triangleFaceToCull);
+		//native public void setDepthTest(boolean depthMask, String passCompareMode);
+		//native public void setFillMode(String fillMode);
+		//native public void setProgram(Program3D program);
+		//native public void setProgramConstantsFromByteArray(String programType, int firstRegister, int numRegisters, byte[] data, int byteArrayOffset);
+		//native public void setProgramConstantsFromMatrix(String programType, int firstRegister, Matrix3D matrix, boolean transposedMatrix);
+		//native public void setProgramConstantsFromVector(String programType, int firstRegister, double[] data, int numRegisters);
+		//native public void setRenderToBackBuffer();
+		//native public void setRenderToTexture(Textures.TextureBase texture, boolean enableDepthAndStencil, int antiAlias, int surfaceSelector, int colorOutputIndex);
+		//native public void setSamplerStateAt(int sampler, String wrap, String filter, String mipfilter);
+		//native public void setScissorRectangle(Rectangle rectangle);
+		//native public void setStencilActions(String triangleFace, String compareMode, String actionOnBothPass, String actionOnDepthFail, String actionOnDepthPassStencilFail);
+		//native public void setStencilReferenceValue(int referenceValue, int readMask, int writeMask);
+		//native public void setTextureAt(int sampler, Textures.TextureBase texture);
+		//native public void setVertexBufferAt(int index, VertexBuffer3D buffer, int bufferOffset, String format);
+
+		public int backBufferHeight;
+		public int backBufferWidth;
+		public String driverInfo;
+		public boolean enableErrorChecking;
+		public int maxBackBufferHeight;
+		public int maxBackBufferWidth;
+		public String profile;
+		public boolean supportsVideoTexture;
+		public double totalGPUMemory;
+
+
+		// http://wonderfl.net/c/qc87
+		@JTranscNativeClass("flash.display3D.Context3DClearMask")
+		static class ClearMask {
+			static public final int COLOR = 1;
+			static public final int DEPTH = 2;
+			static public final int STENCIL = 4;
+			static public final int ALL = COLOR | DEPTH | STENCIL;
+		}
+	}
+
+	static class Textures {
+		@JTranscNativeClass("flash.display3D.textures.Texture")
+		static class Texture {
+			native public void uploadCompressedTextureFromByteArray(byte[] data, int byteArrayOffset, boolean async);
+			//native public void uploadFromBitmapData(BitmapData source, int miplevel);
+			native public void uploadFromByteArray(byte[] data, int byteArrayOffset, int miplevel);
+		}
+
+		@JTranscNativeClass("flash.display3D.textures.CubeTexture")
+		static class CubeTexture {
+
+		}
+	}
+	*/
+
+	@HaxeAddMembers({
+		"#if flash var context:flash.display3D.Context3D; #end"
+	})
+	static class Context3D {
+		@HaxeMethodBody(target = "flash", value = "context.clear(p0, p1, p2, p3, p4, p5, p6);")
+		public void clear(double red, double green, double blue, double alpha, double depth, int stencil, int mask) {
+		}
+	}
+
+	static class Context3DClearMask {
+		static public final int COLOR = 1;
+		static public final int DEPTH = 2;
+		static public final int STENCIL = 4;
+		static public final int ALL = COLOR | DEPTH | STENCIL;
 	}
 }

@@ -215,22 +215,22 @@ public class LimeGraphics implements Graphics {
 	}
 
 	@Override
-	public void setTitle(String s) {
+	public void setTitle(String title) {
 
 	}
 
 	@Override
-	public void setUndecorated(boolean b) {
+	public void setUndecorated(boolean undecorated) {
 
 	}
 
 	@Override
-	public void setResizable(boolean b) {
+	public void setResizable(boolean resizable) {
 
 	}
 
 	@Override
-	public void setVSync(boolean b) {
+	public void setVSync(boolean vsync) {
 
 	}
 
@@ -240,12 +240,12 @@ public class LimeGraphics implements Graphics {
 	}
 
 	@Override
-	public boolean supportsExtension(String s) {
+	public boolean supportsExtension(String extension) {
 		return false;
 	}
 
 	@Override
-	public void setContinuousRendering(boolean b) {
+	public void setContinuousRendering(boolean isContinuous) {
 
 	}
 
@@ -265,7 +265,7 @@ public class LimeGraphics implements Graphics {
 	}
 
 	@Override
-	public Cursor newCursor(Pixmap pixmap, int i, int i1) {
+	public Cursor newCursor(Pixmap pixmap, int xHotspot, int yHotspot) {
 		return null;
 	}
 

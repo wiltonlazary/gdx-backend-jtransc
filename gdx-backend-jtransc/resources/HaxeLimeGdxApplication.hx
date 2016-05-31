@@ -144,85 +144,85 @@ class HaxeLimeGdxApplication extends lime.app.Application {
 	////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////
 
-	static var program;
-	static var vertexBuffer;
-
-	static public function testInit() {
-		program = createProgram(
-			"attribute vec3 aVertexPosition; void main(void) { gl_Position = vec4(aVertexPosition, 1.0); }",
-			"void main(void) { gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);}"
-		);
-		vertexBuffer = createTriangle();
-	}
-
-	static private function createTriangle() {
-		var vertexBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-
-		var vertices = new lime.utils.Float32Array(9);
-		vertices[0] =  0;
-		vertices[1] =  1;
-		vertices[2] =  0;
-		vertices[3] = -1;
-		vertices[4] = -1;
-		vertices[5] =  0;
-		vertices[6] =  1;
-		vertices[7] = -1;
-		vertices[8] =  0;
-
-		gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-		return vertexBuffer;
-	}
-
-	static private function createProgram(vertexCode:String, fragmentCode:String) {
-		var program = gl.createProgram();
-		gl.attachShader(program, createShader(gl.VERTEX_SHADER, vertexCode));
-		gl.attachShader(program, createShader(gl.FRAGMENT_SHADER, fragmentCode));
-		gl.linkProgram(program);
-		trace(gl.getProgramInfoLog(program));
-		return program;
-	}
-
-	static private function createShader(type:Int, code:String) {
-		var shader = gl.createShader(type);
-		gl.shaderSource(shader, code);
-		gl.compileShader(shader);
-		return shader;
-	}
-
-	static public function testFrame() {
-		gl.enable(gl.BLEND);
-		gl.viewport(0, 0, 1280, 720);
-
-		gl.clearColor(1, 0, 1, 1);
-		gl.clearStencil(0);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-		gl.disable(gl.SCISSOR_TEST);
-		gl.disable(gl.STENCIL_TEST);
-		gl.depthMask(false);
-		gl.colorMask(true, true, true, true);
-		gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
-		gl.stencilFunc(gl.EQUAL, 0x00, 0x00);
-		gl.stencilMask(0x00);
-
-		var pos = gl.getAttribLocation(program, "aVertexPosition");
-
-		gl.enableVertexAttribArray(pos);
-		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-
-		gl.vertexAttribPointer(
-			pos,               // attribute 0. No particular reason for 0, but must match the layout in the shader.
-			3,                 // size
-			gl.FLOAT,     // type
-			false,             // normalized?
-			0,                 // stride
-			0                  // array buffer offset
-		);
-		gl.useProgram(program);
-		gl.drawArrays(gl.TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
-		gl.disableVertexAttribArray(pos);
-	}
+	//static var program;
+	//static var vertexBuffer;
+	//
+	//static public function testInit() {
+	//	program = createProgram(
+	//		"attribute vec3 aVertexPosition; void main(void) { gl_Position = vec4(aVertexPosition, 1.0); }",
+	//		"void main(void) { gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);}"
+	//	);
+	//	vertexBuffer = createTriangle();
+	//}
+	//
+	//static private function createTriangle() {
+	//	var vertexBuffer = gl.createBuffer();
+	//	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+	//
+	//	var vertices = new lime.utils.Float32Array(9);
+	//	vertices[0] =  0;
+	//	vertices[1] =  1;
+	//	vertices[2] =  0;
+	//	vertices[3] = -1;
+	//	vertices[4] = -1;
+	//	vertices[5] =  0;
+	//	vertices[6] =  1;
+	//	vertices[7] = -1;
+	//	vertices[8] =  0;
+	//
+	//	gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+	//	return vertexBuffer;
+	//}
+	//
+	//static private function createProgram(vertexCode:String, fragmentCode:String) {
+	//	var program = gl.createProgram();
+	//	gl.attachShader(program, createShader(gl.VERTEX_SHADER, vertexCode));
+	//	gl.attachShader(program, createShader(gl.FRAGMENT_SHADER, fragmentCode));
+	//	gl.linkProgram(program);
+	//	trace(gl.getProgramInfoLog(program));
+	//	return program;
+	//}
+	//
+	//static private function createShader(type:Int, code:String) {
+	//	var shader = gl.createShader(type);
+	//	gl.shaderSource(shader, code);
+	//	gl.compileShader(shader);
+	//	return shader;
+	//}
+	//
+	//static public function testFrame() {
+	//	gl.enable(gl.BLEND);
+	//	gl.viewport(0, 0, 1280, 720);
+	//
+	//	gl.clearColor(1, 0, 1, 1);
+	//	gl.clearStencil(0);
+	//	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	//
+	//	gl.disable(gl.SCISSOR_TEST);
+	//	gl.disable(gl.STENCIL_TEST);
+	//	gl.depthMask(false);
+	//	gl.colorMask(true, true, true, true);
+	//	gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
+	//	gl.stencilFunc(gl.EQUAL, 0x00, 0x00);
+	//	gl.stencilMask(0x00);
+	//
+	//	var pos = gl.getAttribLocation(program, "aVertexPosition");
+	//
+	//	gl.enableVertexAttribArray(pos);
+	//	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+	//
+	//	gl.vertexAttribPointer(
+	//		pos,               // attribute 0. No particular reason for 0, but must match the layout in the shader.
+	//		3,                 // size
+	//		gl.FLOAT,     // type
+	//		false,             // normalized?
+	//		0,                 // stride
+	//		0                  // array buffer offset
+	//	);
+	//	gl.useProgram(program);
+	//	gl.drawArrays(gl.TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
+	//	gl.disableVertexAttribArray(pos);
+	//}
 }
 
 class JTranscModule extends lime.app.Module {

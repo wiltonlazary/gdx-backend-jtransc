@@ -65,6 +65,11 @@
     <build>
         <sourceDirectory>src</sourceDirectory>
 		<testSourceDirectory>test</testSourceDirectory>
+		<testResources>
+			<testResource>
+				<directory>testresources</directory>
+			</testResource>
+		</testResources>
         <resources>
             <resource>
                 <directory>resources</directory>

@@ -21,11 +21,17 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.jtransc.JTranscArrays;
 import com.jtransc.JTranscBits;
+import com.jtransc.JTranscSystem;
+import com.jtransc.annotation.JTranscNativeClass;
+import com.jtransc.io.JTranscIoTools;
 import com.jtransc.media.limelibgdx.LimeFiles;
+import com.jtransc.media.limelibgdx.imaging.ImageDecoder;
 import com.jtransc.media.limelibgdx.util.ColorFormat8;
 import com.jtransc.annotation.haxe.HaxeAddMembers;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
@@ -95,14 +101,37 @@ public class Pixmap implements Disposable {
 	static Blending blending;
 
 	public Pixmap(FileHandle file) {
-		loadImage(LimeFiles.fixpath(file.file().getPath()));
-		//JTranscArrays.swizzle_inplace(data, 24, 16, 8, 0);
-		//JTranscArrays.swizzle_inplace(data, 0, 8, 16, 24);
-		JTranscArrays.swizzle_inplace_reverse(data);
+		try {
+
+			loadImage((file.file().isAbsolute()) ? file.file().getPath() : LimeFiles.fixpath(file.file().getPath()));
+			//JTranscArrays.swizzle_inplace(data, 24, 16, 8, 0);
+			//JTranscArrays.swizzle_inplace(data, 0, 8, 16, 24);
+			JTranscArrays.swizzle_inplace_reverse(data);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public Pixmap(int width, int height, Format format) {
 		create(width, height, format);
+	}
+
+	private void loadImage(String path) throws IOException {
+		//if (JTranscSystem.isSwf() || !JTranscSystem.usingJTransc()) {
+		if (true) {
+			ImageDecoder.BitmapData bitmap = ImageDecoder.decode(JTranscIoTools.readFile(new File(path)));
+			this.data = bitmap.data;
+			this.width = bitmap.width;
+			this.height = bitmap.height;
+		} else {
+			loadImageNative(path);
+		}
+	}
+
+	@JTranscNativeClass("lime.Assets")
+	static public class Assets {
+		native static public Object getImage(String path);
+		native static public byte[] getBytes(String path);
 	}
 
 	@HaxeMethodBody("" +
@@ -111,7 +140,7 @@ public class Pixmap implements Disposable {
 		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:width %} = image.width;" +
 		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:height %} = image.height;"
 	)
-	native private void loadImage(String path);
+	native private void loadImageNative(String path);
 
 	private void create(int width, int height, Format format2) {
 		this.width = width;
