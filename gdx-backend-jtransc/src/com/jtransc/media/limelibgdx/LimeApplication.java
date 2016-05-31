@@ -298,13 +298,29 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	@Override
 	public Clipboard getClipboard() {
 		return new Clipboard() {
+			private String content = "";
+
 			@Override
 			@HaxeMethodBody("return HaxeNatives.str(lime.system.Clipboard.text);")
-			native public String getContents();
+			public String getContents() {
+				try {
+					return (String)Class.forName("com.jtransc.media.limelibgdx.LimeApplicationAwtUtils").getMethod("getClipboardContents").invoke(null);
+				} catch (Throwable e) {
+					e.printStackTrace();
+					return content;
+				}
+			}
 
 			@Override
 			@HaxeMethodBody("lime.system.Clipboard.text = p0._str;")
-			native public void setContents(String content);
+			public void setContents(String content) {
+				this.content = content;
+				try {
+					Class.forName("com.jtransc.media.limelibgdx.LimeApplicationAwtUtils").getMethod("setClipboardContents", String.class).invoke(null, content);
+				} catch (Throwable e) {
+					e.printStackTrace();
+				}
+			}
 		};
 	}
 

@@ -1,7 +1,6 @@
 package com.jtransc.media.limelibgdx;
 
-import com.badlogic.gdx.*;
-import com.badlogic.gdx.utils.Clipboard;
+import com.badlogic.gdx.ApplicationListener;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -45,11 +44,11 @@ public class GdxApplicationAdapterTest {
 	@Test
 	public void testPostRunnable() throws Exception {
 		app.postRunnable(() -> {
-            out.add("run1");
+			out.add("run1");
 			app.postRunnable(() -> {
 				out.add("run2");
 			});
-        });
+		});
 
 
 		Assert.assertEquals("", String.join(",", out));
@@ -58,5 +57,12 @@ public class GdxApplicationAdapterTest {
 		app.render();
 		Assert.assertEquals("run1,render,run2,render", String.join(",", out));
 		app.render();
+	}
+
+	@Test
+	public void testClipboard() throws Exception {
+		final String str = "hello";
+		app.getClipboard().setContents(str);
+		Assert.assertEquals(str, app.getClipboard().getContents());
 	}
 }
