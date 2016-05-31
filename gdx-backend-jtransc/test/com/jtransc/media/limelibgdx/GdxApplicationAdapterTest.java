@@ -12,12 +12,10 @@ public class GdxApplicationAdapterTest {
 	final private LimeApplication app = new LimeApplication(new ApplicationListener() {
 		@Override
 		public void create() {
-
 		}
 
 		@Override
 		public void resize(int width, int height) {
-
 		}
 
 		@Override
@@ -27,17 +25,14 @@ public class GdxApplicationAdapterTest {
 
 		@Override
 		public void pause() {
-
 		}
 
 		@Override
 		public void resume() {
-
 		}
 
 		@Override
 		public void dispose() {
-
 		}
 	}, "test", 10, 10);
 
@@ -49,7 +44,6 @@ public class GdxApplicationAdapterTest {
 				out.add("run2");
 			});
 		});
-
 
 		Assert.assertEquals("", String.join(",", out));
 		app.render();

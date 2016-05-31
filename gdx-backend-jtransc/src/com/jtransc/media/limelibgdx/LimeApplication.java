@@ -3,6 +3,7 @@ package com.jtransc.media.limelibgdx;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Clipboard;
+import com.jtransc.JTranscSystem;
 import com.jtransc.annotation.JTranscNativeClass;
 import com.jtransc.annotation.haxe.*;
 
@@ -76,7 +77,6 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 		Gdx.input = input = new LimeInput();
 		Gdx.files = files = new LimeFiles();
 		Gdx.net = net = new LimeNet();
-
 		Gdx.gl = graphics.getGL20();
 		Gdx.gl20 = graphics.getGL20();
 		Gdx.gl30 = graphics.getGL30();
@@ -296,32 +296,26 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	}
 
 	@Override
-	public Clipboard getClipboard() {
-		return new Clipboard() {
-			private String content = "";
+	protected Clipboard createClipboard() {
+		if (JTranscSystem.usingJTransc()) {
+			return new Clipboard() {
+				private String content = "";
 
-			@Override
-			@HaxeMethodBody("return HaxeNatives.str(lime.system.Clipboard.text);")
-			public String getContents() {
-				try {
-					return (String)Class.forName("com.jtransc.media.limelibgdx.LimeApplicationAwtUtils").getMethod("getClipboardContents").invoke(null);
-				} catch (Throwable e) {
-					e.printStackTrace();
-					return content;
-				}
-			}
+				@Override
+				@HaxeMethodBody("return HaxeNatives.str(lime.system.Clipboard.text);")
+				native public String getContents();
 
-			@Override
-			@HaxeMethodBody("lime.system.Clipboard.text = p0._str;")
-			public void setContents(String content) {
-				this.content = content;
-				try {
-					Class.forName("com.jtransc.media.limelibgdx.LimeApplicationAwtUtils").getMethod("setClipboardContents", String.class).invoke(null, content);
-				} catch (Throwable e) {
-					e.printStackTrace();
-				}
+				@Override
+				@HaxeMethodBody("lime.system.Clipboard.text = p0._str;")
+				native public void setContents(String content);
+			};
+		} else {
+			try {
+				return (com.badlogic.gdx.utils.Clipboard) Class.forName("com.jtransc.media.limelibgdx.LimeApplicationAwtUtils$AwtClipboardAdaptor").newInstance();
+			}catch (Throwable t) {
+				throw new RuntimeException(t);
 			}
-		};
+		}
 	}
 
 	@SuppressWarnings("unused")

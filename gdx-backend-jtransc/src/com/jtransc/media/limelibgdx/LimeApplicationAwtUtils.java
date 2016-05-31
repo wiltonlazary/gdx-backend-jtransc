@@ -6,18 +6,22 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 
 public class LimeApplicationAwtUtils {
-	static private Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+	static public class AwtClipboardAdaptor implements com.badlogic.gdx.utils.Clipboard {
+		static private Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 
-	// Called reflectively on java to avoid including dependencies
-	@SuppressWarnings("unused")
-	static public String getClipboardContents() throws Throwable {
-		return (String) clipboard.getData(DataFlavor.stringFlavor);
-	}
+		@Override
+		public String getContents() {
+			try {
+				return (String) clipboard.getData(DataFlavor.stringFlavor);
+			} catch (Throwable t) {
+				throw new RuntimeException(t);
+			}
+		}
 
-	// Called reflectively on java to avoid including dependencies
-	@SuppressWarnings("unused")
-	static public void setClipboardContents(String content) throws Throwable {
-		StringSelection selection = new StringSelection(content);
-		clipboard.setContents(selection, selection);
+		@Override
+		public void setContents(String content) {
+			StringSelection selection = new StringSelection(content);
+			clipboard.setContents(selection, selection);
+		}
 	}
 }

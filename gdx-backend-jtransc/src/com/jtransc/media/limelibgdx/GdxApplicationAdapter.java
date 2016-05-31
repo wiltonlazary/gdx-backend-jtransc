@@ -2,6 +2,7 @@ package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.LifecycleListener;
+import com.badlogic.gdx.utils.Clipboard;
 import com.badlogic.gdx.utils.Queue;
 
 import java.util.ArrayList;
@@ -109,5 +110,15 @@ abstract public class GdxApplicationAdapter implements Application {
 		for (LifecycleListener listener : listeners) {
 			listener.dispose();
 		}
+	}
+
+	abstract protected Clipboard createClipboard();
+
+	private Clipboard clipboard;
+
+	@Override
+	final public Clipboard getClipboard() {
+		if (this.clipboard == null) this.clipboard = createClipboard();
+		return this.clipboard;
 	}
 }
