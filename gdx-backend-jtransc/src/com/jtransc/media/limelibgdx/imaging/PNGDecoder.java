@@ -29,8 +29,6 @@
  */
 package com.jtransc.media.limelibgdx.imaging;
 
-import com.jtransc.compression.JTranscInflater;
-
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
