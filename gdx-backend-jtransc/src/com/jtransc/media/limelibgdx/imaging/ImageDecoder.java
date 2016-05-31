@@ -1,7 +1,5 @@
 package com.jtransc.media.limelibgdx.imaging;
 
-import com.jtransc.io.JTranscBufferTools;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.Buffer;
@@ -43,6 +41,16 @@ public class ImageDecoder {
 		return Format.UNKNOWN;
 	}
 
+	static public int[] toIntArray(ByteBuffer buffer) {
+		//return com.jtransc.io.JTranscBufferTools.toIntArray(buffer);
+		IntBuffer intBuffer = buffer.asIntBuffer();
+		int[] out = new int[intBuffer.limit()];
+		for (int n = 0; n < out.length; n++) {
+			out[n] = intBuffer.get(n);
+		}
+		return out;
+	}
+
 	static public BitmapData decode(byte[] buffer) {
 		try {
 			Format format = detect(buffer);
@@ -56,7 +64,7 @@ public class ImageDecoder {
 					final ByteBuffer data = ByteBuffer.allocate(width * height * 4);
 					decoder.decodeRGB(data, width * 4, decoder.getNumMCURows());
 					data.rewind();
-					return new BitmapData(JTranscBufferTools.toIntArray(data), width, height);
+					return new BitmapData(toIntArray(data), width, height);
 				}
 				case PNG: {
 					final PNGDecoder decoder = new PNGDecoder(new ByteArrayInputStream(buffer));
@@ -65,7 +73,7 @@ public class ImageDecoder {
 					final ByteBuffer data = ByteBuffer.allocate(width * height * 4);
 					decoder.decode(data, width * 4, PNGDecoder.Format.ABGR);
 					data.rewind();
-					return new BitmapData(JTranscBufferTools.toIntArray(data), width, height);
+					return new BitmapData(toIntArray(data), width, height);
 				}
 				default:
 					throw new RuntimeException("Unsupported format " + format);
