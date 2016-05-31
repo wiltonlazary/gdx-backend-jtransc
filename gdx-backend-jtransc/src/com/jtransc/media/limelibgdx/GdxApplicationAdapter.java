@@ -5,21 +5,48 @@ import com.badlogic.gdx.utils.Clipboard;
 import com.badlogic.gdx.utils.Queue;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
+// https://github.com/libgdx/libgdx/blob/master/backends/gdx-backend-lwjgl/src/com/badlogic/gdx/backends/lwjgl/LwjglApplication.java
 abstract public class GdxApplicationAdapter implements Application {
 	ArrayList<LifecycleListener> listeners = new ArrayList<>();
 	private Queue<Runnable> postRunnableList = new Queue<>();
 	private Queue<Runnable> postRunnableListCopy = new Queue<>();
 	private int logLevel = LOG_DEBUG;
+	private ApplicationType type = ApplicationType.WebGL;
 
 	final private ApplicationListener applicationListener;
 	final private Audio audio;
+	final private LimeGraphics graphics;
+	final private LimeInput input;
+	final private LimeFiles files;
+	final private LimeNet net;
 
 	public GdxApplicationAdapter(ApplicationListener applicationListener) {
 		Gdx.app = this;
 		this.applicationListener = applicationListener;
 		Gdx.audio = audio = createAudio();
+		this.type = createApplicationType();
+		Gdx.graphics = graphics = createGraphics();
+		Gdx.input = input = createInput();
+		Gdx.files = files = createFiles();
+		Gdx.net = net = createNet();
+		Gdx.gl20 = Gdx.gl = graphics.getGL20();
+		Gdx.gl30 = graphics.getGL30();
+		initialize();
 	}
+
+	protected void initialize() {
+
+	}
+
+	protected abstract LimeNet createNet();
+
+	protected abstract LimeFiles createFiles();
+
+	protected abstract LimeInput createInput();
+
+	protected abstract LimeGraphics createGraphics();
 
 	public void log(int level, String tag, String message, Throwable exception) {
 		if (level <= this.logLevel) {
@@ -123,16 +150,40 @@ abstract public class GdxApplicationAdapter implements Application {
 		}
 	}
 
+	abstract protected Preferences createPreferences(String name);
+
 	abstract protected Clipboard createClipboard();
 
 	abstract protected Audio createAudio();
 
+	abstract protected ApplicationType createApplicationType();
+
 	private Clipboard clipboard;
+
+	@Override
+	public long getJavaHeap() {
+		return Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+	}
+
+	@Override
+	public long getNativeHeap() {
+		return getJavaHeap();
+	}
 
 	@Override
 	final public Clipboard getClipboard() {
 		if (this.clipboard == null) this.clipboard = createClipboard();
 		return this.clipboard;
+	}
+
+	private HashMap<String, Preferences> preferences = new HashMap<String, Preferences>();
+
+	@Override
+	final public Preferences getPreferences(String name) {
+		if (!this.preferences.containsKey(name)) {
+			this.preferences.put(name, createPreferences(name));
+		}
+		return this.preferences.get(name);
 	}
 
 	@Override
@@ -145,20 +196,45 @@ abstract public class GdxApplicationAdapter implements Application {
 		return audio;
 	}
 
-	@SuppressWarnings("unused")
+	@Override
+	final public Graphics getGraphics() {
+		return graphics;
+	}
+
+	@Override
+	final public Input getInput() {
+		return input;
+	}
+
+	@Override
+	final public Files getFiles() {
+		return files;
+	}
+
+	@Override
+	final public Net getNet() {
+		return net;
+	}
+
+	@Override
+	final public ApplicationType getType() {
+		return type;
+	}
+
 	public void create() {
 		applicationListener.create();
 		resized(LimeApplication.HaxeLimeGdxApplication.instance.getWidth(), LimeApplication.HaxeLimeGdxApplication.instance.getHeight());
 	}
 
-	@SuppressWarnings("unused")
 	public void render() {
 		onFrame();
 		applicationListener.render();
+		graphics.frame();
 	}
 
-	@SuppressWarnings("unused")
 	public void resized(int width, int height) {
+		graphics.width = width;
+		graphics.height = height;
 		Gdx.gl.glViewport(0, 0, width, height);
 		applicationListener.resize(width, height);
 	}

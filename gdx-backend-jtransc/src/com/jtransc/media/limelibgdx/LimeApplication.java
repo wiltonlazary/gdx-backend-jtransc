@@ -1,6 +1,9 @@
 package com.jtransc.media.limelibgdx;
 
-import com.badlogic.gdx.*;
+import com.badlogic.gdx.Application;
+import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.Audio;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Clipboard;
 import com.jtransc.JTranscSystem;
@@ -56,40 +59,32 @@ import java.util.Map;
 	"com/badlogic/gdx/utils/arial-15.png"
 })
 public class LimeApplication extends GdxApplicationAdapter implements Application {
-	final private LimeGraphics graphics;
-	final private LimeInput input;
-	final private LimeFiles files;
-	final private LimeNet net;
-	private ApplicationType type = ApplicationType.WebGL;
+	static private final boolean TRACE = false;
 
 	public LimeApplication(ApplicationListener applicationListener, String title, int width, int height) {
-		this(applicationListener, title, width, height, false);
+		super(applicationListener);
+		setApplicationToLime(this);
+		referenceClasses();
 	}
 
-	public LimeApplication(ApplicationListener applicationListener, String title, int width, int height, boolean trace) {
-		super(applicationListener);
+	@Override
+	protected LimeNet createNet() {
+		return new LimeNet();
+	}
 
-		Gdx.graphics = graphics = new LimeGraphics(trace);
-		Gdx.input = input = new LimeInput();
-		Gdx.files = files = new LimeFiles();
-		Gdx.net = net = new LimeNet();
-		Gdx.gl = graphics.getGL20();
-		Gdx.gl20 = graphics.getGL20();
-		Gdx.gl30 = graphics.getGL30();
+	@Override
+	protected LimeFiles createFiles() {
+		return new LimeFiles();
+	}
 
-		if (LimeDevice.isJs()) {
-			type = ApplicationType.WebGL;
-		} else if (LimeDevice.isIos()) {
-			type = ApplicationType.iOS;
-		} else if (LimeDevice.isAndroid()) {
-			type = ApplicationType.Android;
-		} else {
-			type = ApplicationType.Desktop;
-		}
+	@Override
+	protected LimeInput createInput() {
+		return new LimeInput();
+	}
 
-		setApplicationToLime(this);
-
-		referenceClasses();
+	@Override
+	protected LimeGraphics createGraphics() {
+		return new LimeGraphics(TRACE);
 	}
 
 	// @TODO: mark package to include!
@@ -115,36 +110,8 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 		new GlyphLayout.GlyphRun();
 	}
 
-
 	@HaxeMethodBody("HaxeLimeGdxApplication.app = p0;")
 	private void setApplicationToLime(LimeApplication app) {
-	}
-
-
-	@Override
-	public Graphics getGraphics() {
-		return graphics;
-	}
-
-	@Override
-	public Input getInput() {
-		return input;
-	}
-
-	@Override
-	public Files getFiles() {
-		return files;
-	}
-
-	@Override
-	public Net getNet() {
-		return net;
-	}
-
-
-	@Override
-	public ApplicationType getType() {
-		return type;
 	}
 
 	@Override
@@ -153,17 +120,7 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	}
 
 	@Override
-	public long getJavaHeap() {
-		return 0;
-	}
-
-	@Override
-	public long getNativeHeap() {
-		return 0;
-	}
-
-	@Override
-	public Preferences getPreferences(String name) {
+	protected Preferences createPreferences(String name) {
 		return new GdxPreferencesAdapter(name, false) {
 			@Override
 			protected Map<String, Object> load(String name) {
@@ -193,7 +150,7 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 		} else {
 			try {
 				return (com.badlogic.gdx.utils.Clipboard) Class.forName("com.jtransc.media.limelibgdx.LimeApplicationAwtUtils$AwtClipboardAdaptor").newInstance();
-			}catch (Throwable t) {
+			} catch (Throwable t) {
 				throw new RuntimeException(t);
 			}
 		}
@@ -212,15 +169,13 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 
 	@SuppressWarnings("unused")
 	public void render() {
-		super.render();
 		LimeInput.lime_frame();
-		graphics.frame();
+		super.render();
+
 	}
 
 	@SuppressWarnings("unused")
 	public void resized(int width, int height) {
-		graphics.width = width;
-		graphics.height = height;
 		super.resized(width, height);
 	}
 
@@ -246,5 +201,18 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	@Override
 	public void onDisposed() {
 		super.onDisposed();
+	}
+
+	@Override
+	protected ApplicationType createApplicationType() {
+		if (LimeDevice.isJs()) {
+			return ApplicationType.WebGL;
+		} else if (LimeDevice.isIos()) {
+			return ApplicationType.iOS;
+		} else if (LimeDevice.isAndroid()) {
+			return ApplicationType.Android;
+		} else {
+			return ApplicationType.Desktop;
+		}
 	}
 }
