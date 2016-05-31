@@ -118,6 +118,18 @@ class HaxeLimeGdxApplication extends lime.app.Application {
         super.update(deltaTime);
     }
 
+    public override function onWindowActivate(window:Window):Void {
+        app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:onResumed %}();
+    }
+
+    public override function onWindowDeactivate(window:Window):Void {
+        app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:onPaused %}();
+    }
+
+    public override function onWindowClose (window:Window):Void {
+        app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:onDisposed %}();
+    }
+
     public function new() {
         super();
         HaxeLimeGdxApplication.instance = this;

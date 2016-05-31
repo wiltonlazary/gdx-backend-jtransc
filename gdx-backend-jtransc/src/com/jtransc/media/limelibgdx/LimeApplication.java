@@ -54,14 +54,13 @@ import java.util.Map;
 	"com/badlogic/gdx/utils/arial-15.fnt",
 	"com/badlogic/gdx/utils/arial-15.png"
 })
-public class LimeApplication implements Application {
+public class LimeApplication extends GdxApplicationAdapter implements Application {
 	final private ApplicationListener applicationListener;
 	final private LimeGraphics graphics;
 	final private LimeAudio audio;
 	final private LimeInput input;
 	final private LimeFiles files;
 	final private LimeNet net;
-	private int logLevel = LOG_DEBUG;
 	private ApplicationType type = ApplicationType.WebGL;
 
 	public LimeApplication(ApplicationListener applicationListener, String title, int width, int height) {
@@ -154,51 +153,6 @@ public class LimeApplication implements Application {
 		return net;
 	}
 
-	private void _log(int level, String tag, String message, Throwable exception) {
-		if (level <= this.logLevel) {
-			System.out.println("[" + tag + "] " + message + " : " + exception);
-		}
-	}
-
-	@Override
-	public void log(String tag, String message) {
-		_log(LOG_INFO, tag, message, null);
-	}
-
-	@Override
-	public void log(String tag, String message, Throwable exception) {
-		_log(LOG_INFO, tag, message, exception);
-	}
-
-	@Override
-	public void error(String tag, String message) {
-		_log(LOG_ERROR, tag, message, null);
-	}
-
-	@Override
-	public void error(String tag, String message, Throwable exception) {
-		_log(LOG_ERROR, tag, message, exception);
-	}
-
-	@Override
-	public void debug(String tag, String message) {
-		_log(LOG_DEBUG, tag, message, null);
-	}
-
-	@Override
-	public void debug(String tag, String message, Throwable exception) {
-		_log(LOG_DEBUG, tag, message, exception);
-	}
-
-	@Override
-	public void setLogLevel(int logLevel) {
-		this.logLevel = logLevel;
-	}
-
-	@Override
-	public int getLogLevel() {
-		return this.logLevel;
-	}
 
 	@Override
 	public ApplicationType getType() {
@@ -353,26 +307,6 @@ public class LimeApplication implements Application {
 		};
 	}
 
-	@Override
-	public void postRunnable(Runnable runnable) {
-		System.err.println("ERROR! postRunnable: " + runnable);
-	}
-
-	@Override
-	public void exit() {
-		System.exit(0);
-	}
-
-	@Override
-	public void addLifecycleListener(LifecycleListener listener) {
-		System.err.println("WARNING NOT IMPLEMENTED! addLifecycleListener: " + listener);
-	}
-
-	@Override
-	public void removeLifecycleListener(LifecycleListener listener) {
-		System.err.println("WARNING NOT IMPLEMENTED! removeLifecycleListener: " + listener);
-	}
-
 	@SuppressWarnings("unused")
 	public void create() {
 		applicationListener.create();
@@ -384,6 +318,7 @@ public class LimeApplication implements Application {
 		applicationListener.render();
 		LimeInput.lime_frame();
 		graphics.frame();
+		onFrame();
 	}
 
 	@SuppressWarnings("unused")
@@ -401,5 +336,20 @@ public class LimeApplication implements Application {
 		native public int getWidth();
 
 		native public int getHeight();
+	}
+
+	@Override
+	public void onResumed() {
+		super.onResumed();
+	}
+
+	@Override
+	public void onPaused() {
+		super.onPaused();
+	}
+
+	@Override
+	public void onDisposed() {
+		super.onDisposed();
 	}
 }
