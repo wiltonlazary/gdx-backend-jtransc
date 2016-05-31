@@ -1,7 +1,6 @@
 package com.jtransc.media.limelibgdx;
 
-import com.badlogic.gdx.Application;
-import com.badlogic.gdx.LifecycleListener;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.utils.Clipboard;
 import com.badlogic.gdx.utils.Queue;
 
@@ -12,6 +11,15 @@ abstract public class GdxApplicationAdapter implements Application {
 	private Queue<Runnable> postRunnableList = new Queue<>();
 	private Queue<Runnable> postRunnableListCopy = new Queue<>();
 	private int logLevel = LOG_DEBUG;
+
+	final private ApplicationListener applicationListener;
+	final private Audio audio;
+
+	public GdxApplicationAdapter(ApplicationListener applicationListener) {
+		Gdx.app = this;
+		this.applicationListener = applicationListener;
+		Gdx.audio = audio = createAudio();
+	}
 
 	public void log(int level, String tag, String message, Throwable exception) {
 		if (level <= this.logLevel) {
@@ -95,18 +103,21 @@ abstract public class GdxApplicationAdapter implements Application {
 	}
 
 	public void onPaused() {
+		applicationListener.pause();
 		for (LifecycleListener listener : listeners) {
 			listener.pause();
 		}
 	}
 
 	public void onResumed() {
+		applicationListener.resume();
 		for (LifecycleListener listener : listeners) {
 			listener.resume();
 		}
 	}
 
 	public void onDisposed() {
+		applicationListener.dispose();
 		for (LifecycleListener listener : listeners) {
 			listener.dispose();
 		}
@@ -114,11 +125,41 @@ abstract public class GdxApplicationAdapter implements Application {
 
 	abstract protected Clipboard createClipboard();
 
+	abstract protected Audio createAudio();
+
 	private Clipboard clipboard;
 
 	@Override
 	final public Clipboard getClipboard() {
 		if (this.clipboard == null) this.clipboard = createClipboard();
 		return this.clipboard;
+	}
+
+	@Override
+	final public ApplicationListener getApplicationListener() {
+		return applicationListener;
+	}
+
+	@Override
+	final public Audio getAudio() {
+		return audio;
+	}
+
+	@SuppressWarnings("unused")
+	public void create() {
+		applicationListener.create();
+		resized(LimeApplication.HaxeLimeGdxApplication.instance.getWidth(), LimeApplication.HaxeLimeGdxApplication.instance.getHeight());
+	}
+
+	@SuppressWarnings("unused")
+	public void render() {
+		onFrame();
+		applicationListener.render();
+	}
+
+	@SuppressWarnings("unused")
+	public void resized(int width, int height) {
+		Gdx.gl.glViewport(0, 0, width, height);
+		applicationListener.resize(width, height);
 	}
 }
