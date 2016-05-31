@@ -79,6 +79,7 @@ public class StateGL20 implements GL20Ext {
 
 	public interface Shader extends Disposable {
 		void setSource(String string);
+
 		void compile();
 	}
 
@@ -408,7 +409,7 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glAttachShader(int program, int shader) {
-		((Program)objects[program]).attach((Shader)objects[shader]);
+		((Program) objects[program]).attach((Shader) objects[shader]);
 	}
 
 	@Override
@@ -468,7 +469,7 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glCompileShader(int shader) {
-		((Shader)objects[shader]).compile();
+		((Shader) objects[shader]).compile();
 	}
 
 	@Override
@@ -523,7 +524,7 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glDetachShader(int program, int shader) {
-		((Program)objects[program]).detach((Shader)objects[shader]);
+		((Program) objects[program]).detach((Shader) objects[shader]);
 	}
 
 	@Override
@@ -626,21 +627,25 @@ public class StateGL20 implements GL20Ext {
 
 	}
 
-	@Override
-	public void glGetProgramiv(int program, int pname, IntBuffer params) {
-
+	public int glGetProgrami(int program, int pname) {
 		switch (pname) {
 			case GL20.GL_LINK_STATUS:
-				params.put(((Program)objects[program]).linked() ? 1 : 0);
-				break;
+				int result = ((Program) objects[program]).linked() ? 1 : 0;
+				System.out.println("StateGL20.glGetProgrami(GL20.GL_LINK_STATUS) = " + result);
+				return result;
 			default:
 				throw new RuntimeException("");
 		}
 	}
 
 	@Override
+	public void glGetProgramiv(int program, int pname, IntBuffer params) {
+		params.put(glGetProgrami(program, pname));
+	}
+
+	@Override
 	public String glGetProgramInfoLog(int program) {
-		return ((Program)objects[program]).getInfoLog();
+		return ((Program) objects[program]).getInfoLog();
 	}
 
 	@Override
@@ -753,7 +758,7 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glLinkProgram(int program) {
-		((Program)objects[program]).link();
+		((Program) objects[program]).link();
 	}
 
 	@Override
@@ -778,7 +783,7 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glShaderSource(int shader, String string) {
-		((Shader)objects[shader]).setSource(string);
+		((Shader) objects[shader]).setSource(string);
 	}
 
 	@Override

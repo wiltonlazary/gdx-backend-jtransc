@@ -30,7 +30,6 @@
 package com.jtransc.media.limelibgdx.imaging;
 
 import com.jtransc.FastMemory;
-import com.jtransc.compression.JTranscZlib;
 
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
