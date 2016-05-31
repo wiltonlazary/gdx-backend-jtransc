@@ -8,7 +8,8 @@ import java.util.ArrayList;
 
 abstract public class GdxApplicationAdapter implements Application {
 	ArrayList<LifecycleListener> listeners = new ArrayList<>();
-	Queue<Runnable> postRunnableList = new Queue<>();
+	private Queue<Runnable> postRunnableList = new Queue<>();
+	private Queue<Runnable> postRunnableListCopy = new Queue<>();
 	private int logLevel = LOG_DEBUG;
 
 	public void log(int level, String tag, String message, Throwable exception) {
@@ -79,7 +80,11 @@ abstract public class GdxApplicationAdapter implements Application {
 
 	protected void executePostRunnableQueue() {
 		while (postRunnableList.size > 0) {
-			Runnable runnable = postRunnableList.removeFirst();
+			postRunnableListCopy.addLast(postRunnableList.removeFirst());
+		}
+
+		while (postRunnableListCopy.size > 0) {
+			Runnable runnable = postRunnableListCopy.removeFirst();
 			runnable.run();
 		}
 	}

@@ -121,7 +121,8 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 
 
 	@HaxeMethodBody("HaxeLimeGdxApplication.app = p0;")
-	native private void setApplicationToLime(LimeApplication app);
+	private void setApplicationToLime(LimeApplication app) {
+	}
 
 	@Override
 	public ApplicationListener getApplicationListener() {
@@ -315,10 +316,10 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 
 	@SuppressWarnings("unused")
 	public void render() {
+		onFrame();
 		applicationListener.render();
 		LimeInput.lime_frame();
 		graphics.frame();
-		onFrame();
 	}
 
 	@SuppressWarnings("unused")
@@ -340,16 +341,19 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 
 	@Override
 	public void onResumed() {
+		applicationListener.resume();
 		super.onResumed();
 	}
 
 	@Override
 	public void onPaused() {
+		applicationListener.pause();
 		super.onPaused();
 	}
 
 	@Override
 	public void onDisposed() {
+		applicationListener.dispose();
 		super.onDisposed();
 	}
 }
