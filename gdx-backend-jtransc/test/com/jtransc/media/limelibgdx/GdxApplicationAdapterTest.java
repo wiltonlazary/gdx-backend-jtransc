@@ -59,4 +59,9 @@ public class GdxApplicationAdapterTest {
 		app.getClipboard().setContents(str);
 		Assert.assertEquals(str, app.getClipboard().getContents());
 	}
+
+	@Test
+	public void testGraphics() throws Exception {
+		app.getGraphics().getGLVersion();
+	}
 }

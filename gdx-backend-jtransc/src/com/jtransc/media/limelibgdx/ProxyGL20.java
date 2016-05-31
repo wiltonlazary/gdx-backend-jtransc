@@ -6,7 +6,7 @@ import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-public class ProxyGL20 implements GL20 {
+public class ProxyGL20 implements GL20Ext {
 	private GL20 parent;
 
 	public ProxyGL20(GL20 parent) {

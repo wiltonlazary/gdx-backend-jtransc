@@ -1,12 +1,15 @@
 package com.jtransc.media.limelibgdx;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.glutils.GLVersion;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
 import com.jtransc.media.limelibgdx.dummy.DummyGL20;
+import com.jtransc.media.limelibgdx.flash.FlashGL20;
 import com.jtransc.media.limelibgdx.gl.LimeGL20;
 import com.jtransc.JTranscSystem;
 import com.jtransc.media.limelibgdx.logger.LoggerGL20;
@@ -18,11 +21,14 @@ public class LimeGraphics implements Graphics {
 	int frameId = 0;
 
 	public LimeGraphics(boolean trace) {
-		if (trace) {
-			gl = new LoggerGL20(new LimeGL20());
+		GL20Ext gl;
+		if (JTranscSystem.isSwf()) {
+			gl = FlashGL20.create();
 		} else {
 			gl = new LimeGL20();
 		}
+		if (trace) gl = new LoggerGL20(gl);
+		this.gl = gl;
 	}
 
 	private Monitor2[] monitors = new Monitor2[]{
@@ -118,6 +124,11 @@ public class LimeGraphics implements Graphics {
 		return GraphicsType.WebGL;
 	}
 
+	@Override
+	public GLVersion getGLVersion() {
+		return new GLVersion(LimeDevice.getType(), "2.0", "lime", "lime");
+	}
+
 	// https://github.com/openfl/lime/blob/develop/lime/system/System.hx
 	// https://github.com/openfl/lime/blob/develop/lime/system/Display.hx
 	@HaxeMethodBody("return lime.system.System.getDisplay(0).dpi;")
@@ -205,6 +216,16 @@ public class LimeGraphics implements Graphics {
 
 	@Override
 	public void setTitle(String s) {
+
+	}
+
+	@Override
+	public void setUndecorated(boolean b) {
+
+	}
+
+	@Override
+	public void setResizable(boolean b) {
 
 	}
 

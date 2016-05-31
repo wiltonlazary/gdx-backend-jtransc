@@ -205,14 +205,6 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 
 	@Override
 	protected ApplicationType createApplicationType() {
-		if (LimeDevice.isJs()) {
-			return ApplicationType.WebGL;
-		} else if (LimeDevice.isIos()) {
-			return ApplicationType.iOS;
-		} else if (LimeDevice.isAndroid()) {
-			return ApplicationType.Android;
-		} else {
-			return ApplicationType.Desktop;
-		}
+		return LimeDevice.getType();
 	}
 }

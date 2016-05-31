@@ -1,12 +1,13 @@
 package com.jtransc.media.limelibgdx.flash;
 
 import com.badlogic.gdx.graphics.GL20;
+import com.jtransc.media.limelibgdx.GL20Ext;
 import com.jtransc.media.limelibgdx.StateGL20;
 
 import static com.jtransc.media.limelibgdx.StateGL20.*;
 
 public class FlashGL20 {
-	static public GL20 create() {
+	static public GL20Ext create() {
 		return new StateGL20(new StateGL20.Impl() {
 			@Override
 			public void clear(StateGL20.State state, boolean color, boolean depth, boolean stencil) {

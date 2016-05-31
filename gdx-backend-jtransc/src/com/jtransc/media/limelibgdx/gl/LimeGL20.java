@@ -3,6 +3,7 @@ package com.jtransc.media.limelibgdx.gl;
 import com.badlogic.gdx.graphics.GL20;
 import com.jtransc.JTranscSystem;
 import com.jtransc.annotation.haxe.HaxeMethodBodyPre;
+import com.jtransc.media.limelibgdx.GL20Ext;
 import com.jtransc.media.limelibgdx.dummy.DummyGL20;
 import com.jtransc.annotation.haxe.HaxeAddMembers;
 import com.jtransc.annotation.haxe.HaxeImports;
@@ -40,7 +41,7 @@ import java.nio.IntBuffer;
 	"static public var renderBuffers = new Map<Int, GLRenderbuffer>();",
 	"static public var uniformLocations = new Map<Int, GLUniformLocation>();",
 })
-public class LimeGL20 extends DummyGL20 implements GL20 {
+public class LimeGL20 extends DummyGL20 implements GL20Ext {
 	@HaxeMethodBody("GL.activeTexture(p0);")
 	native public void glActiveTexture(int texture);
 

@@ -7,7 +7,7 @@ import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-public class StateGL20 implements GL20 {
+public class StateGL20 implements GL20Ext {
 	public class State {
 		public float clearRed;
 		public float clearGreen;

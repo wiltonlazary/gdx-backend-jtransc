@@ -30,7 +30,7 @@
 	</parent>
 
     <properties>
-        <gdx.version>1.9.2</gdx.version>
+        <gdx.version>1.9.3</gdx.version>
     </properties>
 
     <artifactId>gdx-websockets-jtransc</artifactId>

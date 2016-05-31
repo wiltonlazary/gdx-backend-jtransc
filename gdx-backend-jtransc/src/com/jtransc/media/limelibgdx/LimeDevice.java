@@ -1,5 +1,6 @@
 package com.jtransc.media.limelibgdx;
 
+import com.badlogic.gdx.Application;
 import com.jtransc.JTranscSystem;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
 
@@ -22,5 +23,17 @@ public class LimeDevice {
 
 	static public boolean isFlash() {
 		return JTranscSystem.isSwf();
+	}
+
+	static public Application.ApplicationType getType() {
+		if (LimeDevice.isJs()) {
+			return Application.ApplicationType.WebGL;
+		} else if (LimeDevice.isIos()) {
+			return Application.ApplicationType.iOS;
+		} else if (LimeDevice.isAndroid()) {
+			return Application.ApplicationType.Android;
+		} else {
+			return Application.ApplicationType.Desktop;
+		}
 	}
 }

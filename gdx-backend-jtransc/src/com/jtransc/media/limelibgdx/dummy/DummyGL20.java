@@ -1,12 +1,13 @@
 package com.jtransc.media.limelibgdx.dummy;
 
 import com.badlogic.gdx.graphics.GL20;
+import com.jtransc.media.limelibgdx.GL20Ext;
 
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-public class DummyGL20 implements GL20 {
+public class DummyGL20 implements GL20Ext {
 	public void glActiveTexture(int texture) {
 
 	}
