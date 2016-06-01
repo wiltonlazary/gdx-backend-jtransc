@@ -139,13 +139,15 @@ public interface Ast {
 			}
 		}
 
-		class BinopList implements Expr {
-			public final ArrayList<Expr> exprs;
-			public final ArrayList<String> ops;
+		class Binop implements Expr {
+			public final Expr left;
+			public final String op;
+			public final Expr right;
 
-			public BinopList(ArrayList<Expr> exprs, ArrayList<String> ops) {
-				this.exprs = exprs;
-				this.ops = ops;
+			public Binop(Expr left, String op, Expr right) {
+				this.left = left;
+				this.op = op;
+				this.right = right;
 			}
 		}
 	}

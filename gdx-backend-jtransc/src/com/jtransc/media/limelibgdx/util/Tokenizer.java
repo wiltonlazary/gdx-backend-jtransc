@@ -9,6 +9,7 @@ public class Tokenizer {
 	static public final Set<String> OPS = new HashSet<>(Arrays.asList(
 		"&&", "||",
 		"==", "!=", "<", ">", "<=", ">=",
+		"<<", ">>", ">>>",
 		"=",
 		"(", ")",
 		"[", "]",
