@@ -51,7 +51,7 @@ public class ListReader<T> {
 	public void expect(T expected) {
 		T actual = read();
 		if (!Objects.equals(actual, expected)) {
-			throw new RuntimeException("Expected " + expected + " but found " + actual);
+			throw new RuntimeException("Expected '" + expected + "' but found '" + actual + "'");
 		}
 	}
 

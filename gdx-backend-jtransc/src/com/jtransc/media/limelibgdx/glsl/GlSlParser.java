@@ -6,6 +6,7 @@ import com.jtransc.media.limelibgdx.util.Tokenizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class GlSlParser {
 	public static String preprocess(String shader, Map<String, String> macros) {
@@ -62,22 +63,90 @@ public class GlSlParser {
 		return r.read();
 	}
 
+	public String parseId() {
+		return r.read();
+	}
+
 	public Ast.Decl parseDecl() {
 		String s = r.tryRead("precision", "varying", "uniform", "attribute");
 		if (s != null) {
 			switch (s) {
-				case "precision":
+				case "precision": {
 					String prec = parsePrecision();
 					Ast.Type type = parseType();
 					r.expect(";");
 					return new Ast.Decl.Precision(prec, type);
+				}
+				case "varying":
+				case "uniform":
+				case "attribute":
+				{
+					List<String> mods = tryParseModifiers();
+					Ast.Type type = parseType();
+					String name = parseId();
+					r.expect(";");
+					return new Ast.Decl.Varying(mods, type, name);
+				}
 			}
 		}
 
+		// Parse method (global field too?) declaration
 		List<String> mods = tryParseModifiers();
-		switch (r.read()) {
+		Ast.Type type = parseType();
+		String name = parseId();
 
+		String endDecl = r.read();
+		switch (endDecl) {
+			// method
+			case "(":
+				ArrayList<Ast.Argument> arguments = new ArrayList<>();
+				while (!Objects.equals(r.peek(), ")")) {
+					arguments.add(parseArgument());
+					if (Objects.equals(r.peek(), ")")) break;
+					r.expect(",");
+				}
+				r.expect(")");
+				Ast.Stm body = parseStm();
+				return new Ast.Decl.Function(type, name, arguments, body);
+			// global
+			case ";":
+				//System.out.println(";");
+				throw new RuntimeException("Unsupported global variables");
+			default:
+				throw new RuntimeException("Invalid declaration expecting '(' or ';' but found " + endDecl);
 		}
+	}
+
+	private Ast.Stm parseStm() {
+		switch (r.peek()) {
+			case "{":
+				r.expect("{");
+				ArrayList<Ast.Stm> stms = new ArrayList<>();
+				while (!r.peek().equals("}")) {
+					stms.add(parseStm());
+				}
+				r.expect("}");
+				return new Ast.Stm.Stms(stms);
+			case "if":
+			case "while":
+			case "do":
+			case "switch":
+			case "return":
+				throw new RuntimeException("Unimplemented statement " + r.peek());
+			default:
+				Ast.Expr expr = parseExpr();
+				r.expect(";");
+				return new Ast.Stm.ExprStm(expr);
+		}
+	}
+
+	private Ast.Expr parseExpr() {
 		return null;
+	}
+
+	private Ast.Argument parseArgument() {
+		Ast.Type type = parseType();
+		String name = parseId();
+		return new Ast.Argument(type, name);
 	}
 }
