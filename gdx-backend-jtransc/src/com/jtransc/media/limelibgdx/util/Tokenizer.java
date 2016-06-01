@@ -6,21 +6,6 @@ public class Tokenizer {
 	private final ArrayList<Token> out = new ArrayList<>();
 	private final StrReader r;
 
-	static public final Set<String> OPS = new HashSet<>(Arrays.asList(
-		"&&", "||",
-		"==", "!=", "<", ">", "<=", ">=",
-		"<<", ">>", ">>>",
-		"=",
-		"(", ")",
-		"[", "]",
-		"{", "}",
-		"+", "-", "*", "/", "%",
-		"&", "|", "^",
-		"!", "~",
-		"++", "--",
-		".", ",", ";"
-	));
-
 	private Tokenizer(String str) {
 		r = new StrReader(str);
 	}
@@ -57,10 +42,10 @@ public class Tokenizer {
 
 	private void tokenizeStep() {
 		r.skipSpaces();
-		if (OPS.contains(r.peek(2))) {
+		if (Operators.ALL.contains(r.peek(2))) {
 			emit(Token.Type.OPERATOR, r.read(2));
 		}
-		if (OPS.contains(r.peek(1))) {
+		if (Operators.ALL.contains(r.peek(1))) {
 			emit(Token.Type.OPERATOR, r.read(1));
 		}
 		String id = readId();

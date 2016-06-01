@@ -1,6 +1,8 @@
 package com.jtransc.media.limelibgdx.glsl;
 
+import com.jtransc.media.limelibgdx.glsl.ast.*;
 import com.jtransc.media.limelibgdx.util.ListReader;
+import com.jtransc.media.limelibgdx.util.Operators;
 import com.jtransc.media.limelibgdx.util.Tokenizer;
 
 import java.util.*;
@@ -10,7 +12,7 @@ public class GlSlParser {
 		return String.join("\n", CPreprocessor.preprocess(shader.split("\n"), macros));
 	}
 
-	public static Ast.Program parse(String shader, Map<String, String> macros) {
+	public static Shader parse(String shader, Map<String, String> macros) {
 		return new GlSlParser(preprocess(shader, macros)).parseProgram();
 	}
 
@@ -20,12 +22,12 @@ public class GlSlParser {
 		this.r = new ListReader<>(Tokenizer.tokenizeStr(code));
 	}
 
-	public Ast.Program parseProgram() {
-		List<Ast.Decl> decls = new ArrayList<Ast.Decl>();
+	public Shader parseProgram() {
+		List<Decl> decls = new ArrayList<Decl>();
 		while (r.hasMore()) {
 			decls.add(parseDecl());
 		}
-		return new Ast.Program(decls);
+		return new Shader(decls);
 	}
 
 	private String tryParseModifier() {
@@ -52,8 +54,8 @@ public class GlSlParser {
 		return out;
 	}
 
-	public Ast.Type parseType() {
-		return new Ast.Type.Prim(r.read());
+	public Type parseType() {
+		return new Type.Prim(r.read());
 	}
 
 	public String parsePrecision() {
@@ -64,47 +66,46 @@ public class GlSlParser {
 		return r.read();
 	}
 
-	public Ast.Decl parseDecl() {
+	public Decl parseDecl() {
 		String s = r.tryRead("precision", "varying", "uniform", "attribute");
 		if (s != null) {
 			switch (s) {
 				case "precision": {
 					String prec = parsePrecision();
-					Ast.Type type = parseType();
+					Type type = parseType();
 					r.expect(";");
-					return new Ast.Decl.Precision(prec, type);
+					return new Decl.Precision(prec, type);
 				}
 				case "varying":
 				case "uniform":
-				case "attribute":
-				{
+				case "attribute": {
 					List<String> mods = tryParseModifiers();
-					Ast.Type type = parseType();
+					Type type = parseType();
 					String name = parseId();
 					r.expect(";");
-					return new Ast.Decl.Varying(mods, type, name);
+					return new Decl.Global(s, mods, type, name);
 				}
 			}
 		}
 
 		// Parse method (global field too?) declaration
 		List<String> mods = tryParseModifiers();
-		Ast.Type type = parseType();
+		Type type = parseType();
 		String name = parseId();
 
 		String endDecl = r.read();
 		switch (endDecl) {
 			// method
 			case "(":
-				ArrayList<Ast.Argument> arguments = new ArrayList<>();
+				ArrayList<Argument> arguments = new ArrayList<>();
 				while (!Objects.equals(r.peek(), ")")) {
 					arguments.add(parseArgument());
 					if (Objects.equals(r.peek(), ")")) break;
 					r.expect(",");
 				}
 				r.expect(")");
-				Ast.Stm body = parseStm();
-				return new Ast.Decl.Function(type, name, arguments, body);
+				Stm body = parseStm();
+				return new Decl.Function(type, name, arguments, body);
 			// global
 			case ";":
 				//System.out.println(";");
@@ -114,11 +115,11 @@ public class GlSlParser {
 		}
 	}
 
-	private Ast.Stm parseStm() {
+	private Stm parseStm() {
 		switch (r.peek()) {
 			case "{":
 				r.expect("{");
-				ArrayList<Ast.Stm> stms = new ArrayList<>();
+				ArrayList<Stm> stms = new ArrayList<>();
 				while (!r.peek().equals("}")) {
 					stms.add(parseStm());
 				}
@@ -126,7 +127,7 @@ public class GlSlParser {
 				if (stms.size() == 1) {
 					return stms.get(0);
 				} else {
-					return new Ast.Stm.Stms(stms);
+					return new Stm.Stms(stms);
 				}
 			case "if":
 			case "while":
@@ -135,46 +136,21 @@ public class GlSlParser {
 			case "return":
 				throw new RuntimeException("Unimplemented statement " + r.peek());
 			default:
-				Ast.Expr expr = parseBinopExpr();
+				Expr expr = parseBinopExpr();
 				r.expect(";");
-				return new Ast.Stm.ExprStm(expr);
+				return new Stm.ExprStm(expr);
 		}
 	}
 
-	static private HashMap<String, Integer> constructOperators(String[][] opsList) {
-		HashMap<String, Integer> out = new HashMap<>();
-		int priority = 0;
-		for (String[] ops : opsList) {
-			for (String op : ops) {
-				out.put(op, priority);
-			}
-			priority++;
-		}
 
-		return out;
-	}
-
-	static private HashMap<String, Integer> BINOPS = constructOperators(new String[][]{
-		new String[] { "=" },
-		new String[] { "*", "/", "%" },
-		new String[] { "+", "-" },
-		new String[] { "<<", ">>", ">>>" },
-		new String[] { "<", ">", "<=", ">=" },
-		new String[] { "==", "!=" },
-		new String[] { "&" },
-		new String[] { "^" },
-		new String[] { "|" },
-		new String[] { "&&" },
-		new String[] { "||" },
-	});
-
-	private Ast.Expr parseBinopExpr() {
-		LinkedList<Ast.Expr> exprs = new LinkedList<>();
+	private Expr parseBinopExpr() {
+		LinkedList<Expr> exprs = new LinkedList<>();
 		LinkedList<String> ops = new LinkedList<>();
 
-		while (r.hasMore()) {
+		//while (r.hasMore()) {
+		while (true) {
 			exprs.add(parseExprTerminal());
-			if (BINOPS.containsKey(r.peek())) {
+			if (Operators.BINOPS.containsKey(r.peek())) {
 				ops.add(r.read());
 				continue;
 			} else {
@@ -190,79 +166,85 @@ public class GlSlParser {
 	}
 
 	private int compareOperator(String l, String r) {
-		return Integer.compare(BINOPS.get(l), BINOPS.get(r));
+		return Integer.compare(Operators.BINOPS.get(l), Operators.BINOPS.get(r));
 	}
 
-	private Ast.Expr constructBinopList(LinkedList<Ast.Expr> exprs, LinkedList<String> ops) {
+	private Expr constructBinopList(LinkedList<Expr> exprs, LinkedList<String> ops) {
 		if (exprs.size() < 2 || exprs.size() != ops.size() + 1) {
 			throw new AssertionError();
 		}
-		Ast.Expr.Binop out = new Ast.Expr.Binop(exprs.removeFirst(), ops.removeFirst(), exprs.removeFirst());
+		Expr.Binop out = new Expr.Binop(exprs.removeFirst(), ops.removeFirst(), exprs.removeFirst());
 		while (!ops.isEmpty()) {
-			Ast.Expr l = out.left;
+			Expr l = out.left;
 			String op1 = out.op;
-			Ast.Expr c = out.right;
+			Expr c = out.right;
 			String op2 = ops.removeFirst();
-			Ast.Expr r = exprs.removeFirst();
+			Expr r = exprs.removeFirst();
 
 			if (compareOperator(op1, op2) < 0) {
-				out = new Ast.Expr.Binop(l, op1, new Ast.Expr.Binop(c, op2, r));
+				out = new Expr.Binop(l, op1, new Expr.Binop(c, op2, r));
 			} else {
-				out = new Ast.Expr.Binop(new Ast.Expr.Binop(l, op1, c), op2, r);
+				out = new Expr.Binop(new Expr.Binop(l, op1, c), op2, r);
 			}
 		}
 		return out;
 	}
 
-	private Ast.Expr parseExprTerminal() {
+	private Expr parseExprTerminal() {
 		switch (r.peek()) {
 			case "(": {
 				r.expect("(");
-				Ast.Expr out = parseBinopExpr();
+				Expr out = parseBinopExpr();
 				r.expect(")");
 				return out;
 			}
-			case "!": return new Ast.Expr.Unop("!", parseExprTerminal());
-			case "~": return new Ast.Expr.Unop("~", parseExprTerminal());
-			case "-": return new Ast.Expr.Unop("-", parseExprTerminal());
-			case "+": return new Ast.Expr.Unop("+", parseExprTerminal());
-			case "--": return new Ast.Expr.Unop("--", parseExprTerminal());
-			case "++": return new Ast.Expr.Unop("++", parseExprTerminal());
+			case "!":
+				return new Expr.Unop("!", parseExprTerminal());
+			case "~":
+				return new Expr.Unop("~", parseExprTerminal());
+			case "-":
+				return new Expr.Unop("-", parseExprTerminal());
+			case "+":
+				return new Expr.Unop("+", parseExprTerminal());
+			case "--":
+				return new Expr.Unop("--", parseExprTerminal());
+			case "++":
+				return new Expr.Unop("++", parseExprTerminal());
 		}
-		Ast.Expr expr = new Ast.Expr.Id(r.read());
+		Expr expr = new Expr.Id(r.read());
 		while (r.hasMore()) {
 			switch (r.peek()) {
 				case "++": {
 					r.expect("++");
-					expr = new Ast.Expr.UnopPost(expr, "++");
+					expr = new Expr.UnopPost(expr, "++");
 					break;
 				}
 				case "--": {
 					r.expect("--");
-					expr = new Ast.Expr.UnopPost(expr, "--");
+					expr = new Expr.UnopPost(expr, "--");
 					break;
 				}
 				case "(": {
 					r.expect("(");
-					ArrayList<Ast.Expr> args = new ArrayList<>();
+					ArrayList<Expr> args = new ArrayList<>();
 					while (!r.peek().equals(")")) {
 						args.add(parseBinopExpr());
 						if (r.peek().equals(")")) break;
 						r.expect(",");
 					}
 					r.expect(")");
-					expr = new Ast.Expr.Call(expr, args);
+					expr = new Expr.Call(expr, args);
 					break;
 				}
 				case ".": {
 					r.expect(".");
-					expr = new Ast.Expr.Access(expr, r.read());
+					expr = new Expr.Access(expr, r.read());
 					continue;
 				}
 				case "[": {
 					r.expect("[");
-					Ast.Expr access = parseBinopExpr();
-					expr = new Ast.Expr.ArrayAccess(expr, access);
+					Expr access = parseBinopExpr();
+					expr = new Expr.ArrayAccess(expr, access);
 					r.expect("]");
 					continue;
 				}
@@ -272,9 +254,9 @@ public class GlSlParser {
 		return expr;
 	}
 
-	private Ast.Argument parseArgument() {
-		Ast.Type type = parseType();
+	private Argument parseArgument() {
+		Type type = parseType();
 		String name = parseId();
-		return new Ast.Argument(type, name);
+		return new Argument(type, name);
 	}
 }

@@ -1,5 +1,7 @@
 package com.jtransc.media.limelibgdx.glsl;
 
+import com.jtransc.media.limelibgdx.flash.GlSlToAgal;
+import com.jtransc.media.limelibgdx.glsl.ast.Shader;
 import com.jtransc.media.limelibgdx.util.Tokenizer;
 import org.junit.Assert;
 import org.junit.Test;
@@ -7,26 +9,50 @@ import org.junit.Test;
 import java.util.HashMap;
 
 public class GlSlParserTest {
-	private String fragmentShader = ("" +
-		"#ifdef GL_ES\n" +
-		"#define LOWP lowp\n" +
-		"precision mediump float;\n" +
-		"#else\n" +
-		"#define LOWP\n" +
-		"#endif\n" +
-		"varying LOWP vec4 v_color;\n" +
-		"varying vec2 v_texCoords;\n" +
-		"uniform sampler2D u_texture;\n" +
-		"void main()\n" +
-		"{\n" +
-		"	gl_FragColor = v_color * texture2D(u_texture, v_texCoords);\n" +
-		"}\n"
+	private String fragmentShader = (""
+		+ "#ifdef GL_ES\n"
+		+ "#define LOWP lowp\n"
+		+ "precision mediump float;\n"
+		+ "#else\n"
+		+ "#define LOWP\n"
+		+ "#endif\n"
+		+ "varying LOWP vec4 v_color;\n"
+		+ "varying vec2 v_texCoords;\n"
+		+ "uniform sampler2D u_texture;\n"
+		+ "void main()\n"
+		+ "{\n"
+		+ "	gl_FragColor = v_color * texture2D(u_texture, v_texCoords);\n"
+		+ "}\n"
 	);
+
+	String vertexShader = (""
+		+ "attribute vec4 a_position;\n" //
+		+ "attribute vec4 a_color;\n" //
+		+ "attribute vec2 a_texCoord0;\n" //
+		+ "uniform mat4 u_projTrans;\n" //
+		+ "varying vec4 v_color;\n" //
+		+ "varying vec2 v_texCoords;\n" //
+		+ "\n" //
+		+ "void main()\n" //
+		+ "{\n" //
+		+ "   v_color = a_color;\n" //
+		+ "   v_color.a = v_color.a * (255.0/254.0);\n" //
+		+ "   v_texCoords = a_texCoord0;\n" //
+		+ "   gl_Position =  u_projTrans * a_position;\n" //
+		+ "}\n"
+	);
+
+	HashMap<String, String> MACROS_GLES = new HashMap<String, String>() {{
+		put("GL_ES", "1");
+	}};
+
+	HashMap<String, String> MACROS_EMPTY = new HashMap<String, String>() {{
+	}};
 
 	@Test
 	public void testPreprocessor() throws Exception {
 		Assert.assertEquals(
-			String.join("\n", new String[]{
+			String.join("\n",
 				"precision mediump float;",
 				"varying lowp vec4 v_color;",
 				"varying vec2 v_texCoords;",
@@ -35,15 +61,12 @@ public class GlSlParserTest {
 				"{",
 				"	gl_FragColor = v_color * texture2D(u_texture, v_texCoords);",
 				"}"
-			})
-			,
-			GlSlParser.preprocess(fragmentShader, new HashMap<String, String>() {{
-				put("GL_ES", "1");
-			}})
+			),
+			GlSlParser.preprocess(fragmentShader, MACROS_GLES)
 		);
 
 		Assert.assertEquals(
-			String.join("\n", new String[]{
+			String.join("\n",
 				"varying  vec4 v_color;",
 				"varying vec2 v_texCoords;",
 				"uniform sampler2D u_texture;",
@@ -51,10 +74,8 @@ public class GlSlParserTest {
 				"{",
 				"	gl_FragColor = v_color * texture2D(u_texture, v_texCoords);",
 				"}"
-			})
-			,
-			GlSlParser.preprocess(fragmentShader, new HashMap<String, String>() {{
-			}})
+			),
+			GlSlParser.preprocess(fragmentShader, MACROS_EMPTY)
 		);
 	}
 
@@ -69,9 +90,11 @@ public class GlSlParserTest {
 
 	@Test
 	public void parse() throws Exception {
-		Ast.Program program = GlSlParser.parse(fragmentShader, new HashMap<String, String>() {{
-			put("GL_ES", "1");
-		}});
-		System.out.println(program);
+		Shader fragment = GlSlParser.parse(fragmentShader, MACROS_GLES);
+		Shader vertex = GlSlParser.parse(vertexShader, MACROS_GLES);
+		GlSlToAgal.convert(fragment);
+		GlSlToAgal.convert(vertex);
+		System.out.println(fragment);
+		System.out.println(vertex);
 	}
 }
