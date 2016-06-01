@@ -1,5 +1,7 @@
 package com.jtransc.media.limelibgdx.imaging;
 
+import com.jtransc.JTranscSystem;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.Buffer;
@@ -55,16 +57,18 @@ public class ImageDecoder {
 		try {
 			Format format = detect(buffer);
 			System.out.println("Format: " + format);
+			BitmapData out;
+			double start = JTranscSystem.stamp();
 			switch (format) {
 				case JPEG: {
-
 					final JPEGDecoder decoder = new JPEGDecoder(new ByteArrayInputStream(buffer));
 					final int width = decoder.getImageWidth();
 					final int height = decoder.getImageHeight();
 					final ByteBuffer data = ByteBuffer.allocate(width * height * 4);
 					decoder.decodeRGB(data, width * 4, decoder.getNumMCURows());
 					data.rewind();
-					return new BitmapData(toIntArray(data), width, height);
+					out = new BitmapData(toIntArray(data), width, height);
+					break;
 				}
 				case PNG: {
 					final PNGDecoder decoder = new PNGDecoder(new ByteArrayInputStream(buffer));
@@ -73,11 +77,15 @@ public class ImageDecoder {
 					final ByteBuffer data = ByteBuffer.allocate(width * height * 4);
 					decoder.decode(data, width * 4, PNGDecoder.Format.ABGR);
 					data.rewind();
-					return new BitmapData(toIntArray(data), width, height);
+					out = new BitmapData(toIntArray(data), width, height);
+					break;
 				}
 				default:
 					throw new RuntimeException("Unsupported format " + format);
 			}
+			double end = JTranscSystem.stamp();
+			System.out.println("Decoding time: " + (end - start));
+			return out;
 		} catch (Throwable t) {
 			throw new RuntimeException(t);
 		}

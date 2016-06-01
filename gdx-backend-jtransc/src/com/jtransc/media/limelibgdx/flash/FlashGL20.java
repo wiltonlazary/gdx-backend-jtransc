@@ -27,10 +27,10 @@ public class FlashGL20 {
 
 			if (context != null) {
 				context.clear(
-					state.clearRed,
-					state.clearGreen,
-					state.clearBlue,
-					state.clearAlpha,
+					state.clearColor.red,
+					state.clearColor.green,
+					state.clearColor.blue,
+					state.clearColor.alpha,
 					state.clearDepth,
 					state.clearStencil,
 					mask
@@ -54,12 +54,59 @@ public class FlashGL20 {
 		}
 
 		@Override
+		public GLBuffer createBuffer() {
+			return new FlashGLBuffer();
+		}
+
+		@Override
+		public void drawElements(int mode, int count, int type, Buffer indices) {
+
+		}
+
+		@Override
+		public void drawElements(int mode, int count, int type, int indices) {
+
+		}
+
+		@Override
+		public void drawArrays(int mode, int first, int count) {
+
+		}
+
+		@Override
+		public FrameBuffer createFrameBuffer() {
+			return null;
+		}
+
+		@Override
+		public RenderBuffer createRenderBuffer() {
+			return null;
+		}
+
+		@Override
 		public void render(StateGL20.State state) {
 
 		}
 	}
 
-	static class FlashProgram implements Program {
+	static class FlashGLBuffer implements GLBuffer {
+		@Override
+		public void dispose() {
+
+		}
+
+		@Override
+		public void data(int size, Buffer data, int usage) {
+
+		}
+
+		@Override
+		public void subdata(int offset, int size, Buffer data) {
+
+		}
+	}
+
+	static class FlashProgram extends StateGL20.Program {
 		@Override
 		public void dispose() {
 		}
@@ -81,12 +128,27 @@ public class FlashGL20 {
 
 		@Override
 		public String getInfoLog() {
-			return "successful compiled";
+			return "successful linked";
 		}
 
 		@Override
 		public boolean linked() {
 			return true;
+		}
+
+		@Override
+		public int uniformsCount() {
+			return 0;
+		}
+
+		@Override
+		public int attributesCount() {
+			return 0;
+		}
+
+		@Override
+		public void bindAttribLocation(int index, String name) {
+
 		}
 	}
 
@@ -110,6 +172,16 @@ public class FlashGL20 {
 		public void compile() {
 
 		}
+
+		@Override
+		public String getInfoLog() {
+			return "successful compiled";
+		}
+
+		@Override
+		public boolean compiled() {
+			return true;
+		}
 	}
 
 	static class FlashTexture implements Texture {
@@ -123,6 +195,46 @@ public class FlashGL20 {
 		@Override
 		public void uploadData(Buffer data, int width, int height) {
 			//context.crea
+		}
+
+		@Override
+		public void compressedTexImage2D(int level, int internalformat, int width, int height, int border, int imageSize, Buffer data) {
+			
+		}
+
+		@Override
+		public void compressedTexSubImage2D(int level, int xoffset, int yoffset, int width, int height, int format, int imageSize, Buffer data) {
+
+		}
+
+		@Override
+		public void copyTexImage2D(int level, int internalformat, int x, int y, int width, int height, int border) {
+
+		}
+
+		@Override
+		public void copyTexSubImage2D(int level, int xoffset, int yoffset, int x, int y, int width, int height) {
+
+		}
+
+		@Override
+		public void texImage2D(int level, int internalformat, int width, int height, int border, int format, int type, Buffer pixels) {
+
+		}
+
+		@Override
+		public void parameter(int pname, float param) {
+
+		}
+
+		@Override
+		public void texSubImage2D(int level, int xoffset, int yoffset, int width, int height, int format, int type, Buffer pixels) {
+
+		}
+
+		@Override
+		public void generateMipmap() {
+
 		}
 
 		@Override

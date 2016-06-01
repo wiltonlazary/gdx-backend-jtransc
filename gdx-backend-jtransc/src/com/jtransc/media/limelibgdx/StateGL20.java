@@ -6,13 +6,18 @@ import com.jtransc.ds.IntPool;
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.Objects;
 
 public class StateGL20 implements GL20Ext {
-	public class State {
-		public float clearRed;
-		public float clearGreen;
-		public float clearBlue;
-		public float clearAlpha;
+	static public class Color {
+		public float red;
+		public float green;
+		public float blue;
+		public float alpha;
+	}
+
+	static public class State {
+		public Color clearColor = new Color();
 		public float clearDepth;
 		public int clearStencil;
 
@@ -48,6 +53,9 @@ public class StateGL20 implements GL20Ext {
 		public int stencilOpFail;
 		public int stencilOpZFail;
 		public int stencilOpZPass;
+
+		public Color blendColor = new Color();
+
 		public boolean blendEnabled;
 		public boolean depthTestEnabled;
 		public boolean stencilTestEnabled;
@@ -55,6 +63,24 @@ public class StateGL20 implements GL20Ext {
 
 		public int activeTextureUnit = 0;
 		public Texture[] textureUnits = new Texture[8];
+		public int blendEquationRGB;
+		public int blendEquationAlpha;
+		public int blendFuncSrcRGB;
+		public int blendFuncDstRGB;
+		public int blendFuncSrcAlpha;
+		public int blendFuncDstAlpha;
+		public int blendFuncSFactor;
+		public int blendFuncDFactor;
+		public int depthFunc;
+		public int frontFace;
+		public int generateMipmapHint;
+		public boolean[] enabledAttribArrays = new boolean[32];
+		public Program program;
+		public GLBuffer arrayBuffer;
+		public GLBuffer elementArrayBuffer;
+		public FrameBuffer frameBuffer;
+		public RenderBuffer renderBuffer;
+
 	}
 
 	public interface Disposable {
@@ -63,33 +89,105 @@ public class StateGL20 implements GL20Ext {
 
 	public interface Texture extends Disposable {
 		void uploadData(Buffer data, int width, int height);
+
+		void compressedTexImage2D(int level, int internalformat, int width, int height, int border, int imageSize, Buffer data);
+
+		void compressedTexSubImage2D(int level, int xoffset, int yoffset, int width, int height, int format, int imageSize, Buffer data);
+
+		void copyTexImage2D(int level, int internalformat, int x, int y, int width, int height, int border);
+
+		void copyTexSubImage2D(int level, int xoffset, int yoffset, int x, int y, int width, int height);
+
+		void texImage2D(int level, int internalformat, int width, int height, int border, int format, int type, Buffer pixels);
+
+		void parameter(int pname, float param);
+
+		void texSubImage2D(int level, int xoffset, int yoffset, int width, int height, int format, int type, Buffer pixels);
+
+		void generateMipmap();
 	}
 
-	public interface Program extends Disposable {
-		void link();
+	abstract static public class Program implements Disposable {
+		abstract public void link();
 
-		void attach(Shader shader);
+		abstract public void attach(Shader shader);
 
-		void detach(Shader shader);
+		abstract public void detach(Shader shader);
 
-		String getInfoLog();
+		abstract public String getInfoLog();
 
-		boolean linked();
+		abstract public boolean linked();
+
+		public ProgramUniform[] uniforms;
+		public ProgramAttribute[] attributes;
+
+		public int uniformsCount() {
+			return uniforms.length;
+		}
+
+		public int attributesCount() {
+			return attributes.length;
+		}
+
+		public ProgramAttribute getAttrib(int index) {
+			return attributes[index];
+		}
+
+		public ProgramUniform getUniform(int index) {
+			return uniforms[index];
+		}
+
+		abstract public void bindAttribLocation(int index, String name);
+
+		public int getAttribLocation(String name) {
+			for (int n = 0; n < attributes.length; n++) {
+				if (Objects.equals(attributes[n].name, name)) return n;
+			}
+			return -1;
+		}
+
+		public int getUniformLocation(String name) {
+			for (int n = 0; n < uniforms.length; n++) {
+				if (Objects.equals(uniforms[n].name, name)) return n;
+			}
+			return -1;
+		}
 	}
+
+	static public class ProgramAttribute {
+		public String name;
+		public int size;
+		public int type;
+	}
+
+	static public class ProgramUniform {
+		public String name;
+		public int size;
+		public int type;
+	}
+
 
 	public interface Shader extends Disposable {
 		void setSource(String string);
 
 		void compile();
+
+		String getInfoLog();
+
+		boolean compiled();
 	}
 
 	public interface RenderBuffer extends Disposable {
 	}
 
 	public interface FrameBuffer extends Disposable {
+		int status();
 	}
 
 	public interface GLBuffer extends Disposable {
+		void data(int size, Buffer data, int usage);
+
+		void subdata(int offset, int size, Buffer data);
 	}
 
 	public static abstract class Impl {
@@ -102,6 +200,24 @@ public class StateGL20 implements GL20Ext {
 		public abstract Shader createShader(int type);
 
 		public abstract void render(StateGL20.State state);
+
+		public abstract GLBuffer createBuffer();
+
+		public abstract void drawElements(int mode, int count, int type, Buffer indices);
+
+		public abstract void drawElements(int mode, int count, int type, int indices);
+
+		public abstract void drawArrays(int mode, int first, int count);
+
+		public void finish() {
+		}
+
+		public void flush() {
+		}
+
+		public abstract FrameBuffer createFrameBuffer();
+
+		public abstract RenderBuffer createRenderBuffer();
 	}
 
 	private State state = new State();
@@ -130,14 +246,23 @@ public class StateGL20 implements GL20Ext {
 		state.activeTexture = texture;
 	}
 
+	private Texture getActiveTexture(int target) {
+		return state.textureUnits[state.activeTextureUnit];
+	}
+
+	private void setActiveTexture(int target, Texture texture) {
+		state.textureUnits[state.activeTextureUnit] = texture;
+	}
+
 	@Override
 	public void glBindTexture(int target, int texture) {
-		state.textureUnits[state.activeTextureUnit] = (Texture) objects[texture];
+		setActiveTexture(target, (Texture) objects[texture]);
 	}
 
 	@Override
 	public void glBlendFunc(int sfactor, int dfactor) {
-
+		state.blendFuncSFactor = sfactor;
+		state.blendFuncDFactor = dfactor;
 	}
 
 	@Override
@@ -152,10 +277,10 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glClearColor(float red, float green, float blue, float alpha) {
-		state.clearRed = red;
-		state.clearGreen = green;
-		state.clearBlue = blue;
-		state.clearAlpha = alpha;
+		state.clearColor.red = red;
+		state.clearColor.green = green;
+		state.clearColor.blue = blue;
+		state.clearColor.alpha = alpha;
 	}
 
 	@Override
@@ -178,22 +303,22 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glCompressedTexImage2D(int target, int level, int internalformat, int width, int height, int border, int imageSize, Buffer data) {
-
+		getActiveTexture(target).compressedTexImage2D(level, internalformat, width, height, border, imageSize, data);
 	}
 
 	@Override
 	public void glCompressedTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format, int imageSize, Buffer data) {
-
+		getActiveTexture(target).compressedTexSubImage2D(level, xoffset, yoffset, width, height, format, imageSize, data);
 	}
 
 	@Override
 	public void glCopyTexImage2D(int target, int level, int internalformat, int x, int y, int width, int height, int border) {
-
+		getActiveTexture(target).copyTexImage2D(level, internalformat, x, y, width, height, border);
 	}
 
 	@Override
 	public void glCopyTexSubImage2D(int target, int level, int xoffset, int yoffset, int x, int y, int width, int height) {
-
+		getActiveTexture(target).copyTexSubImage2D(level, xoffset, yoffset, x, y, width, height);
 	}
 
 	@Override
@@ -213,7 +338,7 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glDepthFunc(int func) {
-
+		state.depthFunc = func;
 	}
 
 	@Override
@@ -259,26 +384,27 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glDrawArrays(int mode, int first, int count) {
+		impl.drawArrays(mode, first, count);
 	}
 
 	@Override
 	public void glDrawElements(int mode, int count, int type, Buffer indices) {
-
+		impl.drawElements(mode, count, type, indices);
 	}
 
 	@Override
 	public void glFinish() {
-
+		impl.finish();
 	}
 
 	@Override
 	public void glFlush() {
-
+		impl.flush();
 	}
 
 	@Override
 	public void glFrontFace(int mode) {
-
+		state.frontFace = mode;
 	}
 
 	@Override
@@ -306,7 +432,8 @@ public class StateGL20 implements GL20Ext {
 			case GL_BLEND:
 				return state.blendEnabled ? 1 : 0;
 		}
-		return 0;
+		//return 0;
+		throw new RuntimeException("glGetIntegeri: unknown " + pname);
 	}
 
 	@Override
@@ -327,14 +454,19 @@ public class StateGL20 implements GL20Ext {
 				return "OpenGL ES GLSL ES2.0";
 			case GL_EXTENSIONS:
 				return "";
-			default:
-				return null;
 		}
+		throw new RuntimeException("glGetString: unknown " + name);
 	}
 
 	@Override
 	public void glHint(int target, int mode) {
-
+		switch (target) {
+			case GL20.GL_GENERATE_MIPMAP_HINT:
+				state.generateMipmapHint = mode;
+				break;
+			default:
+				throw new RuntimeException("glHint: unknown " + target);
+		}
 	}
 
 	@Override
@@ -344,17 +476,17 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glPixelStorei(int pname, int param) {
-
+		System.out.println("StateGL20.glPixelStorei(" + "pname = [" + pname + "], param = [" + param + "]" + ")");
 	}
 
 	@Override
 	public void glPolygonOffset(float factor, float units) {
-
+		System.out.println("StateGL20.glPolygonOffset(" + "factor = [" + factor + "], units = [" + units + "]" + ")");
 	}
 
 	@Override
 	public void glReadPixels(int x, int y, int width, int height, int format, int type, Buffer pixels) {
-
+		System.out.println("StateGL20.glReadPixels(" + "x = [" + x + "], y = [" + y + "], width = [" + width + "], height = [" + height + "], format = [" + format + "], type = [" + type + "], pixels = [" + pixels + "]" + ")");
 	}
 
 	@Override
@@ -386,17 +518,17 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, Buffer pixels) {
-
+		getActiveTexture(target).texImage2D(level, internalformat, width, height, border, format, type, pixels);
 	}
 
 	@Override
 	public void glTexParameterf(int target, int pname, float param) {
-
+		getActiveTexture(target).parameter(pname, param);
 	}
 
 	@Override
 	public void glTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format, int type, Buffer pixels) {
-
+		getActiveTexture(target).texSubImage2D(level, xoffset, yoffset, width, height, format, type, pixels);
 	}
 
 	@Override
@@ -414,57 +546,112 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glBindAttribLocation(int program, int index, String name) {
-
+		((Program)objects[program]).bindAttribLocation(index, name);
 	}
+
 
 	@Override
 	public void glBindBuffer(int target, int buffer) {
-
+		switch (target) {
+			case GL_ARRAY_BUFFER:
+				state.arrayBuffer = ((GLBuffer)objects[buffer]);
+				break;
+			case GL_ELEMENT_ARRAY_BUFFER:
+				state.elementArrayBuffer = ((GLBuffer)objects[buffer]);
+				break;
+			default:
+				throw new RuntimeException("glBindBuffer invalid target");
+		}
 	}
+
 
 	@Override
 	public void glBindFramebuffer(int target, int framebuffer) {
-
+		switch (target) {
+			case GL_FRAMEBUFFER:
+				state.frameBuffer = ((FrameBuffer)objects[framebuffer]);
+				break;
+			default:
+				throw new RuntimeException("glBindFramebuffer invalid target");
+		}
 	}
+
 
 	@Override
 	public void glBindRenderbuffer(int target, int renderbuffer) {
-
+		switch (target) {
+			case GL_RENDERBUFFER:
+				state.renderBuffer = ((RenderBuffer)objects[renderbuffer]);
+				break;
+			default:
+				throw new RuntimeException("glBindRenderbuffer invalid target");
+		}
 	}
 
 	@Override
 	public void glBlendColor(float red, float green, float blue, float alpha) {
-
+		state.blendColor.red = red;
+		state.blendColor.green = green;
+		state.blendColor.blue = blue;
+		state.blendColor.alpha = alpha;
 	}
 
 	@Override
 	public void glBlendEquation(int mode) {
-
+		state.blendEquationRGB = mode;
+		state.blendEquationAlpha = mode;
 	}
 
 	@Override
 	public void glBlendEquationSeparate(int modeRGB, int modeAlpha) {
-
+		state.blendEquationRGB = modeRGB;
+		state.blendEquationAlpha = modeAlpha;
 	}
 
 	@Override
 	public void glBlendFuncSeparate(int srcRGB, int dstRGB, int srcAlpha, int dstAlpha) {
-
+		state.blendFuncSrcRGB = srcRGB;
+		state.blendFuncDstRGB = dstRGB;
+		state.blendFuncSrcAlpha = srcAlpha;
+		state.blendFuncDstAlpha = dstAlpha;
 	}
 
 	@Override
 	public void glBufferData(int target, int size, Buffer data, int usage) {
-
+		switch (target) {
+			case GL_ARRAY_BUFFER:
+				state.arrayBuffer.data(size, data, usage);
+				break;
+			case GL_ELEMENT_ARRAY_BUFFER:
+				state.elementArrayBuffer.data(size, data, usage);
+				break;
+			default:
+				throw new RuntimeException("glBindBuffer invalid target");
+		}
 	}
 
 	@Override
 	public void glBufferSubData(int target, int offset, int size, Buffer data) {
-
+		switch (target) {
+			case GL_ARRAY_BUFFER:
+				state.arrayBuffer.subdata(offset, size, data);
+				break;
+			case GL_ELEMENT_ARRAY_BUFFER:
+				state.elementArrayBuffer.subdata(offset, size, data);
+				break;
+			default:
+				throw new RuntimeException("glBindBuffer invalid target");
+		}
 	}
 
 	@Override
 	public int glCheckFramebufferStatus(int target) {
-		return 0;
+		switch (target) {
+			case GL_FRAMEBUFFER:
+				return state.frameBuffer.status();
+			default:
+				throw new RuntimeException("glBindFramebuffer invalid target");
+		}
 	}
 
 	@Override
@@ -509,17 +696,17 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glDeleteRenderbuffer(int renderbuffer) {
-
+		deleteObject(renderbuffer);
 	}
 
 	@Override
 	public void glDeleteRenderbuffers(int n, IntBuffer renderbuffers) {
-
+		for (int i = 0; i < n; i++) glDeleteRenderbuffer(renderbuffers.get(i));
 	}
 
 	@Override
 	public void glDeleteShader(int shader) {
-
+		deleteObject(shader);
 	}
 
 	@Override
@@ -529,112 +716,122 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glDisableVertexAttribArray(int index) {
-
+		state.enabledAttribArrays[index] = false;
 	}
 
 	@Override
 	public void glDrawElements(int mode, int count, int type, int indices) {
-
+		impl.drawElements(mode, count, type, indices);
 	}
 
 	@Override
 	public void glEnableVertexAttribArray(int index) {
-
+		state.enabledAttribArrays[index] = true;
 	}
 
 	@Override
 	public void glFramebufferRenderbuffer(int target, int attachment, int renderbuffertarget, int renderbuffer) {
-
+		System.out.println("StateGL20.glFramebufferRenderbuffer(" + "target = [" + target + "], attachment = [" + attachment + "], renderbuffertarget = [" + renderbuffertarget + "], renderbuffer = [" + renderbuffer + "]" + ")");
 	}
 
 	@Override
 	public void glFramebufferTexture2D(int target, int attachment, int textarget, int texture, int level) {
-
+		System.out.println("StateGL20.glFramebufferTexture2D(" + "target = [" + target + "], attachment = [" + attachment + "], textarget = [" + textarget + "], texture = [" + texture + "], level = [" + level + "]" + ")");
 	}
 
 	@Override
 	public int glGenBuffer() {
-		return 0;
+		return allocateObject(impl.createBuffer());
 	}
 
 	@Override
 	public void glGenBuffers(int n, IntBuffer buffers) {
-
+		for (int i = 0; i < n; i++) buffers.put(glGenBuffer());
 	}
 
 	@Override
 	public void glGenerateMipmap(int target) {
-
+		getActiveTexture(target).generateMipmap();
 	}
 
 	@Override
 	public int glGenFramebuffer() {
-		return 0;
+		return allocateObject(impl.createFrameBuffer());
 	}
 
 	@Override
 	public void glGenFramebuffers(int n, IntBuffer framebuffers) {
-
+		for (int i = 0; i < n; i++) framebuffers.put(glGenFramebuffer());
 	}
 
 	@Override
 	public int glGenRenderbuffer() {
-		return 0;
+		return allocateObject(impl.createRenderBuffer());
 	}
 
 	@Override
 	public void glGenRenderbuffers(int n, IntBuffer renderbuffers) {
-
+		for (int i = 0; i < n; i++) renderbuffers.put(glGenRenderbuffer());
 	}
 
 	@Override
 	public String glGetActiveAttrib(int program, int index, IntBuffer size, Buffer type) {
-		return null;
+		ProgramAttribute a = ((Program)objects[program]).getAttrib(index);
+		size.put(a.size);
+		((IntBuffer)type).put(a.type);
+		return a.name;
 	}
 
 	@Override
 	public String glGetActiveUniform(int program, int index, IntBuffer size, Buffer type) {
-		return null;
+		ProgramUniform a = ((Program)objects[program]).getUniform(index);
+		size.put(a.size);
+		((IntBuffer)type).put(a.type);
+		return a.name;
+
 	}
 
 	@Override
 	public void glGetAttachedShaders(int program, int maxcount, Buffer count, IntBuffer shaders) {
-
+		System.out.println("StateGL20.glGetAttachedShaders(" + "program = [" + program + "], maxcount = [" + maxcount + "], count = [" + count + "], shaders = [" + shaders + "]" + ")");
 	}
 
 	@Override
 	public int glGetAttribLocation(int program, String name) {
-		return 0;
+		return ((Program)objects[program]).getAttribLocation(name);
 	}
 
 	@Override
 	public void glGetBooleanv(int pname, Buffer params) {
-
+		System.out.println("StateGL20.glGetBooleanv(" + "pname = [" + pname + "], params = [" + params + "]" + ")");
 	}
 
 	@Override
 	public void glGetBufferParameteriv(int target, int pname, IntBuffer params) {
-
+		System.out.println("StateGL20.glGetBufferParameteriv(" + "target = [" + target + "], pname = [" + pname + "], params = [" + params + "]" + ")");
 	}
 
 	@Override
 	public void glGetFloatv(int pname, FloatBuffer params) {
-
+		System.out.println("StateGL20.glGetFloatv(" + "pname = [" + pname + "], params = [" + params + "]" + ")");
 	}
 
 	@Override
 	public void glGetFramebufferAttachmentParameteriv(int target, int attachment, int pname, IntBuffer params) {
-
+		System.out.println("StateGL20.glGetFramebufferAttachmentParameteriv(" + "target = [" + target + "], attachment = [" + attachment + "], pname = [" + pname + "], params = [" + params + "]" + ")");
 	}
 
 	public int glGetProgrami(int program, int pname) {
+		Program p = (Program) objects[program];
 		switch (pname) {
 			case GL20.GL_LINK_STATUS:
-				int result = ((Program) objects[program]).linked() ? 1 : 0;
-				System.out.println("StateGL20.glGetProgrami(GL20.GL_LINK_STATUS) = " + result);
-				return result;
+				return p.linked() ? 1 : 0;
+			case GL20.GL_ACTIVE_UNIFORMS:
+				return p.uniformsCount();
+			case GL20.GL_ACTIVE_ATTRIBUTES:
+				return p.attributesCount();
 			default:
-				throw new RuntimeException("");
+				throw new RuntimeException("Unknown glGetProgrami:" + pname);
 		}
 	}
 
@@ -650,62 +847,71 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glGetRenderbufferParameteriv(int target, int pname, IntBuffer params) {
+		System.out.println("StateGL20.glGetRenderbufferParameteriv(" + "target = [" + target + "], pname = [" + pname + "], params = [" + params + "]" + ")");
+	}
 
+	public int glGetShaderi(int shader, int pname) {
+		switch (pname) {
+			case GL20.GL_COMPILE_STATUS:
+				return ((Shader)objects[shader]).compiled() ? 1 : 0;
+			default:
+				throw new RuntimeException("Unknown glGetShaderi:" + pname);
+		}
 	}
 
 	@Override
 	public void glGetShaderiv(int shader, int pname, IntBuffer params) {
-
+		params.put(glGetShaderi(shader, pname));
 	}
 
 	@Override
 	public String glGetShaderInfoLog(int shader) {
-		return null;
+		return ((Shader)objects[shader]).getInfoLog();
 	}
 
 	@Override
 	public void glGetShaderPrecisionFormat(int shadertype, int precisiontype, IntBuffer range, IntBuffer precision) {
-
+		System.out.println("StateGL20.glGetShaderPrecisionFormat(" + "shadertype = [" + shadertype + "], precisiontype = [" + precisiontype + "], range = [" + range + "], precision = [" + precision + "]" + ")");
 	}
 
 	@Override
 	public void glGetTexParameterfv(int target, int pname, FloatBuffer params) {
-
+		System.out.println("StateGL20.glGetTexParameterfv(" + "target = [" + target + "], pname = [" + pname + "], params = [" + params + "]" + ")");
 	}
 
 	@Override
 	public void glGetTexParameteriv(int target, int pname, IntBuffer params) {
-
+		System.out.println("StateGL20.glGetTexParameteriv(" + "target = [" + target + "], pname = [" + pname + "], params = [" + params + "]" + ")");
 	}
 
 	@Override
 	public void glGetUniformfv(int program, int location, FloatBuffer params) {
-
+		System.out.println("StateGL20.glGetUniformfv(" + "program = [" + program + "], location = [" + location + "], params = [" + params + "]" + ")");
 	}
 
 	@Override
 	public void glGetUniformiv(int program, int location, IntBuffer params) {
-
+		System.out.println("StateGL20.glGetUniformiv(" + "program = [" + program + "], location = [" + location + "], params = [" + params + "]" + ")");
 	}
 
 	@Override
 	public int glGetUniformLocation(int program, String name) {
-		return 0;
+		return ((Program)objects[program]).getUniformLocation(name);
 	}
 
 	@Override
 	public void glGetVertexAttribfv(int index, int pname, FloatBuffer params) {
-
+		System.out.println("StateGL20.glGetVertexAttribfv(" + "index = [" + index + "], pname = [" + pname + "], params = [" + params + "]" + ")");
 	}
 
 	@Override
 	public void glGetVertexAttribiv(int index, int pname, IntBuffer params) {
-
+		System.out.println("StateGL20.glGetVertexAttribiv(" + "index = [" + index + "], pname = [" + pname + "], params = [" + params + "]" + ")");
 	}
 
 	@Override
 	public void glGetVertexAttribPointerv(int index, int pname, Buffer pointer) {
-
+		System.out.println("StateGL20.glGetVertexAttribPointerv(" + "index = [" + index + "], pname = [" + pname + "], pointer = [" + pointer + "]" + ")");
 	}
 
 	@Override
@@ -763,22 +969,22 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glReleaseShaderCompiler() {
-
+		System.out.println("StateGL20.glReleaseShaderCompiler(" + "" + ")");
 	}
 
 	@Override
 	public void glRenderbufferStorage(int target, int internalformat, int width, int height) {
-
+		System.out.println("StateGL20.glRenderbufferStorage(" + "target = [" + target + "], internalformat = [" + internalformat + "], width = [" + width + "], height = [" + height + "]" + ")");
 	}
 
 	@Override
 	public void glSampleCoverage(float value, boolean invert) {
-
+		System.out.println("StateGL20.glSampleCoverage(" + "value = [" + value + "], invert = [" + invert + "]" + ")");
 	}
 
 	@Override
 	public void glShaderBinary(int n, IntBuffer shaders, int binaryformat, Buffer binary, int length) {
-
+		System.out.println("StateGL20.glShaderBinary(" + "n = [" + n + "], shaders = [" + shaders + "], binaryformat = [" + binaryformat + "], binary = [" + binary + "], length = [" + length + "]" + ")");
 	}
 
 	@Override
@@ -788,241 +994,241 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glStencilFuncSeparate(int face, int func, int ref, int mask) {
-
+		System.out.println("StateGL20.glStencilFuncSeparate(" + "face = [" + face + "], func = [" + func + "], ref = [" + ref + "], mask = [" + mask + "]" + ")");
 	}
 
 	@Override
 	public void glStencilMaskSeparate(int face, int mask) {
-
+		System.out.println("StateGL20.glStencilMaskSeparate(" + "face = [" + face + "], mask = [" + mask + "]" + ")");
 	}
 
 	@Override
 	public void glStencilOpSeparate(int face, int fail, int zfail, int zpass) {
-
+		System.out.println("StateGL20.glStencilOpSeparate(" + "face = [" + face + "], fail = [" + fail + "], zfail = [" + zfail + "], zpass = [" + zpass + "]" + ")");
 	}
 
 	@Override
 	public void glTexParameterfv(int target, int pname, FloatBuffer params) {
-
+		System.out.println("StateGL20.glTexParameterfv(" + "target = [" + target + "], pname = [" + pname + "], params = [" + params + "]" + ")");
 	}
 
 	@Override
 	public void glTexParameteri(int target, int pname, int param) {
-
+		System.out.println("StateGL20.glTexParameteri(" + "target = [" + target + "], pname = [" + pname + "], param = [" + param + "]" + ")");
 	}
 
 	@Override
 	public void glTexParameteriv(int target, int pname, IntBuffer params) {
-
+		System.out.println("StateGL20.glTexParameteriv(" + "target = [" + target + "], pname = [" + pname + "], params = [" + params + "]" + ")");
 	}
 
 	@Override
 	public void glUniform1f(int location, float x) {
-
+		System.out.println("StateGL20.glUniform1f(" + "location = [" + location + "], x = [" + x + "]" + ")");
 	}
 
 	@Override
 	public void glUniform1fv(int location, int count, FloatBuffer v) {
-
+		System.out.println("StateGL20.glUniform1fv(" + "location = [" + location + "], count = [" + count + "], v = [" + v + "]" + ")");
 	}
 
 	@Override
 	public void glUniform1fv(int location, int count, float[] v, int offset) {
-
+		System.out.println("StateGL20.glUniform1fv(" + "location = [" + location + "], count = [" + count + "], v = [" + v + "], offset = [" + offset + "]" + ")");
 	}
 
 	@Override
 	public void glUniform1i(int location, int x) {
-
+		System.out.println("StateGL20.glUniform1i(" + "location = [" + location + "], x = [" + x + "]" + ")");
 	}
 
 	@Override
 	public void glUniform1iv(int location, int count, IntBuffer v) {
-
+		System.out.println("StateGL20.glUniform1iv(" + "location = [" + location + "], count = [" + count + "], v = [" + v + "]" + ")");
 	}
 
 	@Override
 	public void glUniform1iv(int location, int count, int[] v, int offset) {
-
+		System.out.println("StateGL20.glUniform1iv(" + "location = [" + location + "], count = [" + count + "], v = [" + v + "], offset = [" + offset + "]" + ")");
 	}
 
 	@Override
 	public void glUniform2f(int location, float x, float y) {
-
+		System.out.println("StateGL20.glUniform2f(" + "location = [" + location + "], x = [" + x + "], y = [" + y + "]" + ")");
 	}
 
 	@Override
 	public void glUniform2fv(int location, int count, FloatBuffer v) {
-
+		System.out.println("StateGL20.glUniform2fv(" + "location = [" + location + "], count = [" + count + "], v = [" + v + "]" + ")");
 	}
 
 	@Override
 	public void glUniform2fv(int location, int count, float[] v, int offset) {
-
+		System.out.println("StateGL20.glUniform2fv(" + "location = [" + location + "], count = [" + count + "], v = [" + v + "], offset = [" + offset + "]" + ")");
 	}
 
 	@Override
 	public void glUniform2i(int location, int x, int y) {
-
+		System.out.println("StateGL20.glUniform2i(" + "location = [" + location + "], x = [" + x + "], y = [" + y + "]" + ")");
 	}
 
 	@Override
 	public void glUniform2iv(int location, int count, IntBuffer v) {
-
+		System.out.println("StateGL20.glUniform2iv(" + "location = [" + location + "], count = [" + count + "], v = [" + v + "]" + ")");
 	}
 
 	@Override
 	public void glUniform2iv(int location, int count, int[] v, int offset) {
-
+		System.out.println("StateGL20.glUniform2iv(" + "location = [" + location + "], count = [" + count + "], v = [" + v + "], offset = [" + offset + "]" + ")");
 	}
 
 	@Override
 	public void glUniform3f(int location, float x, float y, float z) {
-
+		System.out.println("StateGL20.glUniform3f(" + "location = [" + location + "], x = [" + x + "], y = [" + y + "], z = [" + z + "]" + ")");
 	}
 
 	@Override
 	public void glUniform3fv(int location, int count, FloatBuffer v) {
-
+		System.out.println("StateGL20.glUniform3fv(" + "location = [" + location + "], count = [" + count + "], v = [" + v + "]" + ")");
 	}
 
 	@Override
 	public void glUniform3fv(int location, int count, float[] v, int offset) {
-
+		System.out.println("StateGL20.glUniform3fv(" + "location = [" + location + "], count = [" + count + "], v = [" + v + "], offset = [" + offset + "]" + ")");
 	}
 
 	@Override
 	public void glUniform3i(int location, int x, int y, int z) {
-
+		System.out.println("StateGL20.glUniform3i(" + "location = [" + location + "], x = [" + x + "], y = [" + y + "], z = [" + z + "]" + ")");
 	}
 
 	@Override
 	public void glUniform3iv(int location, int count, IntBuffer v) {
-
+		System.out.println("StateGL20.glUniform3iv(" + "location = [" + location + "], count = [" + count + "], v = [" + v + "]" + ")");
 	}
 
 	@Override
 	public void glUniform3iv(int location, int count, int[] v, int offset) {
-
+		System.out.println("StateGL20.glUniform3iv(" + "location = [" + location + "], count = [" + count + "], v = [" + v + "], offset = [" + offset + "]" + ")");
 	}
 
 	@Override
 	public void glUniform4f(int location, float x, float y, float z, float w) {
-
+		System.out.println("StateGL20.glUniform4f(" + "location = [" + location + "], x = [" + x + "], y = [" + y + "], z = [" + z + "], w = [" + w + "]" + ")");
 	}
 
 	@Override
 	public void glUniform4fv(int location, int count, FloatBuffer v) {
-
+		System.out.println("StateGL20.glUniform4fv(" + "location = [" + location + "], count = [" + count + "], v = [" + v + "]" + ")");
 	}
 
 	@Override
 	public void glUniform4fv(int location, int count, float[] v, int offset) {
-
+		System.out.println("StateGL20.glUniform4fv(" + "location = [" + location + "], count = [" + count + "], v = [" + v + "], offset = [" + offset + "]" + ")");
 	}
 
 	@Override
 	public void glUniform4i(int location, int x, int y, int z, int w) {
-
+		System.out.println("StateGL20.glUniform4i(" + "location = [" + location + "], x = [" + x + "], y = [" + y + "], z = [" + z + "], w = [" + w + "]" + ")");
 	}
 
 	@Override
 	public void glUniform4iv(int location, int count, IntBuffer v) {
-
+		System.out.println("StateGL20.glUniform4iv(" + "location = [" + location + "], count = [" + count + "], v = [" + v + "]" + ")");
 	}
 
 	@Override
 	public void glUniform4iv(int location, int count, int[] v, int offset) {
-
+		System.out.println("StateGL20.glUniform4iv(" + "location = [" + location + "], count = [" + count + "], v = [" + v + "], offset = [" + offset + "]" + ")");
 	}
 
 	@Override
 	public void glUniformMatrix2fv(int location, int count, boolean transpose, FloatBuffer value) {
-
+		System.out.println("StateGL20.glUniformMatrix2fv(" + "location = [" + location + "], count = [" + count + "], transpose = [" + transpose + "], value = [" + value + "]" + ")");
 	}
 
 	@Override
 	public void glUniformMatrix2fv(int location, int count, boolean transpose, float[] value, int offset) {
-
+		System.out.println("StateGL20.glUniformMatrix2fv(" + "location = [" + location + "], count = [" + count + "], transpose = [" + transpose + "], value = [" + value + "], offset = [" + offset + "]" + ")");
 	}
 
 	@Override
 	public void glUniformMatrix3fv(int location, int count, boolean transpose, FloatBuffer value) {
-
+		System.out.println("StateGL20.glUniformMatrix3fv(" + "location = [" + location + "], count = [" + count + "], transpose = [" + transpose + "], value = [" + value + "]" + ")");
 	}
 
 	@Override
 	public void glUniformMatrix3fv(int location, int count, boolean transpose, float[] value, int offset) {
-
+		System.out.println("StateGL20.glUniformMatrix3fv(" + "location = [" + location + "], count = [" + count + "], transpose = [" + transpose + "], value = [" + value + "], offset = [" + offset + "]" + ")");
 	}
 
 	@Override
 	public void glUniformMatrix4fv(int location, int count, boolean transpose, FloatBuffer value) {
-
+		System.out.println("StateGL20.glUniformMatrix4fv(" + "location = [" + location + "], count = [" + count + "], transpose = [" + transpose + "], value = [" + value + "]" + ")");
 	}
 
 	@Override
 	public void glUniformMatrix4fv(int location, int count, boolean transpose, float[] value, int offset) {
-
+		System.out.println("StateGL20.glUniformMatrix4fv(" + "location = [" + location + "], count = [" + count + "], transpose = [" + transpose + "], value = [" + value + "], offset = [" + offset + "]" + ")");
 	}
 
 	@Override
 	public void glUseProgram(int program) {
-
+		state.program = (Program)objects[program];
 	}
 
 	@Override
 	public void glValidateProgram(int program) {
-
+		System.out.println("StateGL20.glValidateProgram(" + "program = [" + program + "]" + ")");
 	}
 
 	@Override
 	public void glVertexAttrib1f(int indx, float x) {
-
+		System.out.println("StateGL20.glVertexAttrib1f(" + "indx = [" + indx + "], x = [" + x + "]" + ")");
 	}
 
 	@Override
 	public void glVertexAttrib1fv(int indx, FloatBuffer values) {
-
+		System.out.println("StateGL20.glVertexAttrib1fv(" + "indx = [" + indx + "], values = [" + values + "]" + ")");
 	}
 
 	@Override
 	public void glVertexAttrib2f(int indx, float x, float y) {
-
+		System.out.println("StateGL20.glVertexAttrib2f(" + "indx = [" + indx + "], x = [" + x + "], y = [" + y + "]" + ")");
 	}
 
 	@Override
 	public void glVertexAttrib2fv(int indx, FloatBuffer values) {
-
+		System.out.println("StateGL20.glVertexAttrib2fv(" + "indx = [" + indx + "], values = [" + values + "]" + ")");
 	}
 
 	@Override
 	public void glVertexAttrib3f(int indx, float x, float y, float z) {
-
+		System.out.println("StateGL20.glVertexAttrib3f(" + "indx = [" + indx + "], x = [" + x + "], y = [" + y + "], z = [" + z + "]" + ")");
 	}
 
 	@Override
 	public void glVertexAttrib3fv(int indx, FloatBuffer values) {
-
+		System.out.println("StateGL20.glVertexAttrib3fv(" + "indx = [" + indx + "], values = [" + values + "]" + ")");
 	}
 
 	@Override
 	public void glVertexAttrib4f(int indx, float x, float y, float z, float w) {
-
+		System.out.println("StateGL20.glVertexAttrib4f(" + "indx = [" + indx + "], x = [" + x + "], y = [" + y + "], z = [" + z + "], w = [" + w + "]" + ")");
 	}
 
 	@Override
 	public void glVertexAttrib4fv(int indx, FloatBuffer values) {
-
+		System.out.println("StateGL20.glVertexAttrib4fv(" + "indx = [" + indx + "], values = [" + values + "]" + ")");
 	}
 
 	@Override
 	public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride, Buffer ptr) {
-
+		System.out.println("StateGL20.glVertexAttribPointer(" + "indx = [" + indx + "], size = [" + size + "], type = [" + type + "], normalized = [" + normalized + "], stride = [" + stride + "], ptr = [" + ptr + "]" + ")");
 	}
 
 	@Override
 	public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride, int ptr) {
-
+		System.out.println("StateGL20.glVertexAttribPointer(" + "indx = [" + indx + "], size = [" + size + "], type = [" + type + "], normalized = [" + normalized + "], stride = [" + stride + "], ptr = [" + ptr + "]" + ")");
 	}
 }
