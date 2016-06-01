@@ -4,20 +4,20 @@ import java.util.ArrayList;
 
 public interface Expr {
 	static public class Id implements Expr {
-		public String read;
+		public String id;
 
-		public Id(String read) {
-			this.read = read;
+		public Id(String id) {
+			this.id = id;
 		}
 	}
 
 	static public class Access implements Expr {
 		public final Expr expr;
-		public final String read;
+		public final String field;
 
 		public Access(Expr expr, String read) {
 			this.expr = expr;
-			this.read = read;
+			this.field = read;
 		}
 	}
 
@@ -32,11 +32,11 @@ public interface Expr {
 	}
 
 	static public class Call implements Expr {
-		public final Expr expr;
+		public final String name;
 		public final ArrayList<Expr> args;
 
-		public Call(Expr expr, ArrayList<Expr> args) {
-			this.expr = expr;
+		public Call(String name, ArrayList<Expr> args) {
+			this.name = name;
 			this.args = args;
 		}
 	}

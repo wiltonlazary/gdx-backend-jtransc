@@ -751,7 +751,7 @@ public class JPEGDecoder {
 			}
 
 			default:
-				throw new IOException("Unknown marker: " + Integer.toHexString(marker));
+				throw new IOException("Special marker: " + Integer.toHexString(marker));
 		}
 	}
 

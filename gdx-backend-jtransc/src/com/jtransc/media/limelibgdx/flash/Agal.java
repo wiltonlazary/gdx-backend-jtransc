@@ -5,6 +5,14 @@ public class Agal {
 
 	}
 
+	static public class Names {
+
+	}
+
+	static public class Program {
+
+	}
+
 	enum Type {
 		mov(0x00),
 		add(0x01),
@@ -55,52 +63,58 @@ public class Agal {
 		}
 	}
 
-	protected void out(Type type, Source dst, Source l) {
-		System.out.println(type.name() + " " + dst + ", " + l);
-	}
+	static public class Assembler {
+		protected void out(Type type, Source dst, Source l) {
+			System.out.println(type.name() + " " + dst + ", " + l);
+		}
 
-	protected void out(Type type, Source dst, Source l, Source r) {
-		System.out.println(type.name() + " " + dst + ", " + l + ", " + r);
-	}
+		protected void out(Type type, Source dst, Source l, Source r) {
+			System.out.println(type.name() + " " + dst + ", " + l + ", " + r);
+		}
 
-	public void mov(Source dst, Source l) {
-		out(Type.mov, dst, l);
-	}
+		public void mov(Source dst, Source l) {
+			out(Type.mov, dst, l);
+		}
 
-	public void add(Source dst, Source l, Source r) {
-		out(Type.add, dst, l, r);
-	}
+		public void add(Source dst, Source l, Source r) {
+			out(Type.add, dst, l, r);
+		}
 
-	public void sub(Source dst, Source l, Source r) {
-		out(Type.sub, dst, l, r);
-	}
+		public void sub(Source dst, Source l, Source r) {
+			out(Type.sub, dst, l, r);
+		}
 
-	public void mul(Source dst, Source l, Source r) {
-		out(Type.mul, dst, l, r);
-	}
+		public void mul(Source dst, Source l, Source r) {
+			out(Type.mul, dst, l, r);
+		}
 
-	public void div(Source dst, Source l, Source r) {
-		out(Type.div, dst, l, r);
-	}
+		public void div(Source dst, Source l, Source r) {
+			out(Type.div, dst, l, r);
+		}
 
-	public void rcp(Source dst, Source l, Source r) {
-		out(Type.rcp, dst, l, r);
-	}
+		public void rcp(Source dst, Source l, Source r) {
+			out(Type.rcp, dst, l, r);
+		}
 
-	public void min(Source dst, Source l, Source r) {
-		out(Type.min, dst, l, r);
-	}
+		public void min(Source dst, Source l, Source r) {
+			out(Type.min, dst, l, r);
+		}
 
-	public void max(Source dst, Source l, Source r) {
-		out(Type.max, dst, l, r);
-	}
+		public void max(Source dst, Source l, Source r) {
+			out(Type.max, dst, l, r);
+		}
 
-	// fractional:
-	public void frc(Source dst, Source l) {
-		out(Type.frc, dst, l);
-	}
+		// fractional:
+		public void frc(Source dst, Source l) {
+			out(Type.frc, dst, l);
+		}
 
-	public void sqt(Source dst, Source l) {
-		out(Type.sqt, dst, l);
+		public void sqt(Source dst, Source l) {
+			out(Type.sqt, dst, l);
+		}
+
+		public void tex(Source dst, Source l, Source r) {
+			out(Type.tex, dst, l, r);
+		}
 	}
 }

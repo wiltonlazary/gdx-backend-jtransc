@@ -233,7 +233,12 @@ public class GlSlParser {
 						r.expect(",");
 					}
 					r.expect(")");
-					expr = new Expr.Call(expr, args);
+					if (expr instanceof Expr.Id) {
+						expr = new Expr.Call(((Expr.Id) expr).id, args);
+					} else {
+						//expr = new Expr.Call(expr, args);
+						throw new RuntimeException("Unsupported calling complex functions");
+					}
 					break;
 				}
 				case ".": {

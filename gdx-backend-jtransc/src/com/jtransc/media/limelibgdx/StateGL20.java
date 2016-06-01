@@ -831,7 +831,7 @@ public class StateGL20 implements GL20Ext {
 			case GL20.GL_ACTIVE_ATTRIBUTES:
 				return p.attributesCount();
 			default:
-				throw new RuntimeException("Unknown glGetProgrami:" + pname);
+				throw new RuntimeException("Special glGetProgrami:" + pname);
 		}
 	}
 
@@ -855,7 +855,7 @@ public class StateGL20 implements GL20Ext {
 			case GL20.GL_COMPILE_STATUS:
 				return ((Shader)objects[shader]).compiled() ? 1 : 0;
 			default:
-				throw new RuntimeException("Unknown glGetShaderi:" + pname);
+				throw new RuntimeException("Special glGetShaderi:" + pname);
 		}
 	}
 

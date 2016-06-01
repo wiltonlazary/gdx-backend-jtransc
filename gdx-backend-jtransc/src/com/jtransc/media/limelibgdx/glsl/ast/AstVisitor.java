@@ -1,6 +1,6 @@
 package com.jtransc.media.limelibgdx.glsl.ast;
 
-public class Visitor {
+public class AstVisitor {
 	public void visit(Shader shader) {
 		for (Decl decl : shader.decls) {
 			visit(decl);

@@ -1,7 +1,11 @@
 package com.jtransc.media.limelibgdx.glsl;
 
+import com.jtransc.media.limelibgdx.flash.Agal;
 import com.jtransc.media.limelibgdx.flash.GlSlToAgal;
 import com.jtransc.media.limelibgdx.glsl.ast.Shader;
+import com.jtransc.media.limelibgdx.glsl.ir.Ir3;
+import com.jtransc.media.limelibgdx.glsl.transform.AstToSir;
+import com.jtransc.media.limelibgdx.glsl.transform.SirToIr3;
 import com.jtransc.media.limelibgdx.util.Tokenizer;
 import org.junit.Assert;
 import org.junit.Test;
@@ -92,8 +96,12 @@ public class GlSlParserTest {
 	public void parse() throws Exception {
 		Shader fragment = GlSlParser.parse(fragmentShader, MACROS_GLES);
 		Shader vertex = GlSlParser.parse(vertexShader, MACROS_GLES);
-		GlSlToAgal.convert(fragment);
-		GlSlToAgal.convert(vertex);
+		//GlSlToAgal.convert(fragment);
+		//GlSlToAgal.convert(vertex);
+
+		//Agal.Program program = GlSlToAgal.convert(vertex, fragment);
+		Agal.Program program = GlSlToAgal.convertTest(fragment);
+
 		System.out.println(fragment);
 		System.out.println(vertex);
 	}
