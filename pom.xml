@@ -54,7 +54,7 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>${junit.version}</version>
-			<type>jar</type>
+			<opcode>jar</opcode>
 			<scope>test</scope>
 		</dependency>
 

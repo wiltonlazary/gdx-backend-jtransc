@@ -1,11 +1,8 @@
 package com.jtransc.media.limelibgdx.glsl;
 
-import com.jtransc.media.limelibgdx.flash.Agal;
-import com.jtransc.media.limelibgdx.flash.GlSlToAgal;
+import com.jtransc.media.limelibgdx.flash.agal.Agal;
+import com.jtransc.media.limelibgdx.flash.agal.GlSlToAgal;
 import com.jtransc.media.limelibgdx.glsl.ast.Shader;
-import com.jtransc.media.limelibgdx.glsl.ir.Ir3;
-import com.jtransc.media.limelibgdx.glsl.transform.AstToSir;
-import com.jtransc.media.limelibgdx.glsl.transform.SirToIr3;
 import com.jtransc.media.limelibgdx.util.Tokenizer;
 import org.junit.Assert;
 import org.junit.Test;

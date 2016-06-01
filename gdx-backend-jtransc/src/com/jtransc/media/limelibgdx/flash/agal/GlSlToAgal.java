@@ -1,4 +1,4 @@
-package com.jtransc.media.limelibgdx.flash;
+package com.jtransc.media.limelibgdx.flash.agal;
 
 import com.jtransc.media.limelibgdx.glsl.ast.*;
 import com.jtransc.media.limelibgdx.glsl.ir.Ir3;
@@ -34,9 +34,31 @@ public class GlSlToAgal {
 		glSlToAgal.convert();
 	}
 
-	private Agal.Source operandToSource(Operand operand) {
-		System.out.println(operand);
-		return new Agal.Source();
+	private Agal.Register operandToSource(Operand operand) {
+		//System.out.println(operand);
+		Agal.Register.Type type;
+		switch (operand.type) {
+			case Uniform:
+				type = Agal.Register.Type.Constant;
+				break;
+			case Attribute:
+				type = Agal.Register.Type.Attribute;
+				break;
+			case Varying:
+				type = Agal.Register.Type.Varying;
+				break;
+			case Temp:
+				type = Agal.Register.Type.Temporary;
+				break;
+			case Special:
+				// @TODO: Or sampler!!
+				type = Agal.Register.Type.Output;
+				break;
+			default:
+				throw new RuntimeException("Unhandled " + operand);
+		}
+		int id = names.get(type).alloc(operand.name);
+		return new Agal.Register(type, id, operand.swizzle);
 	}
 
 	private void convert() {
@@ -46,35 +68,35 @@ public class GlSlToAgal {
 			Ir3.Binop binop = ir3 instanceof Ir3.Binop ? ((Ir3.Binop) ir3) : null;
 			Ir3.Unop unop = ir3 instanceof Ir3.Unop ? ((Ir3.Unop) ir3) : null;
 			if (unop != null) {
-				Agal.Type type = Agal.Type.add;
+				Agal.Opcode opcode = Agal.Opcode.add;
 
 				switch (unop.op.str) {
 					case "=":
 					case "mov":
-						type = Agal.Type.mov;
+						opcode = Agal.Opcode.mov;
 
 						break;
 					default:
 						throw new RuntimeException("Unhandled unop " + unop.op.str);
 				}
 
-				agal.out(type, operandToSource(unop.target), operandToSource(unop.l));
+				agal.out(opcode, operandToSource(unop.target), operandToSource(unop.l));
 			} else if (binop != null) {
-				Agal.Type type;
+				Agal.Opcode opcode;
 
 				switch (binop.op.str) {
 					case "texture2D":
-						type = Agal.Type.tex;
+						opcode = Agal.Opcode.tex;
 						break;
 					case "*":
 					case "mul":
-						type = Agal.Type.mul;
+						opcode = Agal.Opcode.mul;
 						break;
 					default:
 						throw new RuntimeException("Unhandled binop " + binop.op.str);
 				}
 
-				agal.out(type, operandToSource(binop.target), operandToSource(binop.l), operandToSource(binop.r));
+				agal.out(opcode, operandToSource(binop.target), operandToSource(binop.l), operandToSource(binop.r));
 			} else {
 				throw new RuntimeException("Unhandled " + ir3);
 			}

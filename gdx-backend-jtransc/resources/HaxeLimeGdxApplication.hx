@@ -183,8 +183,8 @@ class HaxeLimeGdxApplication extends lime.app.Application {
 	//	return program;
 	//}
 	//
-	//static private function createShader(type:Int, code:String) {
-	//	var shader = gl.createShader(type);
+	//static private function createShader(opcode:Int, code:String) {
+	//	var shader = gl.createShader(opcode);
 	//	gl.shaderSource(shader, code);
 	//	gl.compileShader(shader);
 	//	return shader;
@@ -214,7 +214,7 @@ class HaxeLimeGdxApplication extends lime.app.Application {
 	//	gl.vertexAttribPointer(
 	//		pos,               // attribute 0. No particular reason for 0, but must match the layout in the shader.
 	//		3,                 // size
-	//		gl.FLOAT,     // type
+	//		gl.FLOAT,     // opcode
 	//		false,             // normalized?
 	//		0,                 // stride
 	//		0                  // array buffer offset

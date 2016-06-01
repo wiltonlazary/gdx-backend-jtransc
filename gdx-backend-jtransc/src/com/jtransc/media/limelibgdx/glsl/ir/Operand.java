@@ -1,7 +1,7 @@
 package com.jtransc.media.limelibgdx.glsl.ir;
 
 public class Operand {
-	enum Type {
+	public enum Type {
 		Uniform, Attribute, Varying, Temp, Special
 	}
 
@@ -39,5 +39,15 @@ public class Operand {
 
 	public static Operand uniform(String name) {
 		return new Operand(Type.Uniform, -1, name, null);
+	}
+
+	@Override
+	public String toString() {
+		return "Operand{" +
+			"type=" + type +
+			", id=" + id +
+			", name='" + name + '\'' +
+			", swizzle='" + swizzle + '\'' +
+			'}';
 	}
 }
