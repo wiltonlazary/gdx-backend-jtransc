@@ -1,5 +1,7 @@
 package com.jtransc.media.limelibgdx.glsl;
 
+import com.jtransc.media.limelibgdx.util.ListReader;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -12,13 +14,13 @@ import java.util.regex.Pattern;
 public class CPreprocessor {
 	private final HashMap<String, String> macros;
 	private final ArrayList<String> output = new ArrayList<>();
-	TokenReader<String> lines;
+	ListReader<String> lines;
 
 	LinkedList<Boolean> executableStack = new LinkedList<>();
 	boolean currentExecuting = true;
 
 	private CPreprocessor(String[] lines, Map<String, String> macros) {
-		this.lines = new TokenReader<>(lines);
+		this.lines = new ListReader<>(lines);
 		this.macros = new HashMap<>(macros);
 	}
 
