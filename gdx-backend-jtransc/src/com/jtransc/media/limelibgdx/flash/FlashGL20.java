@@ -165,12 +165,12 @@ public class FlashGL20 {
 
 		@Override
 		public void setSource(String string) {
-
+			System.out.println("FlashShader(" + type + ").setSource('" + string + "')");
 		}
 
 		@Override
 		public void compile() {
-
+			System.out.println("FlashShader.compile");
 		}
 
 		@Override
@@ -199,7 +199,7 @@ public class FlashGL20 {
 
 		@Override
 		public void compressedTexImage2D(int level, int internalformat, int width, int height, int border, int imageSize, Buffer data) {
-			
+
 		}
 
 		@Override

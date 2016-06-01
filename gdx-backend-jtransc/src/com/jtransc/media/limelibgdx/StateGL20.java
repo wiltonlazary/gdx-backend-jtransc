@@ -118,8 +118,8 @@ public class StateGL20 implements GL20Ext {
 
 		abstract public boolean linked();
 
-		public ProgramUniform[] uniforms;
-		public ProgramAttribute[] attributes;
+		public ProgramUniform[] uniforms = new ProgramUniform[0];
+		public ProgramAttribute[] attributes = new ProgramAttribute[0];
 
 		public int uniformsCount() {
 			return uniforms.length;
