@@ -67,11 +67,11 @@ public class GlSlParserTest {
 		);
 	}
 
-	//@Test
-	//public void parse() throws Exception {
-	//	Ast.Program program = GlSlParser.parse(fragmentShader, new HashMap<String, String>() {{
-	//		put("GL_ES", "1");
-	//	}});
-	//	System.out.println(program);
-	//}
+	@Test
+	public void parse() throws Exception {
+		Ast.Program program = GlSlParser.parse(fragmentShader, new HashMap<String, String>() {{
+			put("GL_ES", "1");
+		}});
+		System.out.println(program);
+	}
 }

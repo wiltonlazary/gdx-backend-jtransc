@@ -81,6 +81,73 @@ public interface Ast {
 	}
 
 	interface Expr extends Ast {
+		class Id implements Expr {
+			public String read;
+
+			public Id(String read) {
+				this.read = read;
+			}
+		}
+
+		class Access implements Expr {
+			public final Expr expr;
+			public final String read;
+
+			public Access(Expr expr, String read) {
+				this.expr = expr;
+				this.read = read;
+			}
+		}
+
+		class ArrayAccess implements Expr {
+			public final Expr expr;
+			public final Expr expr1;
+
+			public ArrayAccess(Expr expr, Expr expr1) {
+				this.expr = expr;
+				this.expr1 = expr1;
+			}
+		}
+
+		class Call implements Expr {
+			public final Expr expr;
+			public final ArrayList<Expr> args;
+
+			public Call(Expr expr, ArrayList<Expr> args) {
+				this.expr = expr;
+				this.args = args;
+			}
+		}
+
+		class UnopPost implements Expr {
+			public final Expr expr;
+			public final String s;
+
+			public UnopPost(Expr expr, String s) {
+				this.expr = expr;
+				this.s = s;
+			}
+		}
+
+		class Unop implements Expr {
+			public final String s;
+			public final Expr expr;
+
+			public Unop(String s, Expr expr) {
+				this.s = s;
+				this.expr = expr;
+			}
+		}
+
+		class BinopList implements Expr {
+			public final ArrayList<Expr> exprs;
+			public final ArrayList<String> ops;
+
+			public BinopList(ArrayList<Expr> exprs, ArrayList<String> ops) {
+				this.exprs = exprs;
+				this.ops = ops;
+			}
+		}
 	}
 
 	class Argument {

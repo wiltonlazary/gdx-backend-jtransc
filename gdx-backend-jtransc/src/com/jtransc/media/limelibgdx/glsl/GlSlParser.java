@@ -1,6 +1,7 @@
 package com.jtransc.media.limelibgdx.glsl;
 
 import com.jtransc.media.limelibgdx.util.ListReader;
+import com.jtransc.media.limelibgdx.util.Token;
 import com.jtransc.media.limelibgdx.util.Tokenizer;
 
 import java.util.ArrayList;
@@ -126,7 +127,11 @@ public class GlSlParser {
 					stms.add(parseStm());
 				}
 				r.expect("}");
-				return new Ast.Stm.Stms(stms);
+				if (stms.size() == 1) {
+					return stms.get(0);
+				} else {
+					return new Ast.Stm.Stms(stms);
+				}
 			case "if":
 			case "while":
 			case "do":
@@ -141,7 +146,88 @@ public class GlSlParser {
 	}
 
 	private Ast.Expr parseExpr() {
-		return null;
+		ArrayList<Ast.Expr> exprs = new ArrayList<>();
+		ArrayList<String> ops = new ArrayList<>();
+
+		while (r.hasMore()) {
+			exprs.add(parseExprTerminal());
+			switch (r.peek()) {
+				case "=":
+				case "&&": case "||":
+				case "&": case "|": case "^":
+				case "+": case "-": case "*": case "/": case "%":
+				case "==": case "!=": case "<": case ">": case "<=": case ">=":
+				{
+					ops.add(r.read());
+					continue;
+				}
+			}
+			break;
+		}
+
+		if (ops.isEmpty()) {
+			return exprs.get(0);
+		} else {
+			return new Ast.Expr.BinopList(exprs, ops);
+		}
+	}
+
+	private Ast.Expr parseExprTerminal() {
+		switch (r.peek()) {
+			case "(": {
+				r.expect("(");
+				Ast.Expr out = parseExpr();
+				r.expect(")");
+				return out;
+			}
+			case "!": return new Ast.Expr.Unop("!", parseExprTerminal());
+			case "~": return new Ast.Expr.Unop("~", parseExprTerminal());
+			case "-": return new Ast.Expr.Unop("-", parseExprTerminal());
+			case "+": return new Ast.Expr.Unop("+", parseExprTerminal());
+			case "--": return new Ast.Expr.Unop("--", parseExprTerminal());
+			case "++": return new Ast.Expr.Unop("++", parseExprTerminal());
+		}
+		Ast.Expr expr = new Ast.Expr.Id(r.read());
+		while (r.hasMore()) {
+			switch (r.peek()) {
+				case "++": {
+					r.expect("++");
+					expr = new Ast.Expr.UnopPost(expr, "++");
+					break;
+				}
+				case "--": {
+					r.expect("--");
+					expr = new Ast.Expr.UnopPost(expr, "--");
+					break;
+				}
+				case "(": {
+					r.expect("(");
+					ArrayList<Ast.Expr> args = new ArrayList<>();
+					while (!r.peek().equals(")")) {
+						args.add(parseExpr());
+						if (r.peek().equals(")")) break;
+						r.expect(",");
+					}
+					r.expect(")");
+					expr = new Ast.Expr.Call(expr, args);
+					break;
+				}
+				case ".": {
+					r.expect(".");
+					expr = new Ast.Expr.Access(expr, r.read());
+					continue;
+				}
+				case "[": {
+					r.expect("[");
+					Ast.Expr access = parseExpr();
+					expr = new Ast.Expr.ArrayAccess(expr, access);
+					r.expect("]");
+					continue;
+				}
+			}
+			break;
+		}
+		return expr;
 	}
 
 	private Ast.Argument parseArgument() {

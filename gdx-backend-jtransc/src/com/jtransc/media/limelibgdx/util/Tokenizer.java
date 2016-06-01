@@ -6,7 +6,7 @@ public class Tokenizer {
 	private final ArrayList<Token> out = new ArrayList<>();
 	private final StrReader r;
 
-	static private final Set<String> OPS = new HashSet<>(Arrays.asList(
+	static public final Set<String> OPS = new HashSet<>(Arrays.asList(
 		"&&", "||",
 		"==", "!=", "<", ">", "<=", ">=",
 		"=",
@@ -16,6 +16,7 @@ public class Tokenizer {
 		"+", "-", "*", "/", "%",
 		"&", "|", "^",
 		"!", "~",
+		"++", "--",
 		".", ",", ";"
 	));
 
