@@ -497,4 +497,18 @@ public final class BufferUtils {
         // FIXME ouch :p
         return LongBuffer.wrap(new long[numLongs]);
     }
+
+	@SuppressWarnings("unused")
+	public static ByteBuffer newUnsafeByteBuffer (int numBytes) {
+		return ByteBuffer.allocate(numBytes);
+	}
+
+	@SuppressWarnings("unused")
+	public static ByteBuffer newUnsafeByteBuffer(ByteBuffer buffer) {
+		return buffer;
+	}
+
+	@SuppressWarnings("unused")
+	public static void disposeUnsafeByteBuffer(ByteBuffer buffer) {
+	}
 }

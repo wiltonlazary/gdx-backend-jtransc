@@ -17,6 +17,7 @@
 package com.badlogic.gdx.graphics;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.g2d.Gdx2DPixmap;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.jtransc.JTranscArrays;
@@ -49,6 +50,27 @@ public class Pixmap implements Disposable {
 	 */
 	public enum Format {
 		Alpha, Intensity, LuminanceAlpha, RGB565, RGBA4444, RGB888, RGBA8888;
+
+		public static int toGdx2DPixmapFormat (Format format) {
+			if (format == Alpha) return Gdx2DPixmap.GDX2D_FORMAT_ALPHA;
+			if (format == Intensity) return Gdx2DPixmap.GDX2D_FORMAT_ALPHA;
+			if (format == LuminanceAlpha) return Gdx2DPixmap.GDX2D_FORMAT_LUMINANCE_ALPHA;
+			if (format == RGB565) return Gdx2DPixmap.GDX2D_FORMAT_RGB565;
+			if (format == RGBA4444) return Gdx2DPixmap.GDX2D_FORMAT_RGBA4444;
+			if (format == RGB888) return Gdx2DPixmap.GDX2D_FORMAT_RGB888;
+			if (format == RGBA8888) return Gdx2DPixmap.GDX2D_FORMAT_RGBA8888;
+			throw new GdxRuntimeException("Unknown Format: " + format);
+		}
+
+		public static Format fromGdx2DPixmapFormat (int format) {
+			if (format == Gdx2DPixmap.GDX2D_FORMAT_ALPHA) return Alpha;
+			if (format == Gdx2DPixmap.GDX2D_FORMAT_LUMINANCE_ALPHA) return LuminanceAlpha;
+			if (format == Gdx2DPixmap.GDX2D_FORMAT_RGB565) return RGB565;
+			if (format == Gdx2DPixmap.GDX2D_FORMAT_RGBA4444) return RGBA4444;
+			if (format == Gdx2DPixmap.GDX2D_FORMAT_RGB888) return RGB888;
+			if (format == Gdx2DPixmap.GDX2D_FORMAT_RGBA8888) return RGBA8888;
+			throw new GdxRuntimeException("Unknown Gdx2DPixmap Format: " + format);
+		}
 
 		public static int toGlFormat(Format format) {
 			if (format == Alpha) return GL20.GL_ALPHA;
