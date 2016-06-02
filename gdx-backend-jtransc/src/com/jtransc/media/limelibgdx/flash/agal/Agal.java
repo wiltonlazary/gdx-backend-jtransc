@@ -3,8 +3,101 @@ package com.jtransc.media.limelibgdx.flash.agal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Agal {
+	static public class AllocatedLanes {
+		public final int register;
+		public final int laneStart;
+		public final int laneEnd;
+		public final int size;
+
+		public AllocatedLanes(int register, int laneStart, int laneEnd) {
+			this.register = register;
+			this.laneStart = laneStart;
+			this.laneEnd = laneEnd;
+			this.size = laneEnd - laneStart;
+		}
+
+		static private char getSwizzle(int index) {
+			switch (index) {
+				case 0: return 'x';
+				case 1: return 'y';
+				case 2: return 'z';
+				case 3: return 'w';
+				default: return '?';
+			}
+		}
+
+		public String getSuffix(String swizzle) {
+			String baseSwizzle = "xyzw".substring(0, this.size);
+			if (swizzle == null) swizzle = baseSwizzle;
+			if (Objects.equals(swizzle, baseSwizzle) && swizzle.length() == 4) {
+				return "";
+			} else {
+				String out = ".";
+				for (char c : swizzle.toCharArray()) {
+					switch (c) {
+						case 'r':
+						case 'x':
+							out += getSwizzle(laneStart + 0);
+							break;
+						case 'g':
+						case 'y':
+							out += getSwizzle(laneStart + 1);
+							break;
+						case 'b':
+						case 'z':
+							out += getSwizzle(laneStart + 2);
+							break;
+						case 'a':
+						case 'w':
+							out += getSwizzle(laneStart + 3);
+							break;
+					}
+				}
+				return out;
+			}
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+
+			AllocatedLanes that = (AllocatedLanes) o;
+
+			if (register != that.register) return false;
+			if (laneStart != that.laneStart) return false;
+			if (laneEnd != that.laneEnd) return false;
+			return size == that.size;
+
+		}
+
+		@Override
+		public int hashCode() {
+			int result = register;
+			result = 31 * result + laneStart;
+			result = 31 * result + laneEnd;
+			result = 31 * result + size;
+			return result;
+		}
+
+		@Override
+		public String toString() {
+			return "AllocatedLanes(" + register + "," + laneStart + "-" + laneEnd + ")";
+		}
+
+		//public String getSwizzle() {
+		//	String out = "";
+		//	for (int lane : lanes) {
+		//		out += getSwizzle(lane);
+		//	}
+		//
+		//	return out;
+		//}
+	}
+
 	static public class Register {
 		enum Type {
 			Attribute(0, "va"),
@@ -24,42 +117,63 @@ public class Agal {
 				this.prefix = prefix;
 			}
 
-			public String getName(int index) {
+			public String getName(AllocatedLanes index) {
 				if (this == Output) {
 					return this.prefix;
 				} else {
-					return this.prefix + index;
+					return this.prefix + index.register;
 				}
 			}
 		}
 
 		public Type type;
-		public int index;
+		public AllocatedLanes register;
 		public String swizzle;
 
-		public Register(Type type, int index, String swizzle) {
+		public Register(Type type, AllocatedLanes index, String swizzle) {
 			this.type = type;
-			this.index = index;
+			this.register = index;
 			this.swizzle = swizzle;
 		}
 
 		@Override
 		public String toString() {
-			if (swizzle == null) {
-				return type.getName(index);
-			} else {
-				return (type.getName(index)) + "." + swizzle;
-			}
+			return type.getName(register) + register.getSuffix(swizzle);
 		}
 	}
 
 	static public class Subnames {
 		int lastId = 0;
-		public HashMap<String, Integer> names = new HashMap<>();
+		int laneId = 0;
+		public HashMap<String, AllocatedLanes> names = new HashMap<>();
+		public HashMap<String, Integer> sizes = new HashMap<>();
 
-		public int alloc(String name) {
+		private int availableLanes() {
+			return 4 - laneId;
+		}
+
+		public AllocatedLanes allocSize(int size) {
+			if (size < 1 || size > 4) throw new RuntimeException("Invalid size for lanes " + size);
+			if (size > availableLanes()) {
+				lastId++;
+				laneId = 0;
+			}
+			//System.out.println("lastId:" + lastId + ",laneId:" + laneId + ",size:" + size);
+			try {
+				return new AllocatedLanes(lastId, laneId, laneId + size);
+			} finally {
+				laneId += size;
+			}
+		}
+
+		public AllocatedLanes alloc(String name, int size) {
 			if (!names.containsKey(name)) {
-				names.put(name, lastId++);
+				names.put(name, allocSize(size));
+				sizes.put(name, size);
+			} else {
+				if (sizes.get(name) != size) {
+					throw new RuntimeException("Repeated allocation with different sizes");
+				}
 			}
 			return names.get(name);
 		}
@@ -75,9 +189,9 @@ public class Agal {
 			return names[type.index];
 		}
 
-		public HashMap<Integer, Double> constants = new HashMap<>();
+		public HashMap<Agal.AllocatedLanes, Double> constants = new HashMap<>();
 
-		public void addFixedConstant(int id, double constant) {
+		public void addFixedConstant(Agal.AllocatedLanes id, double constant) {
 			constants.put(id, constant);
 			//System.out.println("Constant" + id + "=" + constant);
 		}
@@ -87,39 +201,39 @@ public class Agal {
 		private final Names names;
 		public final Result vertex;
 		public final Result fragment;
-		private final HashMap<String, Integer> uniforms = new HashMap<>();
-		private final HashMap<String, Integer> attributes = new HashMap<>();
-		private final HashMap<Integer, Double> constants = new HashMap<>();
+		private final HashMap<String, AllocatedLanes> uniforms = new HashMap<>();
+		private final HashMap<String, AllocatedLanes> attributes = new HashMap<>();
+		private final HashMap<Agal.AllocatedLanes, Double> constants = new HashMap<>();
 
 		public Program(Result vertex, Result fragment, Names names) {
 			this.vertex = vertex;
 			this.fragment = fragment;
 			this.names = names;
 
-			for (Map.Entry<String, Integer> entry : names.get(Register.Type.Constant).names.entrySet()) {
+			for (Map.Entry<String, AllocatedLanes> entry : names.get(Register.Type.Constant).names.entrySet()) {
 				if (!entry.getKey().startsWith("#CST#")) {
 					uniforms.put(entry.getKey(), entry.getValue());
 				}
 			}
 
-			for (Map.Entry<String, Integer> entry : names.get(Register.Type.Attribute).names.entrySet()) {
+			for (Map.Entry<String, AllocatedLanes> entry : names.get(Register.Type.Attribute).names.entrySet()) {
 				attributes.put(entry.getKey(), entry.getValue());
 			}
 
-			for (Map.Entry<Integer, Double> entry : names.constants.entrySet()) {
+			for (Map.Entry<Agal.AllocatedLanes, Double> entry : names.constants.entrySet()) {
 				constants.put(entry.getKey(), entry.getValue());
 			}
 		}
 
-		public HashMap<String, Integer> getUniforms() {
+		public HashMap<String, AllocatedLanes> getUniforms() {
 			return uniforms;
 		}
 
-		public HashMap<String, Integer> getAttributes() {
+		public HashMap<String, AllocatedLanes> getAttributes() {
 			return attributes;
 		}
 
-		public HashMap<Integer, Double> getConstants() {
+		public HashMap<Agal.AllocatedLanes, Double> getConstants() {
 			return constants;
 		}
 	}

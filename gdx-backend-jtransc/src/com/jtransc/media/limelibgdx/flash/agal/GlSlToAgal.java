@@ -36,32 +36,39 @@ public class GlSlToAgal {
 
 	private Agal.Register operandToSource(Operand operand) {
 		Agal.Register.Type type;
+		int size = 4;
 		switch (operand.type) {
 			case Uniform:
 				type = Agal.Register.Type.Constant;
+				size = 4;
 				break;
 			case Attribute:
 				type = Agal.Register.Type.Attribute;
+				size = 4;
 				break;
 			case Varying:
 				type = Agal.Register.Type.Varying;
+				size = 4;
 				break;
 			case Temp:
 				type = Agal.Register.Type.Temporary;
+				size = 4;
 				break;
 			case Special:
 				// @TODO: Or sampler!!
 				type = Agal.Register.Type.Output;
+				size = 4;
 				break;
 			case Constant:
+				size = 1;
 				type = Agal.Register.Type.Constant;
-				int id = names.get(type).alloc(operand.name);
+				Agal.AllocatedLanes id = names.get(type).alloc(operand.name, size);
 				names.addFixedConstant(id, operand.constant);
 				break;
 			default:
 				throw new RuntimeException("Unhandled " + operand);
 		}
-		int id = names.get(type).alloc(operand.name);
+		Agal.AllocatedLanes id = names.get(type).alloc(operand.name, size);
 		return new Agal.Register(type, id, operand.swizzle);
 	}
 
