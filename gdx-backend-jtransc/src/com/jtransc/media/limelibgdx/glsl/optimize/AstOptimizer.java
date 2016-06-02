@@ -15,7 +15,7 @@ public class AstOptimizer {
 			out.add(optimize(decl));
 		}
 
-		return new Shader(out);
+		return new Shader(shader.type, out);
 	}
 
 	public Decl optimize(Decl decl) {

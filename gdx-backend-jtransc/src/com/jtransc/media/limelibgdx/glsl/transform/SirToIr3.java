@@ -1,10 +1,7 @@
 package com.jtransc.media.limelibgdx.glsl.transform;
 
 import com.jtransc.media.limelibgdx.glsl.ast.Type;
-import com.jtransc.media.limelibgdx.glsl.ir.Ir3;
-import com.jtransc.media.limelibgdx.glsl.ir.Operand;
-import com.jtransc.media.limelibgdx.glsl.ir.Operator;
-import com.jtransc.media.limelibgdx.glsl.ir.Sir;
+import com.jtransc.media.limelibgdx.glsl.ir.*;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -47,7 +44,7 @@ public class SirToIr3 {
 				stack.push(((Sir.Get) item).operand);
 			} else if (item instanceof Sir.Set) {
 				Operand source = stack.pop();
-				out.add(new Ir3.Unop(((Sir.Set) item).target, Operator.fromString("="), source));
+				out.add(new Ir3.Unop(((Sir.Set) item).target, UnaryOperator.fromString("="), source));
 			} else {
 				throw new RuntimeException("SirToIr3.compile unhandled " + item);
 			}

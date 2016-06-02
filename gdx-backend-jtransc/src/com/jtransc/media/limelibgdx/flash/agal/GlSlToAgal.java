@@ -1,6 +1,7 @@
 package com.jtransc.media.limelibgdx.flash.agal;
 
 import com.jtransc.media.limelibgdx.glsl.GlSlParser;
+import com.jtransc.media.limelibgdx.glsl.ShaderType;
 import com.jtransc.media.limelibgdx.glsl.ast.Shader;
 import com.jtransc.media.limelibgdx.glsl.ir.Ir3;
 import com.jtransc.media.limelibgdx.glsl.ir.Operand;
@@ -27,9 +28,9 @@ public class GlSlToAgal {
 
 	static public Agal.Program compile(String vertex, String fragment, boolean optimize, Map<String, String> macros) {
 		return compile(
-				GlSlParser.parse(vertex, macros),
-				GlSlParser.parse(fragment, macros),
-				optimize
+			GlSlParser.parse(ShaderType.Vertex, vertex, macros),
+			GlSlParser.parse(ShaderType.Fragment, fragment, macros),
+			optimize
 		);
 	}
 
@@ -42,7 +43,7 @@ public class GlSlToAgal {
 
 	static private Agal.Assembler compile(Shader shader, Agal.Names alloc, boolean optimize) {
 		GlSlToAgal glSlToAgal = new GlSlToAgal(shader, alloc);
-		return glSlToAgal.compile(optimize);
+		return glSlToAgal.compile(shader.type, optimize);
 	}
 
 	private Agal.Register operandToSource(Operand operand) {
@@ -83,8 +84,8 @@ public class GlSlToAgal {
 		return new Agal.Register(kind, id, operand.swizzle);
 	}
 
-	private Agal.Assembler compile(boolean optimize) {
-		final Agal.Assembler agal = new Agal.Assembler();
+	private Agal.Assembler compile(ShaderType type, boolean optimize) {
+		final Agal.Assembler agal = new Agal.Assembler(type);
 
 		for (Ir3 ir3 : AstToIr3.convert(shader, optimize)) {
 			Ir3.Binop binop = ir3 instanceof Ir3.Binop ? ((Ir3.Binop) ir3) : null;
@@ -92,34 +93,31 @@ public class GlSlToAgal {
 			if (unop != null) {
 				Agal.Opcode opcode = Agal.Opcode.add;
 
-				switch (unop.op.str) {
-					case "=":
-					case "mov":
+				switch (unop.op) {
+					case ASSIGN:
 						opcode = Agal.Opcode.mov;
 
 						break;
 					default:
-						throw new RuntimeException("Unhandled unop " + unop.op.str);
+						throw new RuntimeException("Unhandled unop " + unop.op);
 				}
 
 				agal.out(opcode, operandToSource(unop.target), operandToSource(unop.l));
 			} else if (binop != null) {
 				Agal.Opcode opcode;
 
-				switch (binop.op.str) {
-					case "texture2D":
+				switch (binop.op) {
+					case TEX2D:
 						opcode = Agal.Opcode.tex;
 						break;
-					case "*":
-					case "mul":
+					case MUL:
 						opcode = Agal.Opcode.mul;
 						break;
-					case "/":
-					case "div":
+					case DIV:
 						opcode = Agal.Opcode.div;
 						break;
 					default:
-						throw new RuntimeException("Unhandled binop " + binop.op.str);
+						throw new RuntimeException("Unhandled binop " + binop.op);
 				}
 
 				agal.out(opcode, operandToSource(binop.target), operandToSource(binop.l), operandToSource(binop.r));

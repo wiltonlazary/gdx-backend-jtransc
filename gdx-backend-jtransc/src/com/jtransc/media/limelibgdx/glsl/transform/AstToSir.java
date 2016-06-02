@@ -2,8 +2,9 @@ package com.jtransc.media.limelibgdx.glsl.transform;
 
 import com.jtransc.media.limelibgdx.glsl.ast.*;
 import com.jtransc.media.limelibgdx.glsl.ir.Operand;
-import com.jtransc.media.limelibgdx.glsl.ir.Operator;
+import com.jtransc.media.limelibgdx.glsl.ir.BinaryOperator;
 import com.jtransc.media.limelibgdx.glsl.ir.Sir;
+import com.jtransc.media.limelibgdx.glsl.ir.UnaryOperator;
 
 import java.util.ArrayList;
 
@@ -91,7 +92,7 @@ public class AstToSir {
 				default:
 					visit(expr.left);
 					visit(expr.right);
-					out.add(new Sir.Binop(Operator.fromString(expr.op)));
+					out.add(new Sir.Binop(BinaryOperator.fromString(expr.op)));
 					break;
 			}
 		}
@@ -123,10 +124,10 @@ public class AstToSir {
 			}
 			switch (expr.args.size()) {
 				case 2:
-					out.add(new Sir.Binop(Operator.fromString(expr.name)));
+					out.add(new Sir.Binop(BinaryOperator.fromString(expr.name)));
 					break;
 				case 1:
-					out.add(new Sir.Unop(Operator.fromString(expr.name)));
+					out.add(new Sir.Unop(UnaryOperator.fromString(expr.name)));
 					break;
 				default:
 					throw new RuntimeException("Unsupported custom functions");

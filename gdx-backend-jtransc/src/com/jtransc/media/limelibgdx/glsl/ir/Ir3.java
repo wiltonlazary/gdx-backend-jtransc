@@ -6,10 +6,10 @@ package com.jtransc.media.limelibgdx.glsl.ir;
 public class Ir3 {
 	static public class Unop extends Ir3 {
 		public final Operand target;
-		public final Operator op;
+		public final UnaryOperator op;
 		public final Operand l;
 
-		public Unop(Operand target, Operator op, Operand l) {
+		public Unop(Operand target, UnaryOperator op, Operand l) {
 			this.target = target;
 			this.op = op;
 			this.l = l;
@@ -23,11 +23,11 @@ public class Ir3 {
 
 	static public class Binop extends Ir3 {
 		public final Operand target;
-		public final Operator op;
+		public final BinaryOperator op;
 		public final Operand l;
 		public final Operand r;
 
-		public Binop(Operand target, Operator op, Operand l, Operand r) {
+		public Binop(Operand target, BinaryOperator op, Operand l, Operand r) {
 			this.target = target;
 			this.op = op;
 			this.l = l;

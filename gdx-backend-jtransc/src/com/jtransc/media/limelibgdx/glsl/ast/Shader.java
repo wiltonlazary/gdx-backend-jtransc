@@ -1,10 +1,13 @@
 package com.jtransc.media.limelibgdx.glsl.ast;
 
+import com.jtransc.media.limelibgdx.glsl.ShaderType;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class Shader {
+	public ShaderType type;
 	public List<Decl> decls = new ArrayList<Decl>();
 	public HashMap<String, Decl.Global> varyings = new HashMap<String, Decl.Global>();
 	public HashMap<String, Decl.Global> uniforms = new HashMap<String, Decl.Global>();
@@ -12,7 +15,8 @@ public class Shader {
 	public HashMap<String, Decl.Precision> precisions = new HashMap<String, Decl.Precision>();
 	public HashMap<String, Decl.Function> functions = new HashMap<String, Decl.Function>();
 
-	public Shader(List<Decl> decls) {
+	public Shader(ShaderType type, List<Decl> decls) {
+		this.type = type;
 		this.decls = decls;
 
 		for (Decl decl : decls) {

@@ -2,27 +2,42 @@ package com.jtransc.media.limelibgdx.glsl.ir;
 
 import com.jtransc.media.limelibgdx.glsl.ast.Type;
 
+import java.util.HashMap;
 import java.util.Objects;
 
-public class Operator {
-	public final String str;
+public enum BinaryOperator {
+	TEX2D("texture2D"),
+	MUL("*"),
+	DIV("/"),
+	REM("%"),
+	//ASSIGN("="),
+	;
 
-	public Operator(String str) {
-		this.str = str;
-	}
+	static private HashMap<String, BinaryOperator> OPS = new HashMap<String, BinaryOperator>() {{
+		for (BinaryOperator o : BinaryOperator.values()) {
+			put(o._str, o);
+		}
+	}};
 
-	static public Operator fromString(String str) {
-		return new Operator(str);
+	private final String _str;
+
+	BinaryOperator(String str) {
+		this._str = str;
 	}
 
 	@Override
 	public String toString() {
-		return str;
+		return _str;
 	}
 
-	static public Type getResultType(Type left, Operator op, Type right) {
-		switch (op.str) {
-			case "texture2D":
+	static public BinaryOperator fromString(String str) {
+		if (!OPS.containsKey(str)) throw new RuntimeException("Unsupported operator " + str);
+		return OPS.get(str);
+	}
+
+	static public Type getResultType(Type left, BinaryOperator op, Type right) {
+		switch (op) {
+			case TEX2D:
 				if (!Objects.equals(left, Type.SAMPLER2D)) {
 					throw new RuntimeException("texture2D requires sampler2D type for first argument");
 				}
@@ -30,9 +45,9 @@ public class Operator {
 					throw new RuntimeException("texture2D requires vec2 type for second argument");
 				}
 				return Type.VEC4;
-			case "*":
-			case "/":
-			case "%":
+			case MUL:
+			case DIV:
+			case REM:
 				if (Objects.equals(left, right)) return right;
 				if (Objects.equals(left, Type.FLOAT)) return right;
 				if (Objects.equals(right, Type.FLOAT)) return left;
@@ -42,17 +57,9 @@ public class Operator {
 		}
 	}
 
-	static public Type getResultType(Operator op, Type right) {
-		switch (op.str) {
-			default: throw new RuntimeException("Unknown unary operation " + op + " for " + right);
-		}
-	}
 
 	public Type getResultType(Type left, Type right) {
-		return Operator.getResultType(left, this, right);
+		return BinaryOperator.getResultType(left, this, right);
 	}
 
-	public Type getResultType(Type right) {
-		return Operator.getResultType(this, right);
-	}
 }

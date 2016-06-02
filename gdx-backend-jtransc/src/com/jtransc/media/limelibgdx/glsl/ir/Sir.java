@@ -18,9 +18,9 @@ public class Sir {
 	}
 
 	static public class Unop extends Sir {
-		public final Operator operator;
+		public final UnaryOperator operator;
 
-		public Unop(Operator operator) {
+		public Unop(UnaryOperator operator) {
 			this.operator = operator;
 		}
 
@@ -31,9 +31,9 @@ public class Sir {
 	}
 
 	static public class Binop extends Sir {
-		public final Operator operator;
+		public final BinaryOperator operator;
 
-		public Binop(Operator operator) {
+		public Binop(BinaryOperator operator) {
 			this.operator = operator;
 		}
 

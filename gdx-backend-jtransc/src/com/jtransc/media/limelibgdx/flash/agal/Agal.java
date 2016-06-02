@@ -1,6 +1,10 @@
 package com.jtransc.media.limelibgdx.flash.agal;
 
+import com.jtransc.media.limelibgdx.StateGL20;
+import com.jtransc.media.limelibgdx.glsl.Lane;
+import com.jtransc.media.limelibgdx.glsl.ShaderType;
 import com.jtransc.media.limelibgdx.glsl.ast.Type;
+import com.jtransc.media.limelibgdx.util.BinWriter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,24 +52,7 @@ public class Agal {
 			} else {
 				String out = ".";
 				for (char c : swizzle.toCharArray()) {
-					switch (c) {
-						case 'r':
-						case 'x':
-							out += getSwizzle(laneStart + 0);
-							break;
-						case 'g':
-						case 'y':
-							out += getSwizzle(laneStart + 1);
-							break;
-						case 'b':
-						case 'z':
-							out += getSwizzle(laneStart + 2);
-							break;
-						case 'a':
-						case 'w':
-							out += getSwizzle(laneStart + 3);
-							break;
-					}
+					out += getSwizzle(laneStart + Lane.getLaneIndex(c));
 				}
 				return out;
 			}
@@ -153,6 +140,10 @@ public class Agal {
 		@Override
 		public String toString() {
 			return type.getName(register) + register.getSuffix(swizzle);
+		}
+
+		public int getValue() {
+			return 0;
 		}
 	}
 
@@ -286,17 +277,34 @@ public class Agal {
 
 	static public class Assembler {
 		public ArrayList<String> sourceCode = new ArrayList<String>();
+		public BinWriter binWriter = new BinWriter();
+
+		public Assembler(ShaderType type) {
+			binWriter.i8(0xa0);
+			binWriter.i32(1);
+			binWriter.i8(0xa1);
+			binWriter.i8(type.id);
+		}
 
 		public Result generateResult() {
-			return new Result(sourceCode, new byte[0]);
+			return new Result(sourceCode, binWriter.toByteArray());
+		}
+
+		protected void _out(Opcode opcode, Register dst, Register source1, Register source2) {
+			binWriter.i32(opcode.opcode);
+			binWriter.i32(dst.getValue());
+			binWriter.i32(source1.getValue());
+			binWriter.i32(source2.getValue());
 		}
 
 		protected void out(Opcode opcode, Register dst, Register l) {
 			sourceCode.add(opcode.name() + " " + dst + ", " + l);
+			_out(opcode, dst, l, l);
 		}
 
 		protected void out(Opcode opcode, Register dst, Register l, Register r) {
 			sourceCode.add(opcode.name() + " " + dst + ", " + l + ", " + r);
+			_out(opcode, dst, l, r);
 		}
 
 		public void mov(Register dst, Register l) {

@@ -2,6 +2,7 @@ package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.jtransc.ds.IntPool;
+import com.jtransc.media.limelibgdx.glsl.ShaderType;
 import com.jtransc.media.limelibgdx.glsl.ast.Type;
 
 import java.nio.Buffer;
@@ -216,9 +217,6 @@ public class StateGL20 implements GL20Ext {
 		}
 	}
 
-	static public enum ShaderType {
-		Vertex, Fragment
-	}
 
 	public static abstract class Shader implements Disposable {
 		public ShaderType type;
@@ -612,7 +610,7 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glBindAttribLocation(int program, int index, String name) {
-		((Program)objects[program]).bindAttribLocation(index, name);
+		((Program) objects[program]).bindAttribLocation(index, name);
 	}
 
 
@@ -620,10 +618,10 @@ public class StateGL20 implements GL20Ext {
 	public void glBindBuffer(int target, int buffer) {
 		switch (target) {
 			case GL_ARRAY_BUFFER:
-				state.arrayBuffer = ((GLBuffer)objects[buffer]);
+				state.arrayBuffer = ((GLBuffer) objects[buffer]);
 				break;
 			case GL_ELEMENT_ARRAY_BUFFER:
-				state.elementArrayBuffer = ((GLBuffer)objects[buffer]);
+				state.elementArrayBuffer = ((GLBuffer) objects[buffer]);
 				break;
 			default:
 				throw new RuntimeException("glBindBuffer invalid target");
@@ -635,7 +633,7 @@ public class StateGL20 implements GL20Ext {
 	public void glBindFramebuffer(int target, int framebuffer) {
 		switch (target) {
 			case GL_FRAMEBUFFER:
-				state.frameBuffer = ((FrameBuffer)objects[framebuffer]);
+				state.frameBuffer = ((FrameBuffer) objects[framebuffer]);
 				break;
 			default:
 				throw new RuntimeException("glBindFramebuffer invalid target");
@@ -647,7 +645,7 @@ public class StateGL20 implements GL20Ext {
 	public void glBindRenderbuffer(int target, int renderbuffer) {
 		switch (target) {
 			case GL_RENDERBUFFER:
-				state.renderBuffer = ((RenderBuffer)objects[renderbuffer]);
+				state.renderBuffer = ((RenderBuffer) objects[renderbuffer]);
 				break;
 			default:
 				throw new RuntimeException("glBindRenderbuffer invalid target");
@@ -853,17 +851,17 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public String glGetActiveAttrib(int program, int index, IntBuffer size, Buffer type) {
-		ProgramAttribute a = ((Program)objects[program]).getAttrib(index);
+		ProgramAttribute a = ((Program) objects[program]).getAttrib(index);
 		size.put(a.size);
-		((IntBuffer)type).put(a.getGlType());
+		((IntBuffer) type).put(a.getGlType());
 		return a.name;
 	}
 
 	@Override
 	public String glGetActiveUniform(int program, int index, IntBuffer size, Buffer type) {
-		ProgramUniform a = ((Program)objects[program]).getUniform(index);
+		ProgramUniform a = ((Program) objects[program]).getUniform(index);
 		size.put(a.size);
-		((IntBuffer)type).put(a.getGlType());
+		((IntBuffer) type).put(a.getGlType());
 		return a.name;
 
 	}
@@ -875,7 +873,7 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public int glGetAttribLocation(int program, String name) {
-		return ((Program)objects[program]).getAttribLocation(name);
+		return ((Program) objects[program]).getAttribLocation(name);
 	}
 
 	@Override
@@ -930,7 +928,7 @@ public class StateGL20 implements GL20Ext {
 	public int glGetShaderi(int shader, int pname) {
 		switch (pname) {
 			case GL20.GL_COMPILE_STATUS:
-				return ((Shader)objects[shader]).compiled() ? 1 : 0;
+				return ((Shader) objects[shader]).compiled() ? 1 : 0;
 			default:
 				throw new RuntimeException("Special glGetShaderi:" + pname);
 		}
@@ -943,7 +941,7 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public String glGetShaderInfoLog(int shader) {
-		return ((Shader)objects[shader]).getInfoLog();
+		return ((Shader) objects[shader]).getInfoLog();
 	}
 
 	@Override
@@ -973,7 +971,7 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public int glGetUniformLocation(int program, String name) {
-		return ((Program)objects[program]).getUniformLocation(name);
+		return ((Program) objects[program]).getUniformLocation(name);
 	}
 
 	@Override
@@ -1251,7 +1249,7 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glUseProgram(int program) {
-		state.program = (Program)objects[program];
+		state.program = (Program) objects[program];
 	}
 
 	@Override

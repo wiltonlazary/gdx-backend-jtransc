@@ -1,6 +1,8 @@
 package com.jtransc.media.limelibgdx.glsl.optimize;
 
 import com.jtransc.media.limelibgdx.glsl.ir.Ir3;
+import com.jtransc.media.limelibgdx.glsl.ir.BinaryOperator;
+import com.jtransc.media.limelibgdx.glsl.ir.UnaryOperator;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -23,7 +25,7 @@ public class Ir3Optimizer {
 			if ((prev instanceof Ir3.Binop) && (next instanceof Ir3.Unop)) {
 				Ir3.Binop p1 = (Ir3.Binop)prev;
 				Ir3.Unop n1 = (Ir3.Unop)next;
-				if (n1.op.str.equals("=") && Objects.equals(p1.target, n1.l)) {
+				if (n1.op == UnaryOperator.ASSIGN && Objects.equals(p1.target, n1.l)) {
 					out.set(n + 0, new Ir3.Binop(n1.target, p1.op, p1.l, p1.r));
 					out.remove(n + 1);
 					n--;

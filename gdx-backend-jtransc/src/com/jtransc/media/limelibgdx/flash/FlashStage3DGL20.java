@@ -6,10 +6,10 @@ import com.jtransc.media.limelibgdx.GL20Ext;
 import com.jtransc.media.limelibgdx.StateGL20;
 import com.jtransc.media.limelibgdx.flash.agal.Agal;
 import com.jtransc.media.limelibgdx.flash.agal.GlSlToAgal;
+import com.jtransc.media.limelibgdx.glsl.ShaderType;
 
 import java.nio.Buffer;
 import java.util.HashMap;
-import java.util.Map;
 
 import static com.jtransc.media.limelibgdx.StateGL20.*;
 

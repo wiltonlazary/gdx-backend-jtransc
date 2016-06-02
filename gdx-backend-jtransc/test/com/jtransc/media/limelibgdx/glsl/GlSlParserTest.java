@@ -101,8 +101,8 @@ public class GlSlParserTest {
 
 	@Test
 	public void parseAndAgailOptimized() throws Exception {
-		Shader fragment = GlSlParser.parse(fragmentShader, MACROS_GLES);
-		Shader vertex = GlSlParser.parse(vertexShader, MACROS_GLES);
+		Shader fragment = GlSlParser.parse(ShaderType.Fragment, fragmentShader, MACROS_GLES);
+		Shader vertex = GlSlParser.parse(ShaderType.Vertex, vertexShader, MACROS_GLES);
 		Agal.Program program = GlSlToAgal.compile(vertex, fragment, true);
 
 		Assert.assertEquals(
@@ -147,8 +147,8 @@ public class GlSlParserTest {
 
 	@Test
 	public void parseAndAgailNotOptimized() throws Exception {
-		Shader fragment = GlSlParser.parse(fragmentShader, MACROS_GLES);
-		Shader vertex = GlSlParser.parse(vertexShader, MACROS_GLES);
+		Shader fragment = GlSlParser.parse(ShaderType.Fragment, fragmentShader, MACROS_GLES);
+		Shader vertex = GlSlParser.parse(ShaderType.Vertex, vertexShader, MACROS_GLES);
 		Agal.Program program = GlSlToAgal.compile(vertex, fragment, false);
 
 		Assert.assertEquals(

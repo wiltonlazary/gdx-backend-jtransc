@@ -13,13 +13,15 @@ public class GlSlParser {
 		return String.join("\n", CPreprocessor.preprocess(shader.split("\n"), macros));
 	}
 
-	public static Shader parse(String shader, Map<String, String> macros) {
-		return new GlSlParser(preprocess(shader, macros)).parseProgram();
+	public static Shader parse(ShaderType type, String shader, Map<String, String> macros) {
+		return new GlSlParser(type, preprocess(shader, macros)).parseProgram();
 	}
 
+	private ShaderType type;
 	private ListReader<String> r;
 
-	public GlSlParser(String code) {
+	public GlSlParser(ShaderType type, String code) {
+		this.type = type;
 		this.r = new ListReader<>(Tokenizer.tokenizeStr(code));
 	}
 
@@ -28,7 +30,7 @@ public class GlSlParser {
 		while (r.hasMore()) {
 			decls.add(parseDecl());
 		}
-		return new Shader(decls);
+		return new Shader(type, decls);
 	}
 
 	private String tryParseModifier() {
