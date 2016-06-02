@@ -11,6 +11,7 @@ import com.jtransc.media.limelibgdx.glsl.ShaderType;
 
 import java.nio.Buffer;
 import java.util.HashMap;
+import java.util.Map;
 
 import static com.jtransc.media.limelibgdx.StateGL20.*;
 
@@ -136,9 +137,16 @@ public class FlashStage3DGL20 {
 			}});
 
 			System.out.println("FlashProgram().vertex:");
-			System.out.println(String.join("\n", agal.vertex.sourceCode));
+			for (String s : agal.vertex.sourceCode) System.out.println(" - " + s);
 			System.out.println("FlashProgram().fragment:");
-			System.out.println(String.join("\n", agal.fragment.sourceCode));
+			for (String s : agal.fragment.sourceCode) System.out.println(" - " + s);
+			System.out.println("FlashProgram().uniforms:");
+			for (Agal.AllocatedLanes lane : agal.getUniforms().values()) System.out.println(" - " + lane.name + " : " + lane);
+			System.out.println("FlashProgram().attributes:");
+			for (Agal.AllocatedLanes lane : agal.getAttributes().values()) System.out.println(" - " + lane.name + " : " + lane);
+			System.out.println("FlashProgram().constants:");
+			for (Map.Entry<Agal.AllocatedLanes, Double> e : agal.getConstants().entrySet()) System.out.println(" - " + e.getKey().name + " = " + e.getValue() + " : " + e.getKey());
+
 
 			this.uniforms.clear();
 			this.attributes.clear();
