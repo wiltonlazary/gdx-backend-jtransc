@@ -1,5 +1,6 @@
 package com.jtransc.media.limelibgdx.flash.agal;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Agal {
@@ -11,7 +12,7 @@ public class Agal {
 			Output(3, "op"),
 			Varying(4, "v"),
 			Sampler(5, "s"),
-			Fragment(6, "f")
+			Fragment(6, "f"),
 			;
 
 			public int index;
@@ -64,17 +65,31 @@ public class Agal {
 	}
 
 	static public class Names {
-		private Subnames[] names = new Subnames[] {
+		private Subnames[] names = new Subnames[]{
 			new Subnames(), new Subnames(), new Subnames(), new Subnames(), new Subnames(), new Subnames(),
 			new Subnames(), new Subnames()
 		};
+
 		public Subnames get(Register.Type type) {
 			return names[type.index];
+		}
+
+		HashMap<Integer, Double> constants = new HashMap<>();
+
+		public void addFixedConstant(int id, double constant) {
+			constants.put(id, constant);
+			System.out.println("Constant" + id + "=" + constant);
 		}
 	}
 
 	static public class Program {
+		public final Result vertex;
+		public final Result fragment;
 
+		public Program(Result vertex, Result fragment) {
+			this.vertex = vertex;
+			this.fragment = fragment;
+		}
 	}
 
 	enum Opcode {
@@ -117,8 +132,7 @@ public class Agal {
 		ifg(0x1e),
 		ifl(0x1f),
 		els(0x20),
-		eif(0x21),
-		;
+		eif(0x21),;
 
 		public final int opcode;
 
@@ -127,13 +141,31 @@ public class Agal {
 		}
 	}
 
+	static public class Result {
+		public ArrayList<String> sourceCode;
+		public String[] sourceCodeArray;
+		public byte[] binary;
+
+		public Result(ArrayList<String> sourceCode, byte[] binary) {
+			this.sourceCode = sourceCode;
+			this.sourceCodeArray = sourceCode.toArray(new String[sourceCode.size()]);
+			this.binary = binary;
+		}
+	}
+
 	static public class Assembler {
+		public ArrayList<String> sourceCode = new ArrayList<String>();
+
+		public Result generateResult() {
+			return new Result(sourceCode, new byte[0]);
+		}
+
 		protected void out(Opcode opcode, Register dst, Register l) {
-			System.out.println(opcode.name() + " " + dst + ", " + l);
+			sourceCode.add(opcode.name() + " " + dst + ", " + l);
 		}
 
 		protected void out(Opcode opcode, Register dst, Register l, Register r) {
-			System.out.println(opcode.name() + " " + dst + ", " + l + ", " + r);
+			sourceCode.add(opcode.name() + " " + dst + ", " + l + ", " + r);
 		}
 
 		public void mov(Register dst, Register l) {

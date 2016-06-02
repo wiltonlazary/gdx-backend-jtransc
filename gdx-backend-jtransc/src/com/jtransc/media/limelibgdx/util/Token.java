@@ -2,7 +2,7 @@ package com.jtransc.media.limelibgdx.util;
 
 public class Token {
 	enum Type {
-		OPERATOR, STRING, ID;
+		OPERATOR, STRING, ID, NUMBER;
 	}
 
 	public final Type type;

@@ -11,7 +11,7 @@ public class Ir3Optimizer {
 		for (int n = 0; n < out.size() - 1; n++) {
 			Ir3 prev = out.get(n + 0);
 			Ir3 next = out.get(n + 1);
-			
+
 			// -------------
 			// Optimization:
 			// -------------

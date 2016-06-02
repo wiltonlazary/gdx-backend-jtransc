@@ -18,24 +18,23 @@ public class GlSlToAgal {
 
 	static public Agal.Program convertTest(Shader shader) {
 		Agal.Names names = new Agal.Names();
-		convert(shader, names);
-		return new Agal.Program();
+		Agal.Assembler shaderAssembler = convert(shader, names);
+		return new Agal.Program(shaderAssembler.generateResult(), shaderAssembler.generateResult());
 	}
 
 	static public Agal.Program convert(Shader vertex, Shader fragment) {
 		Agal.Names names = new Agal.Names();
-		convert(vertex, names);
-		convert(fragment, names);
-		return new Agal.Program();
+		Agal.Assembler fragmentAssembler = convert(fragment, names);
+		Agal.Assembler vertexAssembler = convert(vertex, names);
+		return new Agal.Program(vertexAssembler.generateResult(), fragmentAssembler.generateResult());
 	}
 
-	static private void convert(Shader shader, Agal.Names alloc) {
+	static private Agal.Assembler convert(Shader shader, Agal.Names alloc) {
 		GlSlToAgal glSlToAgal = new GlSlToAgal(shader, alloc);
-		glSlToAgal.convert();
+		return glSlToAgal.convert();
 	}
 
 	private Agal.Register operandToSource(Operand operand) {
-		//System.out.println(operand);
 		Agal.Register.Type type;
 		switch (operand.type) {
 			case Uniform:
@@ -54,6 +53,11 @@ public class GlSlToAgal {
 				// @TODO: Or sampler!!
 				type = Agal.Register.Type.Output;
 				break;
+			case Constant:
+				type = Agal.Register.Type.Constant;
+				int id = names.get(type).alloc(operand.name);
+				names.addFixedConstant(id, operand.constant);
+				break;
 			default:
 				throw new RuntimeException("Unhandled " + operand);
 		}
@@ -61,7 +65,7 @@ public class GlSlToAgal {
 		return new Agal.Register(type, id, operand.swizzle);
 	}
 
-	private void convert() {
+	private Agal.Assembler convert() {
 		final Agal.Assembler agal = new Agal.Assembler();
 
 		for (Ir3 ir3 : AstToIr3.convertAndOptimize(shader)) {
@@ -92,6 +96,10 @@ public class GlSlToAgal {
 					case "mul":
 						opcode = Agal.Opcode.mul;
 						break;
+					case "/":
+					case "div":
+						opcode = Agal.Opcode.div;
+						break;
 					default:
 						throw new RuntimeException("Unhandled binop " + binop.op.str);
 				}
@@ -101,6 +109,8 @@ public class GlSlToAgal {
 				throw new RuntimeException("Unhandled " + ir3);
 			}
 		}
+
+		return agal;
 	}
 }
 

@@ -24,8 +24,7 @@ public class AstToSir {
 			this.shader = shader;
 		}
 
-		@Override
-		public void visit(Expr.Id expr) {
+		private Operand getOperand(Expr.Id expr) {
 			String id = expr.id;
 			Operand operand;
 			switch (id) {
@@ -34,17 +33,46 @@ public class AstToSir {
 					operand = Operand.special(id);
 					break;
 				default:
-					if (shader.attributes.containsKey(id)) {
-						operand = Operand.attribute(id);
-					} else if (shader.varyings.containsKey(id)) {
-						operand = Operand.varying(id);
-					} else if (shader.uniforms.containsKey(id)) {
-						operand = Operand.uniform(id);
+					if (Character.isDigit(id.charAt(0))) {
+						operand = Operand.constant(Double.parseDouble(id));
 					} else {
-						throw new RuntimeException("Unknown id " + id);
+						if (shader.attributes.containsKey(id)) {
+							operand = Operand.attribute(id);
+						} else if (shader.varyings.containsKey(id)) {
+							operand = Operand.varying(id);
+						} else if (shader.uniforms.containsKey(id)) {
+							operand = Operand.uniform(id);
+						} else {
+							throw new RuntimeException("Unknown id " + id);
+						}
 					}
 			}
-			out.add(new Sir.Get(operand));
+			return operand;
+		}
+
+		private Operand getOperand(Expr.Access expr) {
+			Expr left = expr.expr;
+			String right = expr.field;
+			if (left instanceof Expr.Id) {
+				return getOperand((Expr.Id) left).withSwizzle(right);
+			} else {
+				throw new RuntimeException("Unsupported access ");
+			}
+		}
+
+		private Operand getOperand(Expr expr) {
+			if (expr instanceof Expr.Id) {
+				return getOperand((Expr.Id)expr);
+			} else if (expr instanceof Expr.Access) {
+				return getOperand((Expr.Access)expr);
+			} else {
+				throw new RuntimeException("Unsupported operand");
+			}
+		}
+
+		@Override
+		public void visit(Expr.Id expr) {
+			out.add(new Sir.Get(getOperand(expr)));
 		}
 
 		@Override
@@ -52,19 +80,7 @@ public class AstToSir {
 			switch (expr.op) {
 				case "=":
 					visit(expr.right);
-					if (expr.left instanceof Expr.Id) {
-						Expr.Id left = (Expr.Id) expr.left;
-						out.add(new Sir.Set(Operand.special(left.id)));
-					} else if (expr.left instanceof Expr.Access) {
-						Expr.Access left = (Expr.Access) expr.left;
-						if (left.expr instanceof Expr.Id) {
-							out.add(new Sir.Set(Operand.special(((Expr.Id) left.expr).id).withSwizzle(left.field)));
-						} else {
-							throw new RuntimeException("Unsupported assignment " + left.expr);
-						}
-					} else {
-						throw new RuntimeException("Unsupported assignment " + expr.left);
-					}
+					out.add(new Sir.Set(getOperand(expr.left)));
 					break;
 				default:
 					visit(expr.left);
@@ -81,13 +97,7 @@ public class AstToSir {
 
 		@Override
 		public void visit(Expr.Access expr) {
-			Expr left = expr.expr;
-			String right = expr.field;
-			if (left instanceof Expr.Id) {
-				out.add(new Sir.Get(Operand.special(((Expr.Id) left).id).withSwizzle(right)));
-			} else {
-				throw new RuntimeException("Unsupported access ");
-			}
+			out.add(new Sir.Get(getOperand(expr)));
 		}
 
 		@Override

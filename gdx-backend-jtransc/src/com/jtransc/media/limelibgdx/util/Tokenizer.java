@@ -48,10 +48,26 @@ public class Tokenizer {
 		if (Operators.ALL.contains(r.peek(1))) {
 			emit(Token.Type.OPERATOR, r.read(1));
 		}
+		String number = readNumber();
+		if (number.length() > 0) {
+			emit(Token.Type.NUMBER, number);
+		}
 		String id = readId();
 		if (id.length() > 0) {
 			emit(Token.Type.ID, id);
 		}
+	}
+
+	private String readNumber() {
+		final int[] index = {-1};
+		return r.readWhile(ch -> {
+			index[0]++;
+			if (index[0] == 0) {
+				return Character.isDigit(ch);
+			} else {
+				return Character.isDigit(ch) || ch == '.';
+			}
+		});
 	}
 
 	private String readId() {
