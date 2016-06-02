@@ -9,12 +9,14 @@ typedef LimeInput = {% CLASS com.jtransc.media.limelibgdx.LimeInput %};
 class HaxeLimeGdxApplication extends lime.app.Application {
     static public var instance:HaxeLimeGdxApplication;
     static public var app:{% CLASS com.jtransc.media.limelibgdx.LimeApplication %};
+    static public var initializingListener:Bool = false;
     static public var initializedListener:Bool = false;
 
     static private var DEBUG = false;
 
 	#if flash
-	static public var sprite: lime.graphics.FlashRenderContext;
+	static public var sprite: lime.graphics.FlashRenderContext; // flash.display.Sprite
+	static public var context3D: flash.display3D.Context3D;
 	#else
 	static public var gl: lime.graphics.GLRenderContext;
 	#end
@@ -97,8 +99,8 @@ class HaxeLimeGdxApplication extends lime.app.Application {
     public override function render(renderer:lime.graphics.Renderer) {
         super.render(renderer);
         if (app != null) {
-            if (!initializedListener) {
-                initializedListener = true;
+            if (!initializingListener) {
+                initializingListener = true;
                 switch (renderer.context) {
 					#if flash
 					case FLASH(sprite): HaxeLimeGdxApplication.sprite = sprite;
@@ -107,10 +109,28 @@ class HaxeLimeGdxApplication extends lime.app.Application {
 					#end
 					default: throw 'Not supported renderer $renderer';
 				}
-                app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:create %}();
+
+				#if flash
+					var sprite = HaxeLimeGdxApplication.sprite;
+					var stage = sprite.stage;
+					var stage3D = stage.stage3Ds[0];
+
+					stage3D.addEventListener(flash.events.Event.CONTEXT3D_CREATE, function(e) {
+                    	context3D = stage3D.context3D;
+						if (!initializedListener) {
+							app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:create %}();
+							initializedListener = true;
+						}
+					});
+                    stage3D.requestContext3D();
+				#else
+	                app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:create %}();
+					initializedListener = true;
+				#end
             }
-            //#if desktop GL.enable(GL.TEXTURE_2D); #end
-            app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:render %}();
+            if (initializedListener) {
+            	app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:render %}();
+            }
         }
     }
 
@@ -118,16 +138,18 @@ class HaxeLimeGdxApplication extends lime.app.Application {
         super.update(deltaTime);
     }
 
+    private function isReady() return app != null && initializedListener;
+
     public override function onWindowActivate(window:Window):Void {
-        app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:onResumed %}();
+        if (isReady()) app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:onResumed %}();
     }
 
     public override function onWindowDeactivate(window:Window):Void {
-        app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:onPaused %}();
+        if (isReady()) app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:onPaused %}();
     }
 
     public override function onWindowClose (window:Window):Void {
-        app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:onDisposed %}();
+        if (isReady()) app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:onDisposed %}();
     }
 
     public function new() {
@@ -137,7 +159,7 @@ class HaxeLimeGdxApplication extends lime.app.Application {
     }
 
 	public override function onWindowResize(window:Window, width:Int, height:Int):Void {
-		app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:resized:(II)V %}(width, height);
+		if (isReady()) app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:resized:(II)V %}(width, height);
 	}
 
 	////////////////////////////////////////////////////////////////////////

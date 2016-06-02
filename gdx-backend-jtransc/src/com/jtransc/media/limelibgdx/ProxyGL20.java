@@ -822,4 +822,11 @@ public class ProxyGL20 implements GL20Ext {
 	public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride, int ptr) {
 		parent.glVertexAttribPointer(indx, size, type, normalized, stride, ptr);
 	}
+
+	@Override
+	public void present() {
+		if (parent instanceof GL20Ext) {
+			((GL20Ext)parent).present();
+		}
+	}
 }

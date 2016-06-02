@@ -655,4 +655,9 @@ public class DummyGL20 implements GL20Ext {
 	public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride, int ptr) {
 
 	}
+
+	@Override
+	public void present() {
+
+	}
 }

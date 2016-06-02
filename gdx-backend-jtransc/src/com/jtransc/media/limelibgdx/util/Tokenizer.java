@@ -1,6 +1,7 @@
 package com.jtransc.media.limelibgdx.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Tokenizer {
 	private final ArrayList<Token> out = new ArrayList<>();
@@ -58,16 +59,21 @@ public class Tokenizer {
 		}
 	}
 
+	@SuppressWarnings("all")
 	private String readNumber() {
 		final int[] index = {-1};
-		return r.readWhile(ch -> {
-			index[0]++;
-			if (index[0] == 0) {
-				return Character.isDigit(ch);
-			} else {
-				return Character.isDigit(ch) || ch == '.';
-			}
-		});
+		return r.readWhile(new StrReader.FilterChar() {
+			   @Override
+			   public boolean filter(char ch) {
+				   index[0]++;
+				   if (index[0] == 0) {
+					   return Character.isDigit(ch);
+				   } else {
+					   return Character.isDigit(ch) || ch == '.';
+				   }
+			   }
+		   }
+		);
 	}
 
 	private String readId() {

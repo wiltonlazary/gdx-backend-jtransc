@@ -279,6 +279,9 @@ public class StateGL20 implements GL20Ext {
 		public void flush() {
 		}
 
+		public void present() {
+		}
+
 		public abstract FrameBuffer createFrameBuffer();
 
 		public abstract RenderBuffer createRenderBuffer();
@@ -1305,5 +1308,10 @@ public class StateGL20 implements GL20Ext {
 	@Override
 	public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride, int ptr) {
 		System.out.println("StateGL20.glVertexAttribPointer(" + "indx = [" + indx + "], size = [" + size + "], type = [" + type + "], normalized = [" + normalized + "], stride = [" + stride + "], ptr = [" + ptr + "]" + ")");
+	}
+
+	@Override
+	public void present() {
+		impl.present();
 	}
 }

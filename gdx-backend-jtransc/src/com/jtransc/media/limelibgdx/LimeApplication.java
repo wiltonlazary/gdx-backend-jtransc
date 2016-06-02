@@ -1,9 +1,6 @@
 package com.jtransc.media.limelibgdx;
 
-import com.badlogic.gdx.Application;
-import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Audio;
-import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Clipboard;
 import com.jtransc.JTranscSystem;
@@ -191,6 +188,9 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	public void render() {
 		LimeInput.lime_frame();
 		super.render();
+		if (Gdx.gl instanceof GL20Ext) {
+			((GL20Ext)Gdx.gl).present();
+		}
 
 	}
 

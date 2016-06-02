@@ -1017,4 +1017,10 @@ public class LoggerGL20 extends ProxyGL20 {
 		log("glVertexAttribPointer: indx = [" + indx + "], size = [" + size + "], type = [" + type + "], normalized = [" + normalized + "], stride = [" + stride + "], ptr = [" + ptr + "]");
 		super.glVertexAttribPointer(indx, size, type, normalized, stride, ptr);
 	}
+
+	@Override
+	public void present() {
+		System.out.println("LoggerGL20.present(" + "" + ")");
+		super.present();
+	}
 }

@@ -4,6 +4,7 @@ import com.jtransc.media.limelibgdx.flash.agal.Agal;
 import com.jtransc.media.limelibgdx.flash.agal.GlSlToAgal;
 import com.jtransc.media.limelibgdx.glsl.ast.Shader;
 import com.jtransc.media.limelibgdx.glsl.ast.Type;
+import com.jtransc.media.limelibgdx.util.StringUtils;
 import com.jtransc.media.limelibgdx.util.Tokenizer;
 import org.junit.Assert;
 import org.junit.Test;
@@ -143,6 +144,16 @@ public class GlSlParserTest {
 				}},
 				program.getUniforms()
 		);
+
+		Assert.assertEquals(
+			"a001000000a1012800000000000f02000000e40400000000000000050010110300000000000f03010000e404000000000000e402000000",
+			StringUtils.toHexString(program.fragment.binary)
+		);
+
+		Assert.assertEquals(
+			"a001000000a1000000000001000f04000000e40000000000000000000000000300000001000004010000ff0400000001000000010000000000000000000f04010000e40000000000000000000000000300000000000f03020000e401000000020000e400000000",
+			StringUtils.toHexString(program.vertex.binary)
+		);
 	}
 
 	@Test
@@ -172,6 +183,17 @@ public class GlSlParserTest {
 				}),
 				String.join("\n", (CharSequence[]) program.vertex.sourceCodeArray)
 		);
+
+		Assert.assertEquals(
+			"a001000000a1012800000000000f02000000e40400000000000000050010110300000000000f02010000e404000000000000e4020000000000000000000f03000000e4020000000000000000000000",
+			StringUtils.toHexString(program.fragment.binary)
+		);
+
+		Assert.assertEquals(
+			"a001000000a1000000000001000f04000000e40000000000000000000000000400000000000102010000000100000001000055010000000300000000000f02010000ff0400000000000000020000000000000001000004000000e40200000000000000000000000000000000000f04010000e40000000000000000000000000300000000000f02020000e401000000020000e4000000000000000000000f03000000e4020000000000000000000000",
+			StringUtils.toHexString(program.vertex.binary)
+		);
+
 		//Assert.assertEquals(
 		//		new HashMap<Agal.AllocatedLanes, Double>() {{
 		//			put(new Agal.AllocatedLanes("#CST#255.0", Type.FLOAT, 1, 0, 1), 255.0);

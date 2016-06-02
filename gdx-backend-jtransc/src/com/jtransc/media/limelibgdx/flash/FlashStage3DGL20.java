@@ -1,5 +1,6 @@
 package com.jtransc.media.limelibgdx.flash;
 
+import com.jtransc.annotation.JTranscNativeClass;
 import com.jtransc.annotation.haxe.HaxeAddMembers;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
 import com.jtransc.media.limelibgdx.GL20Ext;
@@ -19,7 +20,8 @@ public class FlashStage3DGL20 {
 	}
 
 	static private class FlashImpl extends StateGL20.Impl {
-		Context3D context;
+		@HaxeMethodBody("return HaxeLimeGdxApplication.context3D;")
+		native static Context3D getContext3D();
 
 		@Override
 		public void clear(StateGL20.State state, boolean color, boolean depth, boolean stencil) {
@@ -29,8 +31,8 @@ public class FlashStage3DGL20 {
 			if (depth) mask |= Context3DClearMask.DEPTH;
 			if (stencil) mask |= Context3DClearMask.STENCIL;
 
-			if (context != null) {
-				context.clear(
+			if (getContext3D() != null) {
+				getContext3D().clear(
 					state.clearColor.red,
 					state.clearColor.green,
 					state.clearColor.blue,
@@ -44,12 +46,12 @@ public class FlashStage3DGL20 {
 
 		@Override
 		public Texture createTexture() {
-			return new FlashTexture(context);
+			return new FlashTexture(getContext3D());
 		}
 
 		@Override
 		public Program createProgram() {
-			return new FlashProgram();
+			return new FlashProgram(getContext3D());
 		}
 
 		@Override
@@ -89,7 +91,7 @@ public class FlashStage3DGL20 {
 
 		@Override
 		public void render(StateGL20.State state) {
-
+			getContext3D().present();
 		}
 	}
 
@@ -112,9 +114,17 @@ public class FlashStage3DGL20 {
 
 	static class FlashProgram extends StateGL20.Program {
 		Agal.Program agal;
+		Context3D context;
+		Program3D program;
+
+		public FlashProgram(Context3D context) {
+			this.context = context;
+			this.program = context.createProgram();
+		}
 
 		@Override
 		public void dispose() {
+			program.dispose();
 		}
 
 		@Override
@@ -124,6 +134,10 @@ public class FlashStage3DGL20 {
 				put("JTRANSC", "1");
 				put("FLASH", "1");
 			}});
+
+			System.out.println("FlashProgram().vertex('" + String.join("\n", agal.vertex.sourceCode) + "')");
+			System.out.println("FlashProgram().fragment('" + String.join("\n", agal.fragment.sourceCode) + "')");
+
 			this.uniforms.clear();
 			this.attributes.clear();
 			for (Agal.AllocatedLanes e : this.agal.getUniforms().values()) {
@@ -132,6 +146,8 @@ public class FlashStage3DGL20 {
 			for (Agal.AllocatedLanes e : this.agal.getAttributes().values()) {
 				this.attributes.add(new ProgramAttribute(e.name, e.size, e.type));
 			}
+
+			program.upload(As3Utils.toByteArray(agal.vertex.binary), As3Utils.toByteArray(agal.fragment.binary));
 		}
 
 		@Override
@@ -144,9 +160,11 @@ public class FlashStage3DGL20 {
 			return true;
 		}
 
+		public ProgramAttribute[] boundAttribs = new ProgramAttribute[6];
+
 		@Override
 		public void bindAttribLocation(int index, String name) {
-
+			boundAttribs[index] = attributes.get(getAttribLocation(name));
 		}
 	}
 
@@ -241,14 +259,13 @@ public class FlashStage3DGL20 {
 		}
 	}
 
-	/*
 	@JTranscNativeClass("flash.display3D.Context3D")
 	static class Context3D {
 		native public void clear(double red, double green, double blue, double alpha, double depth, int stencil, int mask);
 		//native public void configureBackBuffer(int width, int height, int antiAlias, boolean enableDepthAndStencil, boolean wantsBestResolution, boolean wantsBestResolutionOnBrowserZoom);
 		//native public Textures.CubeTexture createCubeTexture(int size, String format, boolean optimizeForRenderToTexture, int streamingLevels);
 		//native public IndexBuffer3D createIndexBuffer(int numIndices, String bufferUsage);
-		//native public Program3D createProgram();
+		native public Program3D createProgram();
 		//native public RectangleTexture createRectangleTexture(int width, int height, String format, boolean optimizeForRenderToTexture);
 		//native public Textures.Texture createTexture(int width, int height, String format, boolean optimizeForRenderToTexture, int streamingLevels);
 		//native public VertexBuffer3D createVertexBuffer(int numVertices, int data32PerVertex, String bufferUsage);
@@ -258,7 +275,7 @@ public class FlashStage3DGL20 {
 		//native public void drawToBitmapData(BitmapData destination);
 		//native public void drawTriangles(IndexBuffer3D indexBuffer, int firstIndex, int numTriangles);
 		//native public void drawTrianglesInstanced(IndexBuffer3D indexBuffer, int numInstances, int firstIndex, int numTriangles);
-		//native public void present();
+		native public void present();
 		//native public void setBlendFactors(String sourceFactor, String destinationFactor);
 		//native public void setColorMask(boolean red, boolean green, boolean blue, boolean alpha);
 		//native public void setCulling(String triangleFaceToCull);
@@ -286,16 +303,15 @@ public class FlashStage3DGL20 {
 		public String profile;
 		public boolean supportsVideoTexture;
 		public double totalGPUMemory;
+	}
 
-
-		// http://wonderfl.net/c/qc87
-		@JTranscNativeClass("flash.display3D.Context3DClearMask")
-		static class ClearMask {
-			static public final int COLOR = 1;
-			static public final int DEPTH = 2;
-			static public final int STENCIL = 4;
-			static public final int ALL = COLOR | DEPTH | STENCIL;
-		}
+	// http://wonderfl.net/c/qc87
+	@JTranscNativeClass("flash.display3D.Context3DClearMask")
+	static class ClearMask {
+		static public final int COLOR = 1;
+		static public final int DEPTH = 2;
+		static public final int STENCIL = 4;
+		static public final int ALL = COLOR | DEPTH | STENCIL;
 	}
 
 	static class Textures {
@@ -311,15 +327,33 @@ public class FlashStage3DGL20 {
 
 		}
 	}
-	*/
 
-	@HaxeAddMembers({
-		"#if flash var context:flash.display3D.Context3D; #end"
-	})
-	static class Context3D {
-		@HaxeMethodBody(target = "flash", value = "context.clear(p0, p1, p2, p3, p4, p5, p6);")
-		public void clear(double red, double green, double blue, double alpha, double depth, int stencil, int mask) {
-		}
+	//@HaxeAddMembers({
+	//	"#if flash var context:flash.display3D.Context3D; #end"
+	//})
+	//static class Context3D {
+	//	@HaxeMethodBody(target = "flash", value = "context.clear(p0, p1, p2, p3, p4, p5, p6);")
+	//	public void clear(double red, double green, double blue, double alpha, double depth, int stencil, int mask) {
+	//	}
+	//}
+
+	static class As3Utils {
+		@HaxeMethodBody("return p0.getBytesData();")
+		native static public ByteArray toByteArray(byte[] bytes);
+	}
+
+	@JTranscNativeClass("flash.utils.ByteArray")
+	static class ByteArray {
+	}
+
+	@JTranscNativeClass("flash.display.BitmapData")
+	static class BitmapData {
+	}
+
+	@JTranscNativeClass("flash.display3D.Program3D")
+	static class Program3D {
+		native public void dispose();
+		native public void upload(ByteArray vertexProgram, ByteArray fragmentProgram);
 	}
 
 	static class Context3DClearMask {

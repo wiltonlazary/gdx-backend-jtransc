@@ -33,6 +33,7 @@ public class CPreprocessor {
 		return true;
 	}
 
+	@SuppressWarnings("all")
 	private void preprocess() {
 		while (this.lines.hasMore()) {
 			String line = this.lines.read();
@@ -65,12 +66,15 @@ public class CPreprocessor {
 				}
 			} else {
 				if (actualExecuting()) {
-					output.add(ReplaceCallback.replace("\\b(\\w+)\\b+", line, match -> {
-						String out = match.group(1);
-						if (macros.containsKey(out)) {
-							return macros.get(out);
-						} else {
-							return out;
+					output.add(ReplaceCallback.replace("\\b(\\w+)\\b+", line, new ReplaceCallback.Callback() {
+						@Override
+						public String matchFound(MatchResult match) {
+							String out = match.group(1);
+							if (macros.containsKey(out)) {
+								return macros.get(out);
+							} else {
+								return out;
+							}
 						}
 					}));
 				}
