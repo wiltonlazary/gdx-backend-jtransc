@@ -1,5 +1,7 @@
 package com.jtransc.media.limelibgdx.flash.agal;
 
+import com.jtransc.media.limelibgdx.glsl.ast.Type;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,12 +9,16 @@ import java.util.Objects;
 
 public class Agal {
 	static public class AllocatedLanes {
+		public final String name;
+		public final Type type;
 		public final int register;
 		public final int laneStart;
 		public final int laneEnd;
 		public final int size;
 
-		public AllocatedLanes(int register, int laneStart, int laneEnd) {
+		public AllocatedLanes(String name, Type type, int register, int laneStart, int laneEnd) {
+			this.name = name;
+			this.type = type;
 			this.register = register;
 			this.laneStart = laneStart;
 			this.laneEnd = laneEnd;
@@ -75,13 +81,17 @@ public class Agal {
 			if (register != that.register) return false;
 			if (laneStart != that.laneStart) return false;
 			if (laneEnd != that.laneEnd) return false;
-			return size == that.size;
+			if (size != that.size) return false;
+			if (name != null ? !name.equals(that.name) : that.name != null) return false;
+			return type != null ? type.equals(that.type) : that.type == null;
 
 		}
 
 		@Override
 		public int hashCode() {
-			int result = register;
+			int result = name != null ? name.hashCode() : 0;
+			result = 31 * result + (type != null ? type.hashCode() : 0);
+			result = 31 * result + register;
 			result = 31 * result + laneStart;
 			result = 31 * result + laneEnd;
 			result = 31 * result + size;
@@ -90,7 +100,7 @@ public class Agal {
 
 		@Override
 		public String toString() {
-			return "AllocatedLanes(" + register + "," + laneStart + "-" + laneEnd + ")";
+			return "AllocatedLanes(" + name + "," + type + "," + register + "," + laneStart + "-" + laneEnd + ")";
 		}
 
 		//public String getSwizzle() {
@@ -156,7 +166,7 @@ public class Agal {
 			return 4 - laneId;
 		}
 
-		public AllocatedLanes allocSize(int size) {
+		public AllocatedLanes allocSize(String name, Type type, int size) {
 			if (size < 1 || size > 4) throw new RuntimeException("Invalid size for lanes " + size);
 			if (size > availableLanes()) {
 				lastId++;
@@ -164,22 +174,25 @@ public class Agal {
 			}
 			//System.out.println("lastId:" + lastId + ",laneId:" + laneId + ",size:" + size);
 			try {
-				return new AllocatedLanes(lastId, laneId, laneId + size);
+				return new AllocatedLanes(name, type, lastId, laneId, laneId + size);
 			} finally {
 				laneId += size;
 			}
 		}
 
-		public AllocatedLanes alloc(String name, int size) {
+		public AllocatedLanes alloc(String name, Type type, int size) {
 			if (!names.containsKey(name)) {
-				names.put(name, allocSize(size));
+				names.put(name, allocSize(name, type, size));
 				sizes.put(name, size);
-			} else {
-				if (sizes.get(name) != size) {
-					throw new RuntimeException("Repeated allocation with different sizes");
-				}
 			}
-			return names.get(name);
+			AllocatedLanes out = names.get(name);
+			if (out.size != size) {
+				throw new RuntimeException("Repeated allocation " + name + " with different sizes : " + size + " != " + out.size);
+			}
+			if (!Objects.equals(out.type, type)) {
+				throw new RuntimeException("Repeated allocation " + name + " with different type : " + type + " != " + out.type);
+			}
+			return out;
 		}
 	}
 

@@ -4,6 +4,19 @@ abstract public class Type {
 	abstract public String getName();
 	abstract public int getLaneCount();
 
+	public boolean isVector() {
+		return this instanceof VectorType;
+	}
+
+	public boolean isMatrix() {
+		return this instanceof MatrixType;
+	}
+
+	@Override
+	public String toString() {
+		return getName();
+	}
+
 	static public class Prim extends Type {
 		private final String name;
 

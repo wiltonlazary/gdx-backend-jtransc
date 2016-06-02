@@ -1,8 +1,6 @@
 package com.jtransc.media.limelibgdx.glsl.transform;
 
-import com.jtransc.media.limelibgdx.glsl.ast.AstVisitor;
-import com.jtransc.media.limelibgdx.glsl.ast.Expr;
-import com.jtransc.media.limelibgdx.glsl.ast.Shader;
+import com.jtransc.media.limelibgdx.glsl.ast.*;
 import com.jtransc.media.limelibgdx.glsl.ir.Operand;
 import com.jtransc.media.limelibgdx.glsl.ir.Operator;
 import com.jtransc.media.limelibgdx.glsl.ir.Sir;
@@ -30,18 +28,21 @@ public class AstToSir {
 			switch (id) {
 				case "gl_Position":
 				case "gl_FragColor":
-					operand = Operand.special(id);
+					operand = Operand.special(id, Type.VEC4);
 					break;
 				default:
 					if (Character.isDigit(id.charAt(0))) {
 						operand = Operand.constant(Double.parseDouble(id));
 					} else {
 						if (shader.attributes.containsKey(id)) {
-							operand = Operand.attribute(id);
+							Decl.Global global = shader.attributes.get(id);
+							operand = Operand.attribute(id, global.type);
 						} else if (shader.varyings.containsKey(id)) {
-							operand = Operand.varying(id);
+							Decl.Global global = shader.varyings.get(id);
+							operand = Operand.varying(id, global.type);
 						} else if (shader.uniforms.containsKey(id)) {
-							operand = Operand.uniform(id);
+							Decl.Global global = shader.uniforms.get(id);
+							operand = Operand.uniform(id, global.type);
 						} else {
 							throw new RuntimeException("Unknown id " + id);
 						}

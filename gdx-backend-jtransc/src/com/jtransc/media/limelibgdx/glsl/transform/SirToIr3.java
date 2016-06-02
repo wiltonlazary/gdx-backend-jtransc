@@ -1,5 +1,6 @@
 package com.jtransc.media.limelibgdx.glsl.transform;
 
+import com.jtransc.media.limelibgdx.glsl.ast.Type;
 import com.jtransc.media.limelibgdx.glsl.ir.Ir3;
 import com.jtransc.media.limelibgdx.glsl.ir.Operand;
 import com.jtransc.media.limelibgdx.glsl.ir.Operator;
@@ -25,16 +26,20 @@ public class SirToIr3 {
 
 	private void convert() {
 		int tempId = 0;
+		Operand stackTemp = Operand.temp(0, Type.VEC4);
 		for (Sir item : items) {
+			// @TODO: CHECK operation type to determine type!
 			if (item instanceof Sir.Unop) {
-				Operand temp = Operand.temp(tempId++);
 				Operand source = stack.pop();
+				Type resultType = ((Sir.Unop) item).operator.getResultType(source.type);
+				Operand temp = stackTemp.withLanesCount(resultType.getLaneCount());
 				out.add(new Ir3.Unop(temp, ((Sir.Unop) item).operator, source));
 				stack.push(temp);
 			} else if (item instanceof Sir.Binop) {
-				Operand temp = Operand.temp(tempId++);
 				Operand right = stack.pop();
 				Operand left = stack.pop();
+				Type resultType = ((Sir.Binop) item).operator.getResultType(left.type, right.type);
+				Operand temp = stackTemp.withLanesCount(resultType.getLaneCount());
 
 				out.add(new Ir3.Binop(temp, ((Sir.Binop) item).operator, left, right));
 				stack.push(temp);

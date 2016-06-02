@@ -4,8 +4,12 @@ import com.jtransc.annotation.haxe.HaxeAddMembers;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
 import com.jtransc.media.limelibgdx.GL20Ext;
 import com.jtransc.media.limelibgdx.StateGL20;
+import com.jtransc.media.limelibgdx.flash.agal.Agal;
+import com.jtransc.media.limelibgdx.flash.agal.GlSlToAgal;
 
 import java.nio.Buffer;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.jtransc.media.limelibgdx.StateGL20.*;
 
@@ -49,7 +53,7 @@ public class FlashStage3DGL20 {
 		}
 
 		@Override
-		public Shader createShader(int type) {
+		public Shader createShader(ShaderType type) {
 			return new FlashShader(type);
 		}
 
@@ -107,23 +111,27 @@ public class FlashStage3DGL20 {
 	}
 
 	static class FlashProgram extends StateGL20.Program {
+		Agal.Program agal;
+
 		@Override
 		public void dispose() {
 		}
 
 		@Override
 		public void link() {
-
-		}
-
-		@Override
-		public void attach(Shader shader) {
-
-		}
-
-		@Override
-		public void detach(Shader shader) {
-
+			this.agal = GlSlToAgal.compile(vertex.source, fragment.source, true, new HashMap<String, String>() {{
+				put("GL_ES", "1");
+				put("JTRANSC", "1");
+				put("FLASH", "1");
+			}});
+			this.uniforms.clear();
+			this.attributes.clear();
+			for (Agal.AllocatedLanes e : this.agal.getUniforms().values()) {
+				this.uniforms.add(new ProgramUniform(e.name, e.size, e.type));
+			}
+			for (Agal.AllocatedLanes e : this.agal.getAttributes().values()) {
+				this.attributes.add(new ProgramAttribute(e.name, e.size, e.type));
+			}
 		}
 
 		@Override
@@ -137,26 +145,16 @@ public class FlashStage3DGL20 {
 		}
 
 		@Override
-		public int uniformsCount() {
-			return 0;
-		}
-
-		@Override
-		public int attributesCount() {
-			return 0;
-		}
-
-		@Override
 		public void bindAttribLocation(int index, String name) {
 
 		}
 	}
 
-	static class FlashShader implements Shader {
-		private int type;
+	static public class FlashShader extends Shader {
+		public String source;
 
-		public FlashShader(int type) {
-			this.type = type;
+		public FlashShader(ShaderType type) {
+			super(type);
 		}
 
 		@Override
@@ -164,8 +162,9 @@ public class FlashStage3DGL20 {
 		}
 
 		@Override
-		public void setSource(String string) {
-			System.out.println("FlashShader(" + type + ").setSource('" + string + "')");
+		public void setSource(String source) {
+			super.setSource(source);
+			System.out.println("FlashShader(" + type + ").setSource('" + source + "')");
 		}
 
 		@Override

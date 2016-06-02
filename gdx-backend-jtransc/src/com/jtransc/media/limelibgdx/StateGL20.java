@@ -2,10 +2,12 @@ package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.jtransc.ds.IntPool;
+import com.jtransc.media.limelibgdx.glsl.ast.Type;
 
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class StateGL20 implements GL20Ext {
@@ -108,73 +110,137 @@ public class StateGL20 implements GL20Ext {
 	}
 
 	abstract static public class Program implements Disposable {
+		public Shader fragment;
+		public Shader vertex;
+
 		abstract public void link();
 
-		abstract public void attach(Shader shader);
+		public void attach(Shader shader) {
+			switch (shader.type) {
+				case Vertex:
+					this.vertex = shader;
+					break;
+				case Fragment:
+					this.fragment = shader;
+					break;
+				default:
+					throw new RuntimeException("Unsupported shader type");
+			}
+		}
 
-		abstract public void detach(Shader shader);
+		public void detach(Shader shader) {
+			switch (shader.type) {
+				case Vertex:
+					this.vertex = null;
+					break;
+				case Fragment:
+					this.fragment = null;
+					break;
+				default:
+					throw new RuntimeException("Unsupported shader type");
+			}
+		}
 
 		abstract public String getInfoLog();
 
 		abstract public boolean linked();
 
-		public ProgramUniform[] uniforms = new ProgramUniform[0];
-		public ProgramAttribute[] attributes = new ProgramAttribute[0];
+		public ArrayList<ProgramUniform> uniforms = new ArrayList<>();
+		public ArrayList<ProgramAttribute> attributes = new ArrayList<>();
 
 		public int uniformsCount() {
-			return uniforms.length;
+			return uniforms.size();
 		}
 
 		public int attributesCount() {
-			return attributes.length;
+			return attributes.size();
 		}
 
 		public ProgramAttribute getAttrib(int index) {
-			return attributes[index];
+			return attributes.get(index);
 		}
 
 		public ProgramUniform getUniform(int index) {
-			return uniforms[index];
+			return uniforms.get(index);
 		}
 
 		abstract public void bindAttribLocation(int index, String name);
 
 		public int getAttribLocation(String name) {
-			for (int n = 0; n < attributes.length; n++) {
-				if (Objects.equals(attributes[n].name, name)) return n;
+			for (int n = 0; n < attributes.size(); n++) {
+				if (Objects.equals(attributes.get(n).name, name)) return n;
 			}
 			return -1;
 		}
 
 		public int getUniformLocation(String name) {
-			for (int n = 0; n < uniforms.length; n++) {
-				if (Objects.equals(uniforms[n].name, name)) return n;
+			for (int n = 0; n < uniforms.size(); n++) {
+				if (Objects.equals(uniforms.get(n).name, name)) return n;
 			}
 			return -1;
 		}
 	}
 
-	static public class ProgramAttribute {
+	static public class ProgramAttributeUniform {
 		public String name;
 		public int size;
-		public int type;
+		public Type type;
+
+		public ProgramAttributeUniform(String name, int size, Type type) {
+			this.name = name;
+			this.size = size;
+			this.type = type;
+		}
+
+		public int getGlType() {
+			if (Objects.equals(type, Type.FLOAT)) return GL20.GL_FLOAT;
+			if (Objects.equals(type, Type.VEC2)) return GL20.GL_FLOAT_VEC2;
+			if (Objects.equals(type, Type.VEC3)) return GL20.GL_FLOAT_VEC3;
+			if (Objects.equals(type, Type.VEC4)) return GL20.GL_FLOAT_VEC4;
+			if (Objects.equals(type, Type.MAT2)) return GL20.GL_FLOAT_MAT2;
+			if (Objects.equals(type, Type.MAT3)) return GL20.GL_FLOAT_MAT3;
+			if (Objects.equals(type, Type.MAT4)) return GL20.GL_FLOAT_MAT4;
+			return -1;
+		}
 	}
 
-	static public class ProgramUniform {
-		public String name;
-		public int size;
-		public int type;
+	static public class ProgramAttribute extends ProgramAttributeUniform {
+		public ProgramAttribute(String name, int size, Type type) {
+			super(name, size, type);
+		}
 	}
 
+	static public class ProgramUniform extends ProgramAttributeUniform {
+		public ProgramUniform(String name, int size, Type type) {
+			super(name, size, type);
+		}
+	}
 
-	public interface Shader extends Disposable {
-		void setSource(String string);
+	static public enum ShaderType {
+		Vertex, Fragment
+	}
 
-		void compile();
+	public static abstract class Shader implements Disposable {
+		public ShaderType type;
+		public String source;
 
-		String getInfoLog();
+		public Shader(ShaderType type) {
+			this.type = type;
+		}
 
-		boolean compiled();
+		public ShaderType getType() {
+			return type;
+		}
+
+		public void setSource(String source) {
+			this.source = source;
+		}
+
+		abstract public void compile();
+
+		abstract public String getInfoLog();
+
+		abstract public boolean compiled();
 	}
 
 	public interface RenderBuffer extends Disposable {
@@ -197,7 +263,7 @@ public class StateGL20 implements GL20Ext {
 
 		public abstract Program createProgram();
 
-		public abstract Shader createShader(int type);
+		public abstract Shader createShader(ShaderType type);
 
 		public abstract void render(StateGL20.State state);
 
@@ -666,7 +732,18 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public int glCreateShader(int type) {
-		return allocateObject(impl.createShader(type));
+		ShaderType shaderType;
+		switch (type) {
+			case GL20.GL_FRAGMENT_SHADER:
+				shaderType = ShaderType.Fragment;
+				break;
+			case GL20.GL_VERTEX_SHADER:
+				shaderType = ShaderType.Vertex;
+				break;
+			default:
+				throw new RuntimeException("Unknown shader type " + type);
+		}
+		return allocateObject(impl.createShader(shaderType));
 	}
 
 	@Override
@@ -778,7 +855,7 @@ public class StateGL20 implements GL20Ext {
 	public String glGetActiveAttrib(int program, int index, IntBuffer size, Buffer type) {
 		ProgramAttribute a = ((Program)objects[program]).getAttrib(index);
 		size.put(a.size);
-		((IntBuffer)type).put(a.type);
+		((IntBuffer)type).put(a.getGlType());
 		return a.name;
 	}
 
@@ -786,7 +863,7 @@ public class StateGL20 implements GL20Ext {
 	public String glGetActiveUniform(int program, int index, IntBuffer size, Buffer type) {
 		ProgramUniform a = ((Program)objects[program]).getUniform(index);
 		size.put(a.size);
-		((IntBuffer)type).put(a.type);
+		((IntBuffer)type).put(a.getGlType());
 		return a.name;
 
 	}

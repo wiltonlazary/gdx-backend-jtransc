@@ -1,9 +1,12 @@
 package com.jtransc.media.limelibgdx.flash.agal;
 
-import com.jtransc.media.limelibgdx.glsl.ast.*;
+import com.jtransc.media.limelibgdx.glsl.GlSlParser;
+import com.jtransc.media.limelibgdx.glsl.ast.Shader;
 import com.jtransc.media.limelibgdx.glsl.ir.Ir3;
 import com.jtransc.media.limelibgdx.glsl.ir.Operand;
 import com.jtransc.media.limelibgdx.glsl.transform.AstToIr3;
+
+import java.util.Map;
 
 // http://www.adobe.com/devnet/flashplayer/articles/what-is-agal.html
 // http://help.adobe.com/en_US/as3/dev/WSd6a006f2eb1dc31e-310b95831324724ec56-8000.html
@@ -22,6 +25,14 @@ public class GlSlToAgal {
 		return new Agal.Program(shaderAssembler.generateResult(), shaderAssembler.generateResult(), names);
 	}
 
+	static public Agal.Program compile(String vertex, String fragment, boolean optimize, Map<String, String> macros) {
+		return compile(
+				GlSlParser.parse(vertex, macros),
+				GlSlParser.parse(fragment, macros),
+				optimize
+		);
+	}
+
 	static public Agal.Program compile(Shader vertex, Shader fragment, boolean optimize) {
 		Agal.Names names = new Agal.Names();
 		Agal.Assembler fragmentAssembler = compile(fragment, names, optimize);
@@ -35,41 +46,41 @@ public class GlSlToAgal {
 	}
 
 	private Agal.Register operandToSource(Operand operand) {
-		Agal.Register.Type type;
+		Agal.Register.Type kind;
 		int size = 4;
-		switch (operand.type) {
+		switch (operand.kind) {
 			case Uniform:
-				type = Agal.Register.Type.Constant;
+				kind = Agal.Register.Type.Constant;
 				size = 4;
 				break;
 			case Attribute:
-				type = Agal.Register.Type.Attribute;
+				kind = Agal.Register.Type.Attribute;
 				size = 4;
 				break;
 			case Varying:
-				type = Agal.Register.Type.Varying;
+				kind = Agal.Register.Type.Varying;
 				size = 4;
 				break;
 			case Temp:
-				type = Agal.Register.Type.Temporary;
+				kind = Agal.Register.Type.Temporary;
 				size = 4;
 				break;
 			case Special:
 				// @TODO: Or sampler!!
-				type = Agal.Register.Type.Output;
+				kind = Agal.Register.Type.Output;
 				size = 4;
 				break;
 			case Constant:
 				size = 1;
-				type = Agal.Register.Type.Constant;
-				Agal.AllocatedLanes id = names.get(type).alloc(operand.name, size);
+				kind = Agal.Register.Type.Constant;
+				Agal.AllocatedLanes id = names.get(kind).alloc(operand.name, operand.type, size);
 				names.addFixedConstant(id, operand.constant);
 				break;
 			default:
 				throw new RuntimeException("Unhandled " + operand);
 		}
-		Agal.AllocatedLanes id = names.get(type).alloc(operand.name, size);
-		return new Agal.Register(type, id, operand.swizzle);
+		Agal.AllocatedLanes id = names.get(kind).alloc(operand.name, operand.type, size);
+		return new Agal.Register(kind, id, operand.swizzle);
 	}
 
 	private Agal.Assembler compile(boolean optimize) {

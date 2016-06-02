@@ -3,6 +3,7 @@ package com.jtransc.media.limelibgdx.glsl;
 import com.jtransc.media.limelibgdx.flash.agal.Agal;
 import com.jtransc.media.limelibgdx.flash.agal.GlSlToAgal;
 import com.jtransc.media.limelibgdx.glsl.ast.Shader;
+import com.jtransc.media.limelibgdx.glsl.ast.Type;
 import com.jtransc.media.limelibgdx.util.Tokenizer;
 import org.junit.Assert;
 import org.junit.Test;
@@ -123,22 +124,22 @@ public class GlSlParserTest {
 		);
 		Assert.assertEquals(
 				new HashMap<Agal.AllocatedLanes, Double>() {{
-					put(new Agal.AllocatedLanes(1, 0, 1), 255.0 / 254.0);
+					put(new Agal.AllocatedLanes("#CST#1.0039370078740157", Type.FLOAT, 1, 0, 1), 255.0 / 254.0);
 				}},
 				program.getConstants()
 		);
 		Assert.assertEquals(
 				new HashMap<String, Agal.AllocatedLanes>() {{
-					put("a_color", new Agal.AllocatedLanes(0, 0, 4));
-					put("a_texCoord0", new Agal.AllocatedLanes(1, 0, 4));
-					put("a_position", new Agal.AllocatedLanes(2, 0, 4));
+					put("a_color", new Agal.AllocatedLanes("a_color", Type.VEC4, 0, 0, 4));
+					put("a_texCoord0", new Agal.AllocatedLanes("a_texCoord0", Type.VEC2, 1, 0, 4));
+					put("a_position", new Agal.AllocatedLanes("a_position", Type.VEC4, 2, 0, 4));
 				}},
 				program.getAttributes()
 		);
 		Assert.assertEquals(
 				new HashMap<String, Agal.AllocatedLanes>() {{
-					put("u_texture", new Agal.AllocatedLanes(0, 0, 4));
-					put("u_projTrans", new Agal.AllocatedLanes(2, 0, 4));
+					put("u_texture", new Agal.AllocatedLanes("u_texture", Type.SAMPLER2D, 0, 0, 4));
+					put("u_projTrans", new Agal.AllocatedLanes("u_projTrans", Type.MAT4, 2, 0, 4));
 				}},
 				program.getUniforms()
 		);
@@ -153,8 +154,8 @@ public class GlSlParserTest {
 		Assert.assertEquals(
 				String.join("\n", new CharSequence[]{
 						"tex t0, vc0, v0",
-						"mul t1, v1, t0",
-						"mov op, t1",
+						"mul t0, v1, t0",
+						"mov op, t0",
 				}),
 				String.join("\n", (CharSequence[]) program.fragment.sourceCodeArray)
 		);
@@ -162,36 +163,21 @@ public class GlSlParserTest {
 		Assert.assertEquals(
 				String.join("\n", new CharSequence[]{
 						"mov v1, va0",
-						"div t0, vc1.x, vc1.y",
-						"mul t1, v1.w, t0",
-						"mov v1.w, t1",
+						"div t0.x, vc1.x, vc1.y",
+						"mul t0, v1.w, t0.x",
+						"mov v1.w, t0",
 						"mov v0, va1",
-						"mul t2, vc2, va2",
-						"mov op, t2",
+						"mul t0, vc2, va2",
+						"mov op, t0",
 				}),
 				String.join("\n", (CharSequence[]) program.vertex.sourceCodeArray)
 		);
 		Assert.assertEquals(
 				new HashMap<Agal.AllocatedLanes, Double>() {{
-					put(new Agal.AllocatedLanes(1, 0, 1), 255.0);
-					put(new Agal.AllocatedLanes(1, 1, 2), 254.0);
+					put(new Agal.AllocatedLanes("#CST#255.0", Type.FLOAT, 1, 0, 1), 255.0);
+					put(new Agal.AllocatedLanes("#CST#254.0", Type.FLOAT, 1, 1, 2), 254.0);
 				}},
 				program.getConstants()
-		);
-		Assert.assertEquals(
-				new HashMap<String, Agal.AllocatedLanes>() {{
-					put("a_color", new Agal.AllocatedLanes(0, 0, 4));
-					put("a_texCoord0", new Agal.AllocatedLanes(1, 0, 4));
-					put("a_position", new Agal.AllocatedLanes(2, 0, 4));
-				}},
-				program.getAttributes()
-		);
-		Assert.assertEquals(
-				new HashMap<String, Agal.AllocatedLanes>() {{
-					put("u_texture", new Agal.AllocatedLanes(0, 0, 4));
-					put("u_projTrans", new Agal.AllocatedLanes(2, 0, 4));
-				}},
-				program.getUniforms()
 		);
 	}
 }
