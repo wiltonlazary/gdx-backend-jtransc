@@ -44,7 +44,7 @@ public class SirToIr3 {
 				Operand source = stack.pop();
 				out.add(new Ir3.Unop(((Sir.Set) item).target, Operator.fromString("="), source));
 			} else {
-				throw new RuntimeException("SirToIr3.convert unhandled " + item);
+				throw new RuntimeException("SirToIr3.compile unhandled " + item);
 			}
 		}
 	}

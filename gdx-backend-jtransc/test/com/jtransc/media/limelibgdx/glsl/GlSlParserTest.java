@@ -99,22 +99,10 @@ public class GlSlParserTest {
 	}
 
 	@Test
-	public void parse() throws Exception {
+	public void parseAndAgailOptimized() throws Exception {
 		Shader fragment = GlSlParser.parse(fragmentShader, MACROS_GLES);
 		Shader vertex = GlSlParser.parse(vertexShader, MACROS_GLES);
-		//GlSlToAgal.convert(fragment);
-		//GlSlToAgal.convert(vertex);
-
-		//System.out.println(":: SIR");
-		//for (Sir sir : fragment.functions.get("main").body) System.out.println(sir);
-
-		//System.out.println(":: SIR");
-		//for (Sir sir : AstToSir.convert(fragment)) System.out.println(sir);
-		//System.out.println(":: IR3");
-		//for (Ir3 ir3 : AstToIr3.convert(fragment)) System.out.println(ir3);
-
-		Agal.Program program = GlSlToAgal.convert(vertex, fragment);
-		//Agal.Program program = GlSlToAgal.convertTest(fragment);
+		Agal.Program program = GlSlToAgal.compile(vertex, fragment, true);
 
 		Assert.assertEquals(
 				String.join("\n", new CharSequence[]{
@@ -136,6 +124,57 @@ public class GlSlParserTest {
 		Assert.assertEquals(
 				new HashMap<Agal.AllocatedLanes, Double>() {{
 					put(new Agal.AllocatedLanes(1, 0, 1), 255.0 / 254.0);
+				}},
+				program.getConstants()
+		);
+		Assert.assertEquals(
+				new HashMap<String, Agal.AllocatedLanes>() {{
+					put("a_color", new Agal.AllocatedLanes(0, 0, 4));
+					put("a_texCoord0", new Agal.AllocatedLanes(1, 0, 4));
+					put("a_position", new Agal.AllocatedLanes(2, 0, 4));
+				}},
+				program.getAttributes()
+		);
+		Assert.assertEquals(
+				new HashMap<String, Agal.AllocatedLanes>() {{
+					put("u_texture", new Agal.AllocatedLanes(0, 0, 4));
+					put("u_projTrans", new Agal.AllocatedLanes(2, 0, 4));
+				}},
+				program.getUniforms()
+		);
+	}
+
+	@Test
+	public void parseAndAgailNotOptimized() throws Exception {
+		Shader fragment = GlSlParser.parse(fragmentShader, MACROS_GLES);
+		Shader vertex = GlSlParser.parse(vertexShader, MACROS_GLES);
+		Agal.Program program = GlSlToAgal.compile(vertex, fragment, false);
+
+		Assert.assertEquals(
+				String.join("\n", new CharSequence[]{
+						"tex t0, vc0, v0",
+						"mul t1, v1, t0",
+						"mov op, t1",
+				}),
+				String.join("\n", (CharSequence[]) program.fragment.sourceCodeArray)
+		);
+
+		Assert.assertEquals(
+				String.join("\n", new CharSequence[]{
+						"mov v1, va0",
+						"div t0, vc1.x, vc1.y",
+						"mul t1, v1.w, t0",
+						"mov v1.w, t1",
+						"mov v0, va1",
+						"mul t2, vc2, va2",
+						"mov op, t2",
+				}),
+				String.join("\n", (CharSequence[]) program.vertex.sourceCodeArray)
+		);
+		Assert.assertEquals(
+				new HashMap<Agal.AllocatedLanes, Double>() {{
+					put(new Agal.AllocatedLanes(1, 0, 1), 255.0);
+					put(new Agal.AllocatedLanes(1, 1, 2), 254.0);
 				}},
 				program.getConstants()
 		);

@@ -13,8 +13,15 @@ public class AstToIr3 {
 		return SirToIr3.convert(AstToSir.convert(shader));
 	}
 
-	static public ArrayList<Ir3> convertAndOptimize(Shader shader) {
+	static public ArrayList<Ir3> convert(Shader shader, boolean optimize) {
+		if (optimize) {
+			return convertAndOptimize(shader);
+		} else {
+			return convert(shader);
+		}
+	}
 
+	static public ArrayList<Ir3> convertAndOptimize(Shader shader) {
 		return Ir3Optimizer.optimize(
 				SirToIr3.convert(
 						AstToSir.convert(new AstOptimizer().optimize(shader))

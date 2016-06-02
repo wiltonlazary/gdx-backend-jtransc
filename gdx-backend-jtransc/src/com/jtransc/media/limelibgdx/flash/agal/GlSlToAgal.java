@@ -16,22 +16,22 @@ public class GlSlToAgal {
 		this.names = names;
 	}
 
-	static public Agal.Program convertTest(Shader shader) {
+	static public Agal.Program convertTest(Shader shader, boolean optimize) {
 		Agal.Names names = new Agal.Names();
-		Agal.Assembler shaderAssembler = convert(shader, names);
+		Agal.Assembler shaderAssembler = compile(shader, names, optimize);
 		return new Agal.Program(shaderAssembler.generateResult(), shaderAssembler.generateResult(), names);
 	}
 
-	static public Agal.Program convert(Shader vertex, Shader fragment) {
+	static public Agal.Program compile(Shader vertex, Shader fragment, boolean optimize) {
 		Agal.Names names = new Agal.Names();
-		Agal.Assembler fragmentAssembler = convert(fragment, names);
-		Agal.Assembler vertexAssembler = convert(vertex, names);
+		Agal.Assembler fragmentAssembler = compile(fragment, names, optimize);
+		Agal.Assembler vertexAssembler = compile(vertex, names, optimize);
 		return new Agal.Program(vertexAssembler.generateResult(), fragmentAssembler.generateResult(), names);
 	}
 
-	static private Agal.Assembler convert(Shader shader, Agal.Names alloc) {
+	static private Agal.Assembler compile(Shader shader, Agal.Names alloc, boolean optimize) {
 		GlSlToAgal glSlToAgal = new GlSlToAgal(shader, alloc);
-		return glSlToAgal.convert();
+		return glSlToAgal.compile(optimize);
 	}
 
 	private Agal.Register operandToSource(Operand operand) {
@@ -72,10 +72,10 @@ public class GlSlToAgal {
 		return new Agal.Register(type, id, operand.swizzle);
 	}
 
-	private Agal.Assembler convert() {
+	private Agal.Assembler compile(boolean optimize) {
 		final Agal.Assembler agal = new Agal.Assembler();
 
-		for (Ir3 ir3 : AstToIr3.convertAndOptimize(shader)) {
+		for (Ir3 ir3 : AstToIr3.convert(shader, optimize)) {
 			Ir3.Binop binop = ir3 instanceof Ir3.Binop ? ((Ir3.Binop) ir3) : null;
 			Ir3.Unop unop = ir3 instanceof Ir3.Unop ? ((Ir3.Unop) ir3) : null;
 			if (unop != null) {
