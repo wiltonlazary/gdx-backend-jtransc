@@ -1,7 +1,11 @@
 package com.jtransc.media.limelibgdx;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.utils.Json;
+import jdk.nashorn.internal.parser.JSONParser;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,11 +17,41 @@ public abstract class GdxPreferencesAdapter implements Preferences {
 	public GdxPreferencesAdapter(String name, boolean autoflush) {
 		this.name = name;
 		this.autoflush = autoflush;
-		load(name);
+		this.prefs.clear();
+		this.prefs.putAll(load(name));
 	}
 
-	abstract protected Map<String, Object> load(String name);
-	abstract protected void store(String name, Map<String, Object> prefs);
+	// Default generic storage!
+	protected String loadString(String name) throws IOException {
+		return Gdx.files.absolute(Gdx.files.getLocalStoragePath() + "/" + name + ".prefs").readString();
+	}
+
+	protected void storeString(String name, String prefs) throws IOException {
+		Gdx.files.absolute(Gdx.files.getLocalStoragePath() + "/" + name + ".prefs").writeString(prefs, false);
+	}
+
+	private Json json = new Json();
+
+	protected Map<String, Object> load(String name) {
+		try {
+			String s = loadString(name);
+			if (s == null) s = "{}";
+			return json.fromJson(HashMap.class, s);
+		} catch (Throwable t) {
+			t.printStackTrace();
+			return new HashMap<>();
+		}
+	}
+
+	protected void store(String name, Map<String, Object> prefs) {
+		try {
+			String s = json.toJson(prefs);
+			if (s == null) s = "{}";
+			storeString(name, s);
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+	}
 
 	@Override
 	public Preferences putBoolean(String key, boolean val) {

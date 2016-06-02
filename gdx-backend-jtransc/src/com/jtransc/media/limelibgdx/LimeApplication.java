@@ -9,7 +9,11 @@ import com.badlogic.gdx.utils.Clipboard;
 import com.jtransc.JTranscSystem;
 import com.jtransc.annotation.JTranscNativeClass;
 import com.jtransc.annotation.haxe.*;
+import com.jtransc.io.JTranscIoTools;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -121,14 +125,30 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 
 	@Override
 	protected Preferences createPreferences(String name) {
+		// @TODO: node.js support
 		return new GdxPreferencesAdapter(name, false) {
-			@Override
-			protected Map<String, Object> load(String name) {
-				return new HashMap<>();
+			private File getFile(String name) {
+				return new File(name + ".prefs");
 			}
 
 			@Override
-			protected void store(String name, Map<String, Object> prefs) {
+			@HaxeMethodBody(target = "js", value = "trace('localStorage.getItem:' + p0); return N.str(js.Browser.window.localStorage.getItem(p0._str));")
+			protected String loadString(String name) throws IOException {
+				//return new String(JTranscIoTools.readFile(getFile(name)), "utf-8");
+				return super.loadString(name);
+			}
+
+			@Override
+			@HaxeMethodBody(target = "js", value = "trace('localStorage.setItem:' + p0 + ':' + p1); js.Browser.window.localStorage.setItem(p0._str, p1._str);")
+			protected void storeString(String name, String prefs) throws IOException {
+				//writeFile(getFile(name), prefs.getBytes("utf-8"));
+				super.storeString(name, prefs);
+			}
+
+			@Override
+			public void flush() {
+				System.out.println("GdxPreferencesAdapter.flush();");
+				super.flush();
 			}
 		};
 	}
