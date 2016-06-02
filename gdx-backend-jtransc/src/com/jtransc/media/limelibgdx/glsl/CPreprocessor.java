@@ -1,16 +1,12 @@
 package com.jtransc.media.limelibgdx.glsl;
 
 import com.jtransc.media.limelibgdx.util.ListReader;
-import com.jtransc.media.limelibgdx.util.ReplaceCallback;
+import com.jtransc.media.limelibgdx.util.StrReader;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.MatchResult;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class CPreprocessor {
 	private final HashMap<String, String> macros;
@@ -32,6 +28,8 @@ public class CPreprocessor {
 		}
 		return true;
 	}
+
+	static private FilterJavaId FilterJavaId = new FilterJavaId();
 
 	@SuppressWarnings("all")
 	private void preprocess() {
@@ -66,20 +64,44 @@ public class CPreprocessor {
 				}
 			} else {
 				if (actualExecuting()) {
-					output.add(ReplaceCallback.replace("\\b(\\w+)\\b+", line, new ReplaceCallback.Callback() {
-						@Override
-						public String matchFound(MatchResult match) {
-							String out = match.group(1);
-							if (macros.containsKey(out)) {
-								return macros.get(out);
-							} else {
-								return out;
-							}
-						}
-					}));
+					StrReader r = new StrReader(line);
+					String out = "";
+					while (r.hasMore()) {
+						out += r.readUntil(FilterJavaId);
+						out += processId(r.readWhile(FilterJavaId));
+					}
+					output.add(out);
+					//output.add(ReplaceCallback.replace("\\b(\\w+)\\b+", line, new ReplaceCallback.Callback() {
+					//	@Override
+					//	public String matchFound(MatchResult match) {
+					//		String out = match.group(1);
+					//		if (macros.containsKey(out)) {
+					//			return macros.get(out);
+					//		} else {
+					//			return out;
+					//		}
+					//	}
+					//}));
 				}
 			}
 		}
+	}
+
+	private String processId(String id) {
+		if (macros.containsKey(id)) {
+			return macros.get(id);
+		} else {
+			return id;
+		}
+	}
+
+
+	static class FilterJavaId implements StrReader.FilterChar {
+		@Override
+		public boolean filter(char ch) {
+			return Character.isJavaIdentifierPart(ch);
+		}
+
 	}
 
 	static public String[] preprocess(String[] lines, Map<String, String> macros) {

@@ -80,7 +80,7 @@ public class StrReader {
 		readWhile(Character::isWhitespace);
 	}
 
-	interface FilterChar {
+	public interface FilterChar {
 		boolean filter(char ch);
 	}
 }

@@ -135,8 +135,10 @@ public class FlashStage3DGL20 {
 				put("FLASH", "1");
 			}});
 
-			System.out.println("FlashProgram().vertex('" + String.join("\n", agal.vertex.sourceCode) + "')");
-			System.out.println("FlashProgram().fragment('" + String.join("\n", agal.fragment.sourceCode) + "')");
+			System.out.println("FlashProgram().vertex:");
+			System.out.println(String.join("\n", agal.vertex.sourceCode));
+			System.out.println("FlashProgram().fragment:");
+			System.out.println(String.join("\n", agal.fragment.sourceCode));
 
 			this.uniforms.clear();
 			this.attributes.clear();
