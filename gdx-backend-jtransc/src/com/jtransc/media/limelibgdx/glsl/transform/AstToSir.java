@@ -76,6 +76,11 @@ public class AstToSir {
 		}
 
 		@Override
+		public void visit(Expr.NumberLiteral expr) {
+			out.add(new Sir.Get(Operand.constant(expr.value)));
+		}
+
+		@Override
 		public void visit(Expr.Binop expr) {
 			switch (expr.op) {
 				case "=":

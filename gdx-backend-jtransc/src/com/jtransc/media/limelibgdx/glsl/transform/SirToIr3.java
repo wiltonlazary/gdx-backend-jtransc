@@ -35,6 +35,7 @@ public class SirToIr3 {
 				Operand temp = Operand.temp(tempId++);
 				Operand right = stack.pop();
 				Operand left = stack.pop();
+
 				out.add(new Ir3.Binop(temp, ((Sir.Binop) item).operator, left, right));
 				stack.push(temp);
 			} else if (item instanceof Sir.Get) {

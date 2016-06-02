@@ -127,8 +127,7 @@ public class GlSlParserTest {
 		Assert.assertEquals(
 				String.join("\n", new CharSequence[]{
 						"mov v1, va0",
-						"div t0, vc1.x, vc1.y",
-						"mul v1.w, v1.w, t0",
+						"mul v1.w, v1.w, vc1.x",
 						"mov v0, va1",
 						"mul op, vc2, va2",
 				}),
@@ -136,8 +135,7 @@ public class GlSlParserTest {
 		);
 		Assert.assertEquals(
 				new HashMap<Agal.AllocatedLanes, Double>() {{
-					put(new Agal.AllocatedLanes(1, 0, 1), 255.0);
-					put(new Agal.AllocatedLanes(1, 1, 2), 254.0);
+					put(new Agal.AllocatedLanes(1, 0, 1), 255.0 / 254.0);
 				}},
 				program.getConstants()
 		);

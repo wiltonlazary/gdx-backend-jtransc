@@ -21,11 +21,16 @@ public class Agal {
 
 		static private char getSwizzle(int index) {
 			switch (index) {
-				case 0: return 'x';
-				case 1: return 'y';
-				case 2: return 'z';
-				case 3: return 'w';
-				default: return '?';
+				case 0:
+					return 'x';
+				case 1:
+					return 'y';
+				case 2:
+					return 'z';
+				case 3:
+					return 'w';
+				default:
+					return '?';
 			}
 		}
 
@@ -106,8 +111,7 @@ public class Agal {
 			Output(3, "op"),
 			Varying(4, "v"),
 			Sampler(5, "s"),
-			Fragment(6, "f"),
-			;
+			Fragment(6, "f"),;
 
 			public int index;
 			public String prefix;
@@ -181,8 +185,8 @@ public class Agal {
 
 	static public class Names {
 		private Subnames[] names = new Subnames[]{
-			new Subnames(), new Subnames(), new Subnames(), new Subnames(), new Subnames(), new Subnames(),
-			new Subnames(), new Subnames()
+				new Subnames(), new Subnames(), new Subnames(), new Subnames(), new Subnames(), new Subnames(),
+				new Subnames(), new Subnames()
 		};
 
 		public Subnames get(Register.Type type) {
@@ -198,7 +202,6 @@ public class Agal {
 	}
 
 	static public class Program {
-		private final Names names;
 		public final Result vertex;
 		public final Result fragment;
 		private final HashMap<String, AllocatedLanes> uniforms = new HashMap<>();
@@ -208,7 +211,6 @@ public class Agal {
 		public Program(Result vertex, Result fragment, Names names) {
 			this.vertex = vertex;
 			this.fragment = fragment;
-			this.names = names;
 
 			for (Map.Entry<String, AllocatedLanes> entry : names.get(Register.Type.Constant).names.entrySet()) {
 				if (!entry.getKey().startsWith("#CST#")) {
@@ -239,46 +241,16 @@ public class Agal {
 	}
 
 	enum Opcode {
-		mov(0x00),
-		add(0x01),
-		sub(0x02),
-		mul(0x03),
-		div(0x04),
-		rcp(0x05),
-		min(0x06),
-		max(0x07),
-		frc(0x08),
-		sqt(0x09),
-		rsq(0x0a),
-		pow(0x0b),
-		log(0x0c),
-		exp(0x0d),
-		nrm(0x0e),
-		sin(0x0f),
-		cos(0x10),
-		crs(0x11),
-		dp3(0x12),
-		dp4(0x13),
-		abs(0x14),
-		neg(0x15),
-		sat(0x16),
-		m33(0x17),
-		m44(0x18),
-		m34(0x19),
-		kil(0x27),
-		tex(0x28),
-		sge(0x29),
-		slt(0x2a),
-		seq(0x2c),
-		sne(0x2d),
-		ddx(0x1a),
-		ddy(0x1b),
-		ife(0x1c),
-		ine(0x1d),
-		ifg(0x1e),
-		ifl(0x1f),
-		els(0x20),
-		eif(0x21),;
+		mov(0x00), add(0x01), sub(0x02), mul(0x03),
+		div(0x04), rcp(0x05), min(0x06), max(0x07),
+		frc(0x08), sqt(0x09), rsq(0x0a), pow(0x0b),
+		log(0x0c), exp(0x0d), nrm(0x0e), sin(0x0f),
+		cos(0x10), crs(0x11), dp3(0x12), dp4(0x13),
+		abs(0x14), neg(0x15), sat(0x16), m33(0x17),
+		m44(0x18), m34(0x19), kil(0x27), tex(0x28),
+		sge(0x29), slt(0x2a), seq(0x2c), sne(0x2d),
+		ddx(0x1a), ddy(0x1b), ife(0x1c), ine(0x1d),
+		ifg(0x1e), ifl(0x1f), els(0x20), eif(0x21);
 
 		public final int opcode;
 

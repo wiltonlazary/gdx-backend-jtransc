@@ -35,6 +35,7 @@ public class Operators {
 		new String[] { "." },
 		new String[] { "," },
 		new String[] { ";" },
+		new String[] { "//", "/*", "*/" }, // Comments
 	});
 
 	static public final Set<String> ALL = new HashSet<String>() {{

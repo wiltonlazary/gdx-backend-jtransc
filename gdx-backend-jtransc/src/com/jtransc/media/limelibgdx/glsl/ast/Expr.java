@@ -3,7 +3,7 @@ package com.jtransc.media.limelibgdx.glsl.ast;
 import java.util.ArrayList;
 
 public interface Expr {
-	static public class Id implements Expr {
+	class Id implements Expr {
 		public String id;
 
 		public Id(String id) {
@@ -11,7 +11,15 @@ public interface Expr {
 		}
 	}
 
-	static public class Access implements Expr {
+	class NumberLiteral implements Expr {
+		public double value;
+
+		public NumberLiteral(double value) {
+			this.value = value;
+		}
+	}
+
+	class Access implements Expr {
 		public final Expr expr;
 		public final String field;
 
@@ -21,17 +29,17 @@ public interface Expr {
 		}
 	}
 
-	static public class ArrayAccess implements Expr {
-		public final Expr expr;
-		public final Expr expr1;
+	class ArrayAccess implements Expr {
+		public final Expr array;
+		public final Expr index;
 
 		public ArrayAccess(Expr expr, Expr expr1) {
-			this.expr = expr;
-			this.expr1 = expr1;
+			this.array = expr;
+			this.index = expr1;
 		}
 	}
 
-	static public class Call implements Expr {
+	class Call implements Expr {
 		public final String name;
 		public final ArrayList<Expr> args;
 
@@ -41,22 +49,22 @@ public interface Expr {
 		}
 	}
 
-	static public class UnopPost implements Expr {
+	class UnopPost implements Expr {
 		public final Expr expr;
-		public final String s;
+		public final String op;
 
 		public UnopPost(Expr expr, String s) {
 			this.expr = expr;
-			this.s = s;
+			this.op = s;
 		}
 	}
 
-	static public class Unop implements Expr {
-		public final String s;
+	class Unop implements Expr {
+		public final String op;
 		public final Expr expr;
 
 		public Unop(String s, Expr expr) {
-			this.s = s;
+			this.op = s;
 			this.expr = expr;
 		}
 	}

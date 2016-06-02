@@ -1,6 +1,7 @@
 package com.jtransc.media.limelibgdx.glsl;
 
 import com.jtransc.media.limelibgdx.util.ListReader;
+import com.jtransc.media.limelibgdx.util.ReplaceCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,55 +82,5 @@ public class CPreprocessor {
 		CPreprocessor preprocessor = new CPreprocessor(lines, macros);
 		preprocessor.preprocess();
 		return preprocessor.output.toArray(new String[0]);
-	}
-}
-
-
-class ReplaceCallback {
-	public static interface Callback {
-		/**
-		 * This function is called when a match is made. The string which was matched
-		 * can be obtained via match.group(), and the individual groupings via
-		 * match.group(n).
-		 */
-		public String matchFound(MatchResult match);
-	}
-
-	/**
-	 * Replaces with callback, with no limit to the number of replacements.
-	 * Probably what you want most of the time.
-	 */
-	public static String replace(String pattern, String subject, Callback callback) {
-		return replace(pattern, subject, -1, null, callback);
-	}
-
-	public static String replace(String pattern, String subject, int limit, Callback callback) {
-		return replace(pattern, subject, limit, null, callback);
-	}
-
-	/**
-	 * @param regex    The regular expression pattern to search on.
-	 * @param subject  The string to be replaced.
-	 * @param limit    The maximum number of replacements to make. A negative value
-	 *                 indicates replace all.
-	 * @param count    If this is not null, it will be set to the number of
-	 *                 replacements made.
-	 * @param callback Callback function
-	 */
-	public static String replace(String regex, String subject, int limit,
-								 AtomicInteger count, Callback callback) {
-		StringBuffer sb = new StringBuffer();
-		Matcher matcher = Pattern.compile(regex).matcher(subject);
-		int i;
-		for (i = 0; (limit < 0 || i < limit) && matcher.find(); i++) {
-			String replacement = callback.matchFound(matcher.toMatchResult());
-			replacement = Matcher.quoteReplacement(replacement); //probably what you want...
-			matcher.appendReplacement(sb, replacement);
-		}
-		matcher.appendTail(sb);
-
-		if (count != null)
-			count.set(i);
-		return sb.toString();
 	}
 }

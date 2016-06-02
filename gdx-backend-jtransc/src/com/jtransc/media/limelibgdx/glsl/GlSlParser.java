@@ -2,6 +2,7 @@ package com.jtransc.media.limelibgdx.glsl;
 
 import com.jtransc.media.limelibgdx.glsl.ast.*;
 import com.jtransc.media.limelibgdx.util.ListReader;
+import com.jtransc.media.limelibgdx.util.NumberUtils;
 import com.jtransc.media.limelibgdx.util.Operators;
 import com.jtransc.media.limelibgdx.util.Tokenizer;
 
@@ -54,8 +55,50 @@ public class GlSlParser {
 		return out;
 	}
 
+	public Type parseBasicType() {
+		String token = r.read();
+		switch (token) {
+			case "void": return Type.VOID;
+			case "bool": return Type.BOOL;
+			case "int": return Type.INT;
+			case "uint": return Type.UINT;
+			case "float": return Type.FLOAT;
+			case "double": return Type.DOUBLE;
+
+			// Vector types
+			case "bvec2": return Type.BVEC2;
+			case "bvec3": return Type.BVEC3;
+			case "bvec4": return Type.BVEC4;
+			case "ivec2": return Type.IVEC2;
+			case "ivec3": return Type.IVEC3;
+			case "ivec4": return Type.IVEC4;
+			case "uvec2": return Type.UVEC2;
+			case "uvec3": return Type.UVEC3;
+			case "uvec4": return Type.UVEC4;
+			case "vec2": return Type.VEC2;
+			case "vec3": return Type.VEC3;
+			case "vec4": return Type.VEC4;
+			case "dvec2": return Type.DVEC2;
+			case "dvec3": return Type.DVEC3;
+			case "dvec4": return Type.DVEC4;
+
+			// Matrix types
+			case "mat2": return Type.MAT2;
+			case "mat3": return Type.MAT3;
+			case "mat4": return Type.MAT4;
+
+			case "sampler2D": return Type.SAMPLER2D;
+			default:
+				throw new RuntimeException("Unsupported type " + token);
+		}
+	}
+
 	public Type parseType() {
-		return new Type.Prim(r.read());
+		Type result = parseBasicType();
+		if (Objects.equals(r.peek(), "[")) {
+			throw new RuntimeException("Not supported array types yet");
+		}
+		return result;
 	}
 
 	public String parsePrecision() {
@@ -211,7 +254,9 @@ public class GlSlParser {
 			case "++":
 				return new Expr.Unop("++", parseExprTerminal());
 		}
-		Expr expr = new Expr.Id(r.read());
+		String idOrNumber = r.read();
+
+		Expr expr = NumberUtils.isNumber(idOrNumber) ? new Expr.NumberLiteral(Double.parseDouble(idOrNumber)) : new Expr.Id(idOrNumber);
 		while (r.hasMore()) {
 			switch (r.peek()) {
 				case "++": {

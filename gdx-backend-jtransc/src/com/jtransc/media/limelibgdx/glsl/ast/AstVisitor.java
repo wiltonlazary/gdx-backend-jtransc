@@ -58,6 +58,8 @@ public class AstVisitor {
 	public void visit(Expr expr) {
 		if (expr instanceof Expr.Id) {
 			visit((Expr.Id)expr);
+		} else if (expr instanceof Expr.NumberLiteral) {
+			visit((Expr.NumberLiteral)expr);
 		} else if (expr instanceof Expr.Access) {
 			visit((Expr.Access)expr);
 		} else if (expr instanceof Expr.ArrayAccess) {
@@ -79,6 +81,10 @@ public class AstVisitor {
 
 	}
 
+	public void visit(Expr.NumberLiteral expr) {
+
+	}
+
 	public void visit(Expr.Access expr) {
 
 	}
@@ -88,7 +94,8 @@ public class AstVisitor {
 	}
 
 	public void visit(Expr.Binop expr) {
-
+		visit(expr.left);
+		visit(expr.right);
 	}
 
 	public void visit(Expr.Call expr) {
@@ -96,7 +103,7 @@ public class AstVisitor {
 	}
 
 	public void visit(Expr.Unop expr) {
-
+		visit(expr.expr);
 	}
 
 	public void visit(Expr.UnopPost expr) {

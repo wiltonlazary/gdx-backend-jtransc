@@ -1,6 +1,5 @@
 package com.jtransc.media.limelibgdx;
 
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.GL20;
@@ -8,8 +7,7 @@ import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.glutils.GLVersion;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
-import com.jtransc.media.limelibgdx.dummy.DummyGL20;
-import com.jtransc.media.limelibgdx.flash.FlashGL20;
+import com.jtransc.media.limelibgdx.flash.FlashStage3DGL20;
 import com.jtransc.media.limelibgdx.gl.LimeGL20;
 import com.jtransc.JTranscSystem;
 import com.jtransc.media.limelibgdx.logger.LoggerGL20;
@@ -23,7 +21,7 @@ public class LimeGraphics implements Graphics {
 	public LimeGraphics(boolean trace) {
 		GL20Ext gl;
 		if (JTranscSystem.isSwf()) {
-			gl = FlashGL20.create();
+			gl = FlashStage3DGL20.create();
 		} else {
 			gl = new LimeGL20();
 		}

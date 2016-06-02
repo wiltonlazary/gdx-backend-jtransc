@@ -9,7 +9,7 @@ import java.nio.Buffer;
 
 import static com.jtransc.media.limelibgdx.StateGL20.*;
 
-public class FlashGL20 {
+public class FlashStage3DGL20 {
 	static public GL20Ext create() {
 		return new StateGL20(new FlashImpl());
 	}
