@@ -46,81 +46,60 @@ public class GlSlToAgal {
 		return glSlToAgal.compile(shader.type, optimize);
 	}
 
-	private Agal.Register operandToSource(Operand operand) {
-		Agal.Register.Type kind;
-		int size = 4;
-		switch (operand.kind) {
-			case Uniform:
-				kind = Agal.Register.Type.Constant;
-				size = 4;
-				break;
-			case Attribute:
-				kind = Agal.Register.Type.Attribute;
-				size = 4;
-				break;
-			case Varying:
-				kind = Agal.Register.Type.Varying;
-				size = 4;
-				break;
-			case Temp:
-				kind = Agal.Register.Type.Temporary;
-				size = 4;
-				break;
-			case Special:
-				// @TODO: Or sampler!!
-				kind = Agal.Register.Type.Output;
-				size = 4;
-				break;
-			case Constant:
-				size = 1;
-				kind = Agal.Register.Type.Constant;
-				Agal.AllocatedLanes id = names.get(kind).alloc(operand.name, operand.type, size);
-				names.addFixedConstant(id, operand.constant);
-				break;
-			default:
-				throw new RuntimeException("Unhandled " + operand);
-		}
-		Agal.AllocatedLanes id = names.get(kind).alloc(operand.name, operand.type, size);
-		return new Agal.Register(kind, id, operand.swizzle);
+
+
+	/*
+	private Agal.Destination operandToDestination(Operand operand) {
+		return new Agal.Destination(operandToRegister(operand));
 	}
 
+	private Agal.Source operandToSource(Operand operand) {
+		return new Agal.Source(operandToRegister(operand));
+	}
+
+	private Agal.Sampler operandToSampler(Operand operand) {
+		return new Agal.Sampler(operandToRegister(operand));
+	}
+	*/
+
 	private Agal.Assembler compile(ShaderType type, boolean optimize) {
-		final Agal.Assembler agal = new Agal.Assembler(type);
+		final Agal.Assembler agal = new Agal.Assembler(type, names);
 
 		for (Ir3 ir3 : AstToIr3.convert(shader, optimize)) {
 			Ir3.Binop binop = ir3 instanceof Ir3.Binop ? ((Ir3.Binop) ir3) : null;
 			Ir3.Unop unop = ir3 instanceof Ir3.Unop ? ((Ir3.Unop) ir3) : null;
 			if (unop != null) {
-				Agal.Opcode opcode = Agal.Opcode.add;
+				Agal.Opcode opcode = Agal.Opcode.ADD;
 
 				switch (unop.op) {
 					case ASSIGN:
-						opcode = Agal.Opcode.mov;
+						opcode = Agal.Opcode.MOV;
 
 						break;
 					default:
 						throw new RuntimeException("Unhandled unop " + unop.op);
 				}
 
-				agal.out(opcode, operandToSource(unop.target), operandToSource(unop.l));
+				agal.out(opcode, unop.target, unop.l);
 			} else if (binop != null) {
-				Agal.Opcode opcode;
+				Operand dest = binop.target;
+				Operand src1 = binop.l;
+				Operand src2 = binop.r;
 
 				switch (binop.op) {
 					case TEX2D:
-						opcode = Agal.Opcode.tex;
+						// tex oc, v1, fs0 <2d,linear,repeat,mipnearest>
+						agal.out(Agal.Opcode.TEX, dest, src2, src1);
 						break;
 					case MUL:
-						opcode = Agal.Opcode.mul;
+						agal.out(Agal.Opcode.MUL, dest, src1, src2);
 						break;
 					case DIV:
-						opcode = Agal.Opcode.div;
+						agal.out(Agal.Opcode.DIV, dest, src1, src2);
 						break;
 					default:
 						throw new RuntimeException("Unhandled binop " + binop.op);
 				}
-
-				agal.out(opcode, operandToSource(binop.target), operandToSource(binop.l), operandToSource(binop.r));
 			} else {
 				throw new RuntimeException("Unhandled " + ir3);
 			}

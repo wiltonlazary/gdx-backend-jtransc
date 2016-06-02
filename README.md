@@ -44,6 +44,10 @@ Also will support the JVM version jtransc support, so when supported 1.8, it wil
 
 RoboVM was the ideal option here. But it was closed. So this is an option that also works for other targets.
 
+### Tizen, BlackBerry and WebOS (C++)
+
+JTransc using lime is capable of target these too.
+
 ### Other future targets (C++/C#) (Unity, Windows Phone, Consoles: PS4, XboxOne...)
 
 Since it already includes code for simplifying opengl and parting GlSL code this is pretty portable.

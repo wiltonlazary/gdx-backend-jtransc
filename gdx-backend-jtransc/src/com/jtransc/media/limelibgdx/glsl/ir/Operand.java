@@ -4,7 +4,7 @@ import com.jtransc.media.limelibgdx.glsl.ast.Type;
 
 public class Operand {
 	public enum Kind {
-		Uniform, Attribute, Varying, Temp, Special, Constant
+		Uniform, Sampler, Attribute, Varying, Temp, Special, Constant
 	}
 
 	public final Kind kind;
