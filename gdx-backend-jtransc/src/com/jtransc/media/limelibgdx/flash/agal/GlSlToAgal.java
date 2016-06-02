@@ -64,7 +64,7 @@ public class GlSlToAgal {
 	private void convert() {
 		final Agal.Assembler agal = new Agal.Assembler();
 
-		for (Ir3 ir3 : AstToIr3.convert(shader)) {
+		for (Ir3 ir3 : AstToIr3.convertAndOptimize(shader)) {
 			Ir3.Binop binop = ir3 instanceof Ir3.Binop ? ((Ir3.Binop) ir3) : null;
 			Ir3.Unop unop = ir3 instanceof Ir3.Unop ? ((Ir3.Unop) ir3) : null;
 			if (unop != null) {

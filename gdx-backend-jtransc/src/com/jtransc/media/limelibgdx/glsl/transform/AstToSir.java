@@ -75,6 +75,32 @@ public class AstToSir {
 		}
 
 		@Override
+		public void visit(Expr.UnopPost expr) {
+			throw new RuntimeException("Not implemented");
+		}
+
+		@Override
+		public void visit(Expr.Access expr) {
+			Expr left = expr.expr;
+			String right = expr.field;
+			if (left instanceof Expr.Id) {
+				out.add(new Sir.Get(Operand.special(((Expr.Id) left).id).withSwizzle(right)));
+			} else {
+				throw new RuntimeException("Unsupported access ");
+			}
+		}
+
+		@Override
+		public void visit(Expr.ArrayAccess expr) {
+			throw new RuntimeException("Not implemented");
+		}
+
+		@Override
+		public void visit(Expr.Unop expr) {
+			throw new RuntimeException("Not implemented");
+		}
+
+		@Override
 		public void visit(Expr.Call expr) {
 			for (Expr arg : expr.args) {
 				visit(arg);

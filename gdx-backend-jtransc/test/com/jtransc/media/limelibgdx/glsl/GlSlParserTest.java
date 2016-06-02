@@ -3,6 +3,10 @@ package com.jtransc.media.limelibgdx.glsl;
 import com.jtransc.media.limelibgdx.flash.agal.Agal;
 import com.jtransc.media.limelibgdx.flash.agal.GlSlToAgal;
 import com.jtransc.media.limelibgdx.glsl.ast.Shader;
+import com.jtransc.media.limelibgdx.glsl.ir.Ir3;
+import com.jtransc.media.limelibgdx.glsl.ir.Sir;
+import com.jtransc.media.limelibgdx.glsl.transform.AstToIr3;
+import com.jtransc.media.limelibgdx.glsl.transform.AstToSir;
 import com.jtransc.media.limelibgdx.util.Tokenizer;
 import org.junit.Assert;
 import org.junit.Test;
@@ -95,6 +99,14 @@ public class GlSlParserTest {
 		Shader vertex = GlSlParser.parse(vertexShader, MACROS_GLES);
 		//GlSlToAgal.convert(fragment);
 		//GlSlToAgal.convert(vertex);
+
+		//System.out.println(":: SIR");
+		//for (Sir sir : fragment.functions.get("main").body) System.out.println(sir);
+
+		//System.out.println(":: SIR");
+		//for (Sir sir : AstToSir.convert(fragment)) System.out.println(sir);
+		//System.out.println(":: IR3");
+		//for (Ir3 ir3 : AstToIr3.convert(fragment)) System.out.println(ir3);
 
 		//Agal.Program program = GlSlToAgal.convert(vertex, fragment);
 		Agal.Program program = GlSlToAgal.convertTest(fragment);
