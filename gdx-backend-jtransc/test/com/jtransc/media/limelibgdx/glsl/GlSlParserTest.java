@@ -11,36 +11,36 @@ import java.util.HashMap;
 
 public class GlSlParserTest {
 	private String fragmentShader = (""
-		+ "#ifdef GL_ES\n"
-		+ "#define LOWP lowp\n"
-		+ "precision mediump float;\n"
-		+ "#else\n"
-		+ "#define LOWP\n"
-		+ "#endif\n"
-		+ "varying LOWP vec4 v_color;\n"
-		+ "varying vec2 v_texCoords;\n"
-		+ "uniform sampler2D u_texture;\n"
-		+ "void main()\n"
-		+ "{\n"
-		+ "	gl_FragColor = v_color * texture2D(u_texture, v_texCoords);\n"
-		+ "}\n"
+			+ "#ifdef GL_ES\n"
+			+ "#define LOWP lowp\n"
+			+ "precision mediump float;\n"
+			+ "#else\n"
+			+ "#define LOWP\n"
+			+ "#endif\n"
+			+ "varying LOWP vec4 v_color;\n"
+			+ "varying vec2 v_texCoords;\n"
+			+ "uniform sampler2D u_texture;\n"
+			+ "void main()\n"
+			+ "{\n"
+			+ "	gl_FragColor = v_color * texture2D(u_texture, v_texCoords);\n"
+			+ "}\n"
 	);
 
 	String vertexShader = (""
-		+ "attribute vec4 a_position;\n" //
-		+ "attribute vec4 a_color;\n" //
-		+ "attribute vec2 a_texCoord0;\n" //
-		+ "uniform mat4 u_projTrans;\n" //
-		+ "varying vec4 v_color;\n" //
-		+ "varying vec2 v_texCoords;\n" //
-		+ "\n" //
-		+ "void main()\n" //
-		+ "{\n" //
-		+ "   v_color = a_color;\n" //
-		+ "   v_color.a = v_color.a * (255.0/254.0);\n" //
-		+ "   v_texCoords = a_texCoord0;\n" //
-		+ "   gl_Position =  u_projTrans * a_position;\n" //
-		+ "}\n"
+			+ "attribute vec4 a_position;\n" //
+			+ "attribute vec4 a_color;\n" //
+			+ "attribute vec2 a_texCoord0;\n" //
+			+ "uniform mat4 u_projTrans;\n" //
+			+ "varying vec4 v_color;\n" //
+			+ "varying vec2 v_texCoords;\n" //
+			+ "\n" //
+			+ "void main()\n" //
+			+ "{\n" //
+			+ "   v_color = a_color;\n" //
+			+ "   v_color.a = v_color.a * (255.0/254.0);\n" //
+			+ "   v_texCoords = a_texCoord0;\n" //
+			+ "   gl_Position =  u_projTrans * a_position;\n" //
+			+ "}\n"
 	);
 
 	HashMap<String, String> MACROS_GLES = new HashMap<String, String>() {{
@@ -53,30 +53,30 @@ public class GlSlParserTest {
 	@Test
 	public void testPreprocessor() throws Exception {
 		Assert.assertEquals(
-			String.join("\n",
-				"precision mediump float;",
-				"varying lowp vec4 v_color;",
-				"varying vec2 v_texCoords;",
-				"uniform sampler2D u_texture;",
-				"void main()",
-				"{",
-				"	gl_FragColor = v_color * texture2D(u_texture, v_texCoords);",
-				"}"
-			),
-			GlSlParser.preprocess(fragmentShader, MACROS_GLES)
+				String.join("\n",
+						"precision mediump float;",
+						"varying lowp vec4 v_color;",
+						"varying vec2 v_texCoords;",
+						"uniform sampler2D u_texture;",
+						"void main()",
+						"{",
+						"	gl_FragColor = v_color * texture2D(u_texture, v_texCoords);",
+						"}"
+				),
+				GlSlParser.preprocess(fragmentShader, MACROS_GLES)
 		);
 
 		Assert.assertEquals(
-			String.join("\n",
-				"varying  vec4 v_color;",
-				"varying vec2 v_texCoords;",
-				"uniform sampler2D u_texture;",
-				"void main()",
-				"{",
-				"	gl_FragColor = v_color * texture2D(u_texture, v_texCoords);",
-				"}"
-			),
-			GlSlParser.preprocess(fragmentShader, MACROS_EMPTY)
+				String.join("\n",
+						"varying  vec4 v_color;",
+						"varying vec2 v_texCoords;",
+						"uniform sampler2D u_texture;",
+						"void main()",
+						"{",
+						"	gl_FragColor = v_color * texture2D(u_texture, v_texCoords);",
+						"}"
+				),
+				GlSlParser.preprocess(fragmentShader, MACROS_EMPTY)
 		);
 	}
 
@@ -84,8 +84,8 @@ public class GlSlParserTest {
 	public void tokenize() throws Exception {
 		String[] tokens = Tokenizer.tokenizeStr("hello world, test + 12 + 3").toArray(new String[0]);
 		Assert.assertEquals(
-			"hello:world:,:test:+:12:+:3",
-			String.join(":", tokens)
+				"hello:world:,:test:+:12:+:3",
+				String.join(":", tokens)
 		);
 	}
 
@@ -93,8 +93,8 @@ public class GlSlParserTest {
 	public void tokenize2() throws Exception {
 		String[] tokens = Tokenizer.tokenizeStr("10.1 + 10.2").toArray(new String[0]);
 		Assert.assertEquals(
-			"10.1:+:10.2",
-			String.join(":", tokens)
+				"10.1:+:10.2",
+				String.join(":", tokens)
 		);
 	}
 
@@ -117,22 +117,44 @@ public class GlSlParserTest {
 		//Agal.Program program = GlSlToAgal.convertTest(fragment);
 
 		Assert.assertEquals(
-			String.join("\n", new CharSequence[]{
-				"tex t0, vc0, v0",
-				"mul op, v1, t0",
-			}),
-			String.join("\n", (CharSequence[]) program.fragment.sourceCodeArray)
+				String.join("\n", new CharSequence[]{
+						"tex t0, vc0, v0",
+						"mul op, v1, t0",
+				}),
+				String.join("\n", (CharSequence[]) program.fragment.sourceCodeArray)
 		);
 
 		Assert.assertEquals(
-			String.join("\n", new CharSequence[]{
-				"mov v1, va0",
-				"div t0, vc1, vc2",
-				"mul v1.a, v1.a, t0",
-				"mov v0, va1",
-				"mul op, vc3, va2",
-			}),
-			String.join("\n", (CharSequence[]) program.vertex.sourceCodeArray)
+				String.join("\n", new CharSequence[]{
+						"mov v1, va0",
+						"div t0, vc1, vc2",
+						"mul v1.a, v1.a, t0",
+						"mov v0, va1",
+						"mul op, vc3, va2",
+				}),
+				String.join("\n", (CharSequence[]) program.vertex.sourceCodeArray)
+		);
+		Assert.assertEquals(
+				new HashMap<Integer, Double>() {{
+					put(1, 255.0);
+					put(2, 254.0);
+				}},
+				program.getConstants()
+		);
+		Assert.assertEquals(
+				new HashMap<String, Integer>() {{
+					put("a_color", 0);
+					put("a_texCoord0", 1);
+					put("a_position", 2);
+				}},
+				program.getAttributes()
+		);
+		Assert.assertEquals(
+				new HashMap<String, Integer>() {{
+					put("u_texture", 0);
+					put("u_projTrans", 3);
+				}},
+				program.getUniforms()
 		);
 	}
 }

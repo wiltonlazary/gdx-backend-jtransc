@@ -19,14 +19,14 @@ public class GlSlToAgal {
 	static public Agal.Program convertTest(Shader shader) {
 		Agal.Names names = new Agal.Names();
 		Agal.Assembler shaderAssembler = convert(shader, names);
-		return new Agal.Program(shaderAssembler.generateResult(), shaderAssembler.generateResult());
+		return new Agal.Program(shaderAssembler.generateResult(), shaderAssembler.generateResult(), names);
 	}
 
 	static public Agal.Program convert(Shader vertex, Shader fragment) {
 		Agal.Names names = new Agal.Names();
 		Agal.Assembler fragmentAssembler = convert(fragment, names);
 		Agal.Assembler vertexAssembler = convert(vertex, names);
-		return new Agal.Program(vertexAssembler.generateResult(), fragmentAssembler.generateResult());
+		return new Agal.Program(vertexAssembler.generateResult(), fragmentAssembler.generateResult(), names);
 	}
 
 	static private Agal.Assembler convert(Shader shader, Agal.Names alloc) {

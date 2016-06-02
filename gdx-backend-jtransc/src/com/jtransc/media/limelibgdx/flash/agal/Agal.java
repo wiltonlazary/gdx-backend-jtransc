@@ -2,6 +2,7 @@ package com.jtransc.media.limelibgdx.flash.agal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Agal {
 	static public class Register {
@@ -54,7 +55,7 @@ public class Agal {
 
 	static public class Subnames {
 		int lastId = 0;
-		HashMap<String, Integer> names = new HashMap<>();
+		public HashMap<String, Integer> names = new HashMap<>();
 
 		public int alloc(String name) {
 			if (!names.containsKey(name)) {
@@ -74,21 +75,52 @@ public class Agal {
 			return names[type.index];
 		}
 
-		HashMap<Integer, Double> constants = new HashMap<>();
+		public HashMap<Integer, Double> constants = new HashMap<>();
 
 		public void addFixedConstant(int id, double constant) {
 			constants.put(id, constant);
-			System.out.println("Constant" + id + "=" + constant);
+			//System.out.println("Constant" + id + "=" + constant);
 		}
 	}
 
 	static public class Program {
+		private final Names names;
 		public final Result vertex;
 		public final Result fragment;
+		private final HashMap<String, Integer> uniforms = new HashMap<>();
+		private final HashMap<String, Integer> attributes = new HashMap<>();
+		private final HashMap<Integer, Double> constants = new HashMap<>();
 
-		public Program(Result vertex, Result fragment) {
+		public Program(Result vertex, Result fragment, Names names) {
 			this.vertex = vertex;
 			this.fragment = fragment;
+			this.names = names;
+
+			for (Map.Entry<String, Integer> entry : names.get(Register.Type.Constant).names.entrySet()) {
+				if (!entry.getKey().startsWith("#CST#")) {
+					uniforms.put(entry.getKey(), entry.getValue());
+				}
+			}
+
+			for (Map.Entry<String, Integer> entry : names.get(Register.Type.Attribute).names.entrySet()) {
+				attributes.put(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<Integer, Double> entry : names.constants.entrySet()) {
+				constants.put(entry.getKey(), entry.getValue());
+			}
+		}
+
+		public HashMap<String, Integer> getUniforms() {
+			return uniforms;
+		}
+
+		public HashMap<String, Integer> getAttributes() {
+			return attributes;
+		}
+
+		public HashMap<Integer, Double> getConstants() {
+			return constants;
 		}
 	}
 
