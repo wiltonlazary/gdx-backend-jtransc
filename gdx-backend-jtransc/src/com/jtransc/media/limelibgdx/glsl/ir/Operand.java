@@ -23,6 +23,10 @@ public class Operand {
 		this.swizzle = swizzle;
 	}
 
+	public Operand withoutSwizzle() {
+		return new Operand(kind, type, id, Double.NaN, name, null);
+	}
+
 	public Operand withSwizzle(String swizzle) {
 		return new Operand(kind, type, id, Double.NaN, name, swizzle);
 	}
