@@ -30,6 +30,8 @@
 package com.jtransc.media.limelibgdx.imaging;
 
 import com.jtransc.FastMemory;
+import com.jtransc.JTranscBits;
+import com.jtransc.mem.BytesRead;
 
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
@@ -836,6 +838,7 @@ public class PNGDecoder {
 	}
 
 	private int readInt(byte[] buffer, int offset) {
+		//return BytesRead.s32b(buffer, offset);
 		return
 			((buffer[offset]) << 24) |
 				((buffer[offset + 1] & 255) << 16) |
@@ -846,21 +849,15 @@ public class PNGDecoder {
 	private void skip(long amount) throws IOException {
 		while (amount > 0) {
 			long skipped = input.skip(amount);
-			if (skipped < 0) {
-				throw new EOFException();
-			}
+			if (skipped < 0) throw new EOFException();
 			amount -= skipped;
-			if (skipped == 0) {
-				break;
-			}
+			if (skipped == 0) break;
 		}
 	}
 
 	private static boolean checkSignature(byte[] buffer) {
 		for (int i = 0; i < SIGNATURE.length; i++) {
-			if (buffer[i] != SIGNATURE[i]) {
-				return false;
-			}
+			if (buffer[i] != SIGNATURE[i]) return false;
 		}
 		return true;
 	}

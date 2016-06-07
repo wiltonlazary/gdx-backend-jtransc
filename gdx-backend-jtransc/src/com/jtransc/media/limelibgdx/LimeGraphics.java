@@ -19,14 +19,19 @@ public class LimeGraphics implements Graphics {
 	int frameId = 0;
 
 	public LimeGraphics(boolean trace) {
-		GL20Ext gl;
-		if (JTranscSystem.isSwf()) {
-			gl = FlashStage3DGL20.create();
-		} else {
-			gl = new LimeGL20();
-		}
+		GL20Ext gl = getInternalGl();
 		if (trace) gl = new LoggerGL20(gl);
 		this.gl = gl;
+	}
+
+	@HaxeMethodBody(target = "flash", value = "return {% SMETHOD com.jtransc.media.limelibgdx.flash.FlashStage3DGL20:create %}();")
+	@HaxeMethodBody("return {% SMETHOD com.jtransc.media.limelibgdx.gl.LimeGL20:create %}();")
+	private GL20Ext getInternalGl() {
+		if (JTranscSystem.isSwf()) {
+			return FlashStage3DGL20.create();
+		} else {
+			return LimeGL20.create();
+		}
 	}
 
 	private Monitor2[] monitors = new Monitor2[]{

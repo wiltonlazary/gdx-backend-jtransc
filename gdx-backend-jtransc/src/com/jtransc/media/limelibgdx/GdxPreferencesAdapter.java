@@ -3,7 +3,6 @@ package com.jtransc.media.limelibgdx;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.utils.Json;
-import jdk.nashorn.internal.parser.JSONParser;
 
 import java.io.IOException;
 import java.util.HashMap;

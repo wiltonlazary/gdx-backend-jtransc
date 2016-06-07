@@ -47,6 +47,10 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 
 	static public int bindedTextureId = 0;
 
+	static public LimeGL20 create() {
+		return new LimeGL20();
+	}
+
 	@HaxeMethodBody("{% FIELD com.jtransc.media.limelibgdx.gl.LimeGL20:bindedTextureId %} = p1; GL.bindTexture(p0, textures.get(p1));")
 	native public void glBindTexture(int target, int texture);
 

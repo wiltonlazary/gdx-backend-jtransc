@@ -1,7 +1,7 @@
 package com.jtransc.media.limelibgdx.flash;
 
 import com.jtransc.annotation.JTranscNativeClass;
-import com.jtransc.annotation.haxe.HaxeAddMembers;
+import com.jtransc.annotation.haxe.HaxeAvailableOnTargets;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
 import com.jtransc.media.limelibgdx.GL20Ext;
 import com.jtransc.media.limelibgdx.StateGL20;
@@ -15,11 +15,13 @@ import java.util.Map;
 
 import static com.jtransc.media.limelibgdx.StateGL20.*;
 
+@HaxeAvailableOnTargets({"flash"})
 public class FlashStage3DGL20 {
 	static public GL20Ext create() {
 		return new StateGL20(new FlashImpl());
 	}
 
+	@HaxeAvailableOnTargets({"flash"})
 	static private class FlashImpl extends StateGL20.Impl {
 		@HaxeMethodBody("return HaxeLimeGdxApplication.context3D;")
 		native static Context3D getContext3D();
@@ -96,6 +98,7 @@ public class FlashStage3DGL20 {
 		}
 	}
 
+	@HaxeAvailableOnTargets({"flash"})
 	static class FlashGLBuffer implements GLBuffer {
 		@Override
 		public void dispose() {
@@ -113,6 +116,7 @@ public class FlashStage3DGL20 {
 		}
 	}
 
+	@HaxeAvailableOnTargets({"flash"})
 	static class FlashProgram extends StateGL20.Program {
 		Agal.Program agal;
 		Context3D context;
@@ -130,22 +134,26 @@ public class FlashStage3DGL20 {
 
 		@Override
 		public void link() {
-			this.agal = GlSlToAgal.compile(vertex.source, fragment.source, true, new HashMap<String, String>() {{
-				put("GL_ES", "1");
-				put("JTRANSC", "1");
-				put("FLASH", "1");
-			}});
+			Map<String, String> defines = new HashMap<String, String>();
+			defines.put("GL_ES", "1");
+			defines.put("JTRANSC", "1");
+			defines.put("FLASH", "1");
+
+			this.agal = GlSlToAgal.compile(vertex.source, fragment.source, true, defines);
 
 			System.out.println("FlashProgram().vertex:");
 			for (String s : agal.vertex.sourceCode) System.out.println(" - " + s);
 			System.out.println("FlashProgram().fragment:");
 			for (String s : agal.fragment.sourceCode) System.out.println(" - " + s);
 			System.out.println("FlashProgram().uniforms:");
-			for (Agal.AllocatedLanes lane : agal.getUniforms().values()) System.out.println(" - " + lane.name + " : " + lane);
+			for (Agal.AllocatedLanes lane : agal.getUniforms().values())
+				System.out.println(" - " + lane.name + " : " + lane);
 			System.out.println("FlashProgram().attributes:");
-			for (Agal.AllocatedLanes lane : agal.getAttributes().values()) System.out.println(" - " + lane.name + " : " + lane);
+			for (Agal.AllocatedLanes lane : agal.getAttributes().values())
+				System.out.println(" - " + lane.name + " : " + lane);
 			System.out.println("FlashProgram().constants:");
-			for (Map.Entry<Agal.AllocatedLanes, Double> e : agal.getConstants().entrySet()) System.out.println(" - " + e.getKey().name + " = " + e.getValue() + " : " + e.getKey());
+			for (Map.Entry<Agal.AllocatedLanes, Double> e : agal.getConstants().entrySet())
+				System.out.println(" - " + e.getKey().name + " = " + e.getValue() + " : " + e.getKey());
 
 
 			this.uniforms.clear();
@@ -178,6 +186,7 @@ public class FlashStage3DGL20 {
 		}
 	}
 
+	@HaxeAvailableOnTargets({"flash"})
 	static public class FlashShader extends Shader {
 		public String source;
 
@@ -211,6 +220,7 @@ public class FlashStage3DGL20 {
 		}
 	}
 
+	@HaxeAvailableOnTargets({"flash"})
 	static class FlashTexture implements Texture {
 		final Context3D context;
 		//Textures.Texture internal;
@@ -269,13 +279,16 @@ public class FlashStage3DGL20 {
 		}
 	}
 
+	@HaxeAvailableOnTargets({"flash"})
 	@JTranscNativeClass("flash.display3D.Context3D")
 	static class Context3D {
 		native public void clear(double red, double green, double blue, double alpha, double depth, int stencil, int mask);
+
 		//native public void configureBackBuffer(int width, int height, int antiAlias, boolean enableDepthAndStencil, boolean wantsBestResolution, boolean wantsBestResolutionOnBrowserZoom);
 		//native public Textures.CubeTexture createCubeTexture(int size, String format, boolean optimizeForRenderToTexture, int streamingLevels);
 		//native public IndexBuffer3D createIndexBuffer(int numIndices, String bufferUsage);
 		native public Program3D createProgram();
+
 		//native public RectangleTexture createRectangleTexture(int width, int height, String format, boolean optimizeForRenderToTexture);
 		//native public Textures.Texture createTexture(int width, int height, String format, boolean optimizeForRenderToTexture, int streamingLevels);
 		//native public VertexBuffer3D createVertexBuffer(int numVertices, int data32PerVertex, String bufferUsage);
@@ -316,6 +329,7 @@ public class FlashStage3DGL20 {
 	}
 
 	// http://wonderfl.net/c/qc87
+	@HaxeAvailableOnTargets({"flash"})
 	@JTranscNativeClass("flash.display3D.Context3DClearMask")
 	static class ClearMask {
 		static public final int COLOR = 1;
@@ -324,10 +338,12 @@ public class FlashStage3DGL20 {
 		static public final int ALL = COLOR | DEPTH | STENCIL;
 	}
 
+	@HaxeAvailableOnTargets({"flash"})
 	static class Textures {
 		@JTranscNativeClass("flash.display3D.textures.Texture")
 		static class Texture {
 			native public void uploadCompressedTextureFromByteArray(byte[] data, int byteArrayOffset, boolean async);
+
 			//native public void uploadFromBitmapData(BitmapData source, int miplevel);
 			native public void uploadFromByteArray(byte[] data, int byteArrayOffset, int miplevel);
 		}
@@ -347,25 +363,31 @@ public class FlashStage3DGL20 {
 	//	}
 	//}
 
+	@HaxeAvailableOnTargets({"flash"})
 	static class As3Utils {
 		@HaxeMethodBody("return p0.getBytesData();")
 		native static public ByteArray toByteArray(byte[] bytes);
 	}
 
+	@HaxeAvailableOnTargets({"flash"})
 	@JTranscNativeClass("flash.utils.ByteArray")
 	static class ByteArray {
 	}
 
+	@HaxeAvailableOnTargets({"flash"})
 	@JTranscNativeClass("flash.display.BitmapData")
 	static class BitmapData {
 	}
 
+	@HaxeAvailableOnTargets({"flash"})
 	@JTranscNativeClass("flash.display3D.Program3D")
 	static class Program3D {
 		native public void dispose();
+
 		native public void upload(ByteArray vertexProgram, ByteArray fragmentProgram);
 	}
 
+	@HaxeAvailableOnTargets({"flash"})
 	static class Context3DClearMask {
 		static public final int COLOR = 1;
 		static public final int DEPTH = 2;
