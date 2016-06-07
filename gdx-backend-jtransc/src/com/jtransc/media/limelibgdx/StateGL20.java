@@ -294,6 +294,7 @@ public class StateGL20 implements GL20Ext {
 
 	public StateGL20(Impl impl) {
 		this.impl = impl;
+		this.objects[availableIds.alloc()] = null; // reserve 0!
 	}
 
 	private int allocateObject(Disposable obj) {
