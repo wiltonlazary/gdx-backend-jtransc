@@ -3,11 +3,13 @@ package com.jtransc.media.limelibgdx.flash.agal;
 import com.jtransc.media.limelibgdx.glsl.GlSlParser;
 import com.jtransc.media.limelibgdx.glsl.ShaderType;
 import com.jtransc.media.limelibgdx.glsl.ast.Shader;
+import com.jtransc.media.limelibgdx.glsl.ast.Type;
 import com.jtransc.media.limelibgdx.glsl.ir.Ir3;
 import com.jtransc.media.limelibgdx.glsl.ir.Operand;
 import com.jtransc.media.limelibgdx.glsl.transform.AstToIr3;
 
 import java.util.Map;
+import java.util.Objects;
 
 // http://www.adobe.com/devnet/flashplayer/articles/what-is-agal.html
 // http://help.adobe.com/en_US/as3/dev/WSd6a006f2eb1dc31e-310b95831324724ec56-8000.html
@@ -92,7 +94,11 @@ public class GlSlToAgal {
 						agal.out(Agal.Opcode.TEX, dest, src2, src1);
 						break;
 					case MUL:
-						agal.out(Agal.Opcode.MUL, dest, src1, src2);
+						if (Objects.equals(src1.type, Type.MAT4)) {
+							agal.out(Agal.Opcode.M44, dest, src2, src1);
+						} else {
+							agal.out(Agal.Opcode.MUL, dest, src1, src2);
+						}
 						break;
 					case DIV:
 						agal.out(Agal.Opcode.DIV, dest, src1, src2);
