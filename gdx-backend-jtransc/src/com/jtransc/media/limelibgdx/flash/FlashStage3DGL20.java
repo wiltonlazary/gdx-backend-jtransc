@@ -10,6 +10,8 @@ import com.jtransc.media.limelibgdx.flash.agal.GlSlToAgal;
 import com.jtransc.media.limelibgdx.glsl.ShaderType;
 
 import java.nio.Buffer;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -140,6 +142,9 @@ public class FlashStage3DGL20 {
 			defines.put("FLASH", "1");
 
 			this.agal = GlSlToAgal.compile(vertex.source, fragment.source, true, defines);
+
+			//this.agal.vertex.sourceCode = new ArrayList(Arrays.asList("mov v0, va0\nmov v0, vc0\nmul v0.w, va0.w, vc0.x\nmov v1, vc0\nmov v1.xy, va1.xyxx\nm44 op, va2, vc1\n".split("\n")));
+			//this.agal.fragment.sourceCode = new ArrayList(Arrays.asList("tex ft0, v1.xyxx, fs0 <linear mipdisable repeat 2d>\nmul oc, v0, ft0\n".split("\n")));
 
 			System.out.println("FlashProgram().vertex:");
 			for (String s : agal.vertex.sourceCode) System.out.println(" - " + s);

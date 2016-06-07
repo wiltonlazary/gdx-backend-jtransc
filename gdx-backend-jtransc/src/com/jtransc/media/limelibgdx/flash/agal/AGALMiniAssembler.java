@@ -294,7 +294,8 @@ public class AGALMiniAssembler {
 					int k;
 					for (k = 1; k < maskLength; k++) {
 						cv = maskmatch[0].charAt(k) - 'x';
-						if (cv > 2)
+						//System.out.println("CV:" + cv + " || " + maskmatch[0].charAt(k));
+						if (cv < 0 || cv > 2)
 							cv = 3;
 						if (isDest)
 							regmask |= 1 << cv;
