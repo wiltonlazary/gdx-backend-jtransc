@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.jtransc.ds.IntPool;
 import com.jtransc.media.limelibgdx.glsl.ShaderType;
 import com.jtransc.media.limelibgdx.glsl.ast.Type;
+import com.jtransc.media.limelibgdx.soft.Color32;
 
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
@@ -11,12 +12,16 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class StateGL20 implements GL20Ext {
+public class StateGL20<TImpl extends StateGL20.Impl> implements GL20Ext {
 	static public class Color {
 		public float red;
 		public float green;
 		public float blue;
 		public float alpha;
+
+		public int toColor32() {
+			return Color32.fbuild(red, green, blue, alpha);
+		}
 	}
 
 	static public class State {
@@ -90,31 +95,47 @@ public class StateGL20 implements GL20Ext {
 		void dispose();
 	}
 
-	public interface Texture extends Disposable {
-		void uploadData(Buffer data, int width, int height);
+	static public class Texture implements Disposable {
+		public void uploadData(Buffer data, int width, int height) {
+		}
 
-		void compressedTexImage2D(int level, int internalformat, int width, int height, int border, int imageSize, Buffer data);
+		public void compressedTexImage2D(int level, int internalformat, int width, int height, int border, int imageSize, Buffer data) {
+		}
 
-		void compressedTexSubImage2D(int level, int xoffset, int yoffset, int width, int height, int format, int imageSize, Buffer data);
+		public void compressedTexSubImage2D(int level, int xoffset, int yoffset, int width, int height, int format, int imageSize, Buffer data) {
+		}
 
-		void copyTexImage2D(int level, int internalformat, int x, int y, int width, int height, int border);
+		public void copyTexImage2D(int level, int internalformat, int x, int y, int width, int height, int border) {
+		}
 
-		void copyTexSubImage2D(int level, int xoffset, int yoffset, int x, int y, int width, int height);
+		public void copyTexSubImage2D(int level, int xoffset, int yoffset, int x, int y, int width, int height) {
+		}
 
-		void texImage2D(int level, int internalformat, int width, int height, int border, int format, int type, Buffer pixels);
+		public void texImage2D(int level, int internalformat, int width, int height, int border, int format, int type, Buffer pixels) {
+		}
 
-		void parameter(int pname, float param);
+		public void parameter(int pname, float param) {
+		}
 
-		void texSubImage2D(int level, int xoffset, int yoffset, int width, int height, int format, int type, Buffer pixels);
+		public void texSubImage2D(int level, int xoffset, int yoffset, int width, int height, int format, int type, Buffer pixels) {
+		}
 
-		void generateMipmap();
+		public void generateMipmap() {
+		}
+
+		public void dispose() {
+		}
 	}
 
-	abstract static public class Program implements Disposable {
+	static public class Program implements Disposable {
 		public Shader fragment;
 		public Shader vertex;
+		public boolean linked;
+		public ProgramAttribute[] boundAttribs = new ProgramAttribute[6];
 
-		abstract public void link();
+		public void link() {
+			linked = true;
+		}
 
 		public void attach(Shader shader) {
 			switch (shader.type) {
@@ -142,9 +163,13 @@ public class StateGL20 implements GL20Ext {
 			}
 		}
 
-		abstract public String getInfoLog();
+		public String getInfoLog() {
+			return "success";
+		}
 
-		abstract public boolean linked();
+		public boolean linked() {
+			return linked;
+		}
 
 		public ArrayList<ProgramUniform> uniforms = new ArrayList<>();
 		public ArrayList<ProgramAttribute> attributes = new ArrayList<>();
@@ -165,7 +190,9 @@ public class StateGL20 implements GL20Ext {
 			return uniforms.get(index);
 		}
 
-		abstract public void bindAttribLocation(int index, String name);
+		public void bindAttribLocation(int index, String name) {
+			boundAttribs[index] = attributes.get(getAttribLocation(name));
+		}
 
 		public int getAttribLocation(String name) {
 			for (int n = 0; n < attributes.size(); n++) {
@@ -179,6 +206,9 @@ public class StateGL20 implements GL20Ext {
 				if (Objects.equals(uniforms.get(n).name, name)) return n;
 			}
 			return -1;
+		}
+
+		public void dispose() {
 		}
 	}
 
@@ -218,9 +248,10 @@ public class StateGL20 implements GL20Ext {
 	}
 
 
-	public static abstract class Shader implements Disposable {
+	public static class Shader implements Disposable {
 		public ShaderType type;
 		public String source;
+		private boolean compiled;
 
 		public Shader(ShaderType type) {
 			this.type = type;
@@ -234,44 +265,82 @@ public class StateGL20 implements GL20Ext {
 			this.source = source;
 		}
 
-		abstract public void compile();
+		public void compile() {
+			compiled = true;
+		}
 
-		abstract public String getInfoLog();
+		public String getInfoLog() {
+			return "success";
+		}
 
-		abstract public boolean compiled();
+		public boolean compiled() {
+			return compiled;
+		}
+
+		public void dispose() {
+		}
 	}
 
-	public interface RenderBuffer extends Disposable {
+	static public class RenderBuffer implements Disposable {
+		@Override
+		public void dispose() {
+		}
 	}
 
-	public interface FrameBuffer extends Disposable {
-		int status();
+	static public class FrameBuffer implements Disposable {
+		public int status() {
+			return 0;
+		}
+
+		@Override
+		public void dispose() {
+
+		}
 	}
 
-	public interface GLBuffer extends Disposable {
-		void data(int size, Buffer data, int usage);
+	static public class GLBuffer implements Disposable {
+		public void data(int size, Buffer data, int usage) {
+		}
 
-		void subdata(int offset, int size, Buffer data);
+		public void subdata(int offset, int size, Buffer data) {
+		}
+
+		@Override
+		public void dispose() {
+		}
 	}
 
-	public static abstract class Impl {
-		public abstract void clear(State state, boolean color, boolean depth, boolean stencil);
+	public static class Impl {
+		public void clear(State state, boolean color, boolean depth, boolean stencil) {
+		}
 
-		public abstract Texture createTexture();
+		public Texture createTexture() {
+			return new Texture();
+		}
 
-		public abstract Program createProgram();
+		public Program createProgram() {
+			return new Program();
+		}
 
-		public abstract Shader createShader(ShaderType type);
+		public Shader createShader(ShaderType type) {
+			return new Shader(type);
+		}
 
-		public abstract void render(StateGL20.State state);
+		public void render(StateGL20.State state) {
+		}
 
-		public abstract GLBuffer createBuffer();
+		public GLBuffer createBuffer() {
+			return new GLBuffer();
+		}
 
-		public abstract void drawElements(int mode, int count, int type, Buffer indices);
+		public void drawElements(int mode, int count, int type, Buffer indices) {
+		}
 
-		public abstract void drawElements(int mode, int count, int type, int indices);
+		public void drawElements(int mode, int count, int type, int indices) {
+		}
 
-		public abstract void drawArrays(int mode, int first, int count);
+		public void drawArrays(int mode, int first, int count) {
+		}
 
 		public void finish() {
 		}
@@ -282,19 +351,27 @@ public class StateGL20 implements GL20Ext {
 		public void present() {
 		}
 
-		public abstract FrameBuffer createFrameBuffer();
+		public FrameBuffer createFrameBuffer() {
+			return new FrameBuffer();
+		}
 
-		public abstract RenderBuffer createRenderBuffer();
+		public RenderBuffer createRenderBuffer() {
+			return new RenderBuffer();
+		}
 	}
 
 	private State state = new State();
-	private Impl impl;
+	private TImpl impl;
 	private Disposable[] objects = new Disposable[2048];
 	private IntPool availableIds = new IntPool();
 
-	public StateGL20(Impl impl) {
+	public StateGL20(TImpl impl) {
 		this.impl = impl;
 		this.objects[availableIds.alloc()] = null; // reserve 0!
+	}
+
+	public TImpl getImpl() {
+		return impl;
 	}
 
 	private int allocateObject(Disposable obj) {
@@ -1308,6 +1385,7 @@ public class StateGL20 implements GL20Ext {
 
 	@Override
 	public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride, int ptr) {
+		// setVertexBufferAt
 		System.out.println("StateGL20.glVertexAttribPointer(" + "indx = [" + indx + "], size = [" + size + "], type = [" + type + "], normalized = [" + normalized + "], stride = [" + stride + "], ptr = [" + ptr + "]" + ")");
 	}
 

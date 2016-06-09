@@ -101,7 +101,7 @@ public class FlashStage3DGL20 {
 	}
 
 	@HaxeAvailableOnTargets({"flash"})
-	static class FlashGLBuffer implements GLBuffer {
+	static class FlashGLBuffer extends GLBuffer {
 		@Override
 		public void dispose() {
 
@@ -183,8 +183,6 @@ public class FlashStage3DGL20 {
 			return true;
 		}
 
-		public ProgramAttribute[] boundAttribs = new ProgramAttribute[6];
-
 		@Override
 		public void bindAttribLocation(int index, String name) {
 			boundAttribs[index] = attributes.get(getAttribLocation(name));
@@ -226,7 +224,7 @@ public class FlashStage3DGL20 {
 	}
 
 	@HaxeAvailableOnTargets({"flash"})
-	static class FlashTexture implements Texture {
+	static class FlashTexture extends Texture {
 		final Context3D context;
 		//Textures.Texture internal;
 
