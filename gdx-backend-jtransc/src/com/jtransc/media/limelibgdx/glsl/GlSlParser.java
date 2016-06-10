@@ -308,7 +308,11 @@ public class GlSlParser {
 
 	private Argument parseArgument() {
 		Type type = parseType();
-		String name = parseId();
-		return new Argument(type, name);
+		if (type == Type.VOID) {
+			return new Argument(type, "void");
+		} else {
+			String name = parseId();
+			return new Argument(type, name);
+		}
 	}
 }

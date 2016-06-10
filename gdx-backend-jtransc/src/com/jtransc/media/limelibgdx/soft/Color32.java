@@ -52,4 +52,10 @@ public class Color32 {
 	static public String toString(int color) {
 		return "RGBA(" + getR(color) + "," + getG(color) + ", " + getB(color) + "," + getA(color) + ")";
 	}
+
+	static public String toString(int[] colors) {
+		String out = "";
+		for (int n = 0; n < colors.length; n++) out += toString(colors[n]);
+		return out;
+	}
 }

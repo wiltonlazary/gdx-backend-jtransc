@@ -1,13 +1,16 @@
 package com.jtransc.media.limelibgdx.flash.agal;
 
 import com.jtransc.media.limelibgdx.glsl.GlSlParser;
+import com.jtransc.media.limelibgdx.glsl.Lanes;
 import com.jtransc.media.limelibgdx.glsl.ShaderType;
 import com.jtransc.media.limelibgdx.glsl.ast.Shader;
 import com.jtransc.media.limelibgdx.glsl.ast.Type;
+import com.jtransc.media.limelibgdx.glsl.ir.GlAsm;
 import com.jtransc.media.limelibgdx.glsl.ir.Ir3;
 import com.jtransc.media.limelibgdx.glsl.ir.Operand;
 import com.jtransc.media.limelibgdx.glsl.transform.AstToIr3;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
@@ -64,14 +67,68 @@ public class GlSlToAgal {
 	}
 	*/
 
-	private Agal.Assembler compile(ShaderType type, boolean optimize) {
-		final Agal.Assembler agal = new Agal.Assembler(type, names);
+	private void outAsm(Agal.Assembler agal, Agal.Opcode opcode, Operand target, Operand src, Operand dst) {
+		agal.out(opcode, target, src, dst);
+		agal.asmList.add(new GlAsm(toAsm(opcode), toAsmType(), toAsm(agal, target), toAsm(agal, src), toAsm(agal, dst)));
+	}
 
-		for (Ir3 ir3 : AstToIr3.convert(shader, optimize)) {
+	private void outAsm(Agal.Assembler agal, Agal.Opcode opcode, Operand target, Operand src) {
+		agal.out(opcode, target, src);
+		agal.asmList.add(new GlAsm(toAsm(opcode), toAsmType(), toAsm(agal, target), toAsm(agal, src), null));
+	}
+
+	private int toAsmType() {
+		return GlAsm.TYPE_FLOAT;
+	}
+
+	private int toAsm(Agal.Opcode opcode) {
+		switch (opcode) {
+			case MOV:
+				return GlAsm.OP_COPY;
+			case MUL:
+				return GlAsm.OP_MUL;
+			default:
+				return GlAsm.OP_COPY;
+		}
+	}
+
+	private GlAsm.Operand toAsm(Agal.Assembler agal, Operand operand) {
+		int reg = GlAsm.REG_UNIFORM;
+
+		switch (operand.kind) {
+			case Constant:
+				reg = GlAsm.REG_UNIFORM;
+				break;
+			case Attribute:
+				reg = GlAsm.REG_ATTRIBUTE;
+				break;
+			case Varying:
+				reg = GlAsm.REG_VARYING;
+				break;
+			case Special:
+				reg = GlAsm.REG_TARGET;
+				break;
+		}
+
+
+		Agal.AllocatedLanes id = agal.allocateLanes(operand);
+		int size = operand.type.getLaneCount();
+		int lanes[] = operand.getLaneIndices();
+
+		return new GlAsm.Operand(reg, id.register, size, lanes);
+	}
+
+	private Agal.Assembler compile(ShaderType type, boolean optimize) {
+		ArrayList<Ir3> ir3List = AstToIr3.convert(shader, optimize);
+		ArrayList<GlAsm> asmList = new ArrayList<>();
+
+		final Agal.Assembler agal = new Agal.Assembler(type, names, ir3List, asmList);
+
+		for (Ir3 ir3 : ir3List) {
 			Ir3.Binop binop = ir3 instanceof Ir3.Binop ? ((Ir3.Binop) ir3) : null;
 			Ir3.Unop unop = ir3 instanceof Ir3.Unop ? ((Ir3.Unop) ir3) : null;
 			if (unop != null) {
-				Agal.Opcode opcode = Agal.Opcode.ADD;
+				Agal.Opcode opcode;
 
 				switch (unop.op) {
 					case ASSIGN:
@@ -82,7 +139,7 @@ public class GlSlToAgal {
 						throw new RuntimeException("Unhandled unop " + unop.op);
 				}
 
-				agal.out(opcode, unop.target, unop.l);
+				outAsm(agal, opcode, unop.target, unop.l);
 			} else if (binop != null) {
 				Operand dest = binop.target;
 				Operand src1 = binop.l;
@@ -91,17 +148,17 @@ public class GlSlToAgal {
 				switch (binop.op) {
 					case TEX2D:
 						// tex oc, v1, fs0 <2d,linear,repeat,mipnearest>
-						agal.out(Agal.Opcode.TEX, dest, src2, src1);
+						outAsm(agal, Agal.Opcode.TEX, dest, src2, src1);
 						break;
 					case MUL:
 						if (Objects.equals(src1.type, Type.MAT4)) {
-							agal.out(Agal.Opcode.M44, dest, src2, src1);
+							outAsm(agal, Agal.Opcode.M44, dest, src2, src1);
 						} else {
-							agal.out(Agal.Opcode.MUL, dest, src1, src2);
+							outAsm(agal, Agal.Opcode.MUL, dest, src1, src2);
 						}
 						break;
 					case DIV:
-						agal.out(Agal.Opcode.DIV, dest, src1, src2);
+						outAsm(agal, Agal.Opcode.DIV, dest, src1, src2);
 						break;
 					default:
 						throw new RuntimeException("Unhandled binop " + binop.op);

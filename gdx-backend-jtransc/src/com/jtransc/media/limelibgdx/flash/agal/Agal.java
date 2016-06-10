@@ -1,8 +1,10 @@
 package com.jtransc.media.limelibgdx.flash.agal;
 
-import com.jtransc.media.limelibgdx.glsl.Lane;
+import com.jtransc.media.limelibgdx.glsl.Lanes;
 import com.jtransc.media.limelibgdx.glsl.ShaderType;
 import com.jtransc.media.limelibgdx.glsl.ast.Type;
+import com.jtransc.media.limelibgdx.glsl.ir.GlAsm;
+import com.jtransc.media.limelibgdx.glsl.ir.Ir3;
 import com.jtransc.media.limelibgdx.glsl.ir.Operand;
 
 import java.util.ArrayList;
@@ -189,18 +191,7 @@ public class Agal {
 		}
 
 		static private char getSwizzle(int index) {
-			switch (index) {
-				case 0:
-					return 'x';
-				case 1:
-					return 'y';
-				case 2:
-					return 'z';
-				case 3:
-					return 'w';
-				default:
-					return '?';
-			}
+			return Lanes.stringify(index);
 		}
 
 		public String getSuffix(String swizzle) {
@@ -211,7 +202,7 @@ public class Agal {
 			} else {
 				String out = ".";
 				for (char c : swizzle.toCharArray()) {
-					out += getSwizzle(laneStart + Lane.getLaneIndex(c));
+					out += getSwizzle(laneStart + Lanes.parse(c));
 				}
 				return out;
 			}
@@ -539,11 +530,15 @@ public class Agal {
 		public ArrayList<String> sourceCode;
 		public String[] sourceCodeArray;
 		public byte[] binary;
+		public ArrayList<Ir3> ir3List;
+		public ArrayList<GlAsm> asmList;
 
-		public Result(ArrayList<String> sourceCode, byte[] binary) {
+		public Result(ArrayList<String> sourceCode, byte[] binary, ArrayList<Ir3> ir3List, ArrayList<GlAsm> asmList) {
 			this.sourceCode = sourceCode;
 			this.sourceCodeArray = sourceCode.toArray(new String[sourceCode.size()]);
 			this.binary = binary;
+			this.ir3List = ir3List;
+			this.asmList = asmList;
 		}
 	}
 
@@ -552,56 +547,73 @@ public class Agal {
 		public ArrayList<String> sourceCode = new ArrayList<String>();
 		public ShaderType shaderType;
 		private Names names;
+		public ArrayList<Ir3> ir3List;
+		public ArrayList<GlAsm> asmList;
 
-		public Assembler(ShaderType type, Names names) {
+		public Assembler(ShaderType type, Names names, ArrayList<Ir3> ir3List, ArrayList<GlAsm> asmList) {
 			this.shaderType = type;
 			this.names = names;
+			this.ir3List = ir3List;
+			this.asmList = asmList;
 		}
 
 		public Result generateResult() {
-			return new Result(sourceCode, new AGALMiniAssembler(false).assemble(shaderType, String.join("\n", sourceCode)));
+			return new Result(sourceCode, new AGALMiniAssembler(false).assemble(shaderType, String.join("\n", sourceCode)), ir3List, asmList);
 		}
 
-		private Register operandToRegister(Operand operand) {
-			Register.Kind kind;
-			int size = 4;
+		public Agal.AllocatedLanes allocateLanes(Operand operand) {
+			Register.Kind kind = getOperandKind(operand);
+			int size = getOperandSize(operand);
+			return names.get(kind).alloc(operand.name, operand.type, size);
+		}
+
+		private Register.Kind getOperandKind(Operand operand) {
 			switch (operand.kind) {
 				case Uniform:
-					//if (operand.type == Type.SAMPLER2D) {
-					//	kind = Register.Type.Sampler;
-					//} else {
-					//	kind = Register.Type.Constant;
-					//}
-					kind = Register.Kind.Constant;
-					size = 4;
-					break;
+					return Register.Kind.Constant;
 				case Attribute:
-					kind = Register.Kind.Attribute;
-					size = 4;
-					break;
+					return Register.Kind.Attribute;
 				case Varying:
-					kind = Register.Kind.Varying;
-					size = 4;
-					break;
+					return Register.Kind.Varying;
 				case Temp:
-					kind = Register.Kind.Temporary;
-					size = 4;
-					break;
+					return Register.Kind.Temporary;
 				case Special:
-					// @TODO: Or sampler!!
-					kind = Register.Kind.Output;
-					size = 4;
-					break;
+					return Register.Kind.Output;
 				case Constant:
-					size = 1;
-					kind = Register.Kind.Constant;
-					Agal.AllocatedLanes id = names.get(kind).alloc(operand.name, operand.type, size);
-					names.addFixedConstant(id, operand.constant);
-					break;
+					return Register.Kind.Constant;
 				default:
 					throw new RuntimeException("Unhandled " + operand);
 			}
-			Agal.AllocatedLanes id = names.get(kind).alloc(operand.name, operand.type, size);
+		}
+
+		private int getOperandSize(Operand operand) {
+			switch (operand.kind) {
+				case Uniform:
+					return 4;
+				case Attribute:
+					return 4;
+				case Varying:
+					return 4;
+				case Temp:
+					return 4;
+				case Special:
+					return 4;
+				case Constant:
+					return 1;
+				default:
+					throw new RuntimeException("Unhandled " + operand);
+			}
+		}
+
+		private Register operandToRegister(Operand operand) {
+			Register.Kind kind = getOperandKind(operand);
+			int size = getOperandSize(operand);
+			Agal.AllocatedLanes id = allocateLanes(operand);
+			switch (operand.kind) {
+				case Constant:
+					names.addFixedConstant(id, operand.constant);
+					break;
+			}
 			return new Agal.Register(shaderType, kind, id, operand.swizzle);
 		}
 

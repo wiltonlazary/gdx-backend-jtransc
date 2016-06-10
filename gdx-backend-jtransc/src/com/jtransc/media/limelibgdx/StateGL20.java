@@ -2,6 +2,9 @@ package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.jtransc.ds.IntPool;
+import com.jtransc.media.limelibgdx.flash.agal.Agal;
+import com.jtransc.media.limelibgdx.flash.agal.GlSlToAgal;
+import com.jtransc.media.limelibgdx.glsl.GlSlParser;
 import com.jtransc.media.limelibgdx.glsl.ShaderType;
 import com.jtransc.media.limelibgdx.glsl.ast.Type;
 import com.jtransc.media.limelibgdx.soft.Color32;
@@ -10,6 +13,8 @@ import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class StateGL20<TImpl extends StateGL20.Impl> implements GL20Ext {
@@ -28,6 +33,7 @@ public class StateGL20<TImpl extends StateGL20.Impl> implements GL20Ext {
 		public Color clearColor = new Color();
 		public float clearDepth;
 		public int clearStencil;
+		public AttribInfo[] attribs = {new AttribInfo(), new AttribInfo(), new AttribInfo(), new AttribInfo(), new AttribInfo(), new AttribInfo(), new AttribInfo(), new AttribInfo()};
 
 		public boolean maskRed;
 		public boolean maskGreen;
@@ -82,13 +88,22 @@ public class StateGL20<TImpl extends StateGL20.Impl> implements GL20Ext {
 		public int depthFunc;
 		public int frontFace;
 		public int generateMipmapHint;
-		public boolean[] enabledAttribArrays = new boolean[32];
 		public Program program;
 		public GLBuffer arrayBuffer;
 		public GLBuffer elementArrayBuffer;
 		public FrameBuffer frameBuffer;
 		public RenderBuffer renderBuffer;
+	}
 
+	static public class AttribInfo {
+		public boolean enabled = false;
+		public int size = 1;
+		public int type = GL20.GL_FLOAT;
+		public int typeSize = 4;
+		public int bytesSize = 4;
+		public boolean normalized;
+		public int stride;
+		public int ptr;
 	}
 
 	public interface Disposable {
@@ -132,9 +147,22 @@ public class StateGL20<TImpl extends StateGL20.Impl> implements GL20Ext {
 		public Shader vertex;
 		public boolean linked;
 		public ProgramAttribute[] boundAttribs = new ProgramAttribute[6];
+		public ArrayList<ProgramUniform> uniforms = new ArrayList<>();
+		public ArrayList<ProgramAttribute> attributes = new ArrayList<>();
+		public Agal.Program agal;
 
 		public void link() {
 			linked = true;
+			this.agal = GlSlToAgal.compile(vertex.data, fragment.data, true);
+
+			this.uniforms.clear();
+			this.attributes.clear();
+			for (Agal.AllocatedLanes e : this.agal.getUniforms().values()) {
+				this.uniforms.add(new ProgramUniform(e.name, e.size, e.type));
+			}
+			for (Agal.AllocatedLanes e : this.agal.getAttributes().values()) {
+				this.attributes.add(new ProgramAttribute(e.name, e.size, e.type));
+			}
 		}
 
 		public void attach(Shader shader) {
@@ -164,15 +192,12 @@ public class StateGL20<TImpl extends StateGL20.Impl> implements GL20Ext {
 		}
 
 		public String getInfoLog() {
-			return "success";
+			return "successful linked";
 		}
 
 		public boolean linked() {
 			return linked;
 		}
-
-		public ArrayList<ProgramUniform> uniforms = new ArrayList<>();
-		public ArrayList<ProgramAttribute> attributes = new ArrayList<>();
 
 		public int uniformsCount() {
 			return uniforms.size();
@@ -251,10 +276,15 @@ public class StateGL20<TImpl extends StateGL20.Impl> implements GL20Ext {
 	public static class Shader implements Disposable {
 		public ShaderType type;
 		public String source;
+		public com.jtransc.media.limelibgdx.glsl.ast.Shader data;
 		private boolean compiled;
+		public Map<String, String> defines;
 
 		public Shader(ShaderType type) {
 			this.type = type;
+			defines = new HashMap<>();
+			defines.put("GL_ES", "1");
+			defines.put("JTRANSC", "1");
 		}
 
 		public ShaderType getType() {
@@ -266,6 +296,8 @@ public class StateGL20<TImpl extends StateGL20.Impl> implements GL20Ext {
 		}
 
 		public void compile() {
+			data = GlSlParser.parse(type, source, defines);
+
 			compiled = true;
 		}
 
@@ -311,7 +343,9 @@ public class StateGL20<TImpl extends StateGL20.Impl> implements GL20Ext {
 	}
 
 	public static class Impl {
-		public void clear(State state, boolean color, boolean depth, boolean stencil) {
+		public State state = new State();
+
+		public void clear(boolean color, boolean depth, boolean stencil) {
 		}
 
 		public Texture createTexture() {
@@ -360,13 +394,14 @@ public class StateGL20<TImpl extends StateGL20.Impl> implements GL20Ext {
 		}
 	}
 
-	private State state = new State();
+	private State state;
 	private TImpl impl;
 	private Disposable[] objects = new Disposable[2048];
 	private IntPool availableIds = new IntPool();
 
 	public StateGL20(TImpl impl) {
 		this.impl = impl;
+		this.state = impl.state;
 		this.objects[availableIds.alloc()] = null; // reserve 0!
 	}
 
@@ -413,7 +448,6 @@ public class StateGL20<TImpl extends StateGL20.Impl> implements GL20Ext {
 	@Override
 	public void glClear(int mask) {
 		impl.clear(
-			state,
 			((mask & GL20.GL_COLOR_BUFFER_BIT) != 0),
 			((mask & GL20.GL_DEPTH_BUFFER_BIT) != 0),
 			((mask & GL20.GL_STENCIL_BUFFER_BIT) != 0)
@@ -872,7 +906,7 @@ public class StateGL20<TImpl extends StateGL20.Impl> implements GL20Ext {
 
 	@Override
 	public void glDisableVertexAttribArray(int index) {
-		state.enabledAttribArrays[index] = false;
+		state.attribs[index].enabled = false;
 	}
 
 	@Override
@@ -882,7 +916,7 @@ public class StateGL20<TImpl extends StateGL20.Impl> implements GL20Ext {
 
 	@Override
 	public void glEnableVertexAttribArray(int index) {
-		state.enabledAttribArrays[index] = true;
+		state.attribs[index].enabled = true;
 	}
 
 	@Override
@@ -1386,7 +1420,27 @@ public class StateGL20<TImpl extends StateGL20.Impl> implements GL20Ext {
 	@Override
 	public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride, int ptr) {
 		// setVertexBufferAt
-		System.out.println("StateGL20.glVertexAttribPointer(" + "indx = [" + indx + "], size = [" + size + "], type = [" + type + "], normalized = [" + normalized + "], stride = [" + stride + "], ptr = [" + ptr + "]" + ")");
+		AttribInfo attrib = state.attribs[indx];
+		attrib.size = size;
+		attrib.type = type;
+		attrib.typeSize = getTypeSize(type);
+		attrib.bytesSize = attrib.size * attrib.typeSize;
+		attrib.normalized = normalized;
+		attrib.stride = (stride != 0) ? stride : (attrib.size * attrib.typeSize);
+		attrib.ptr = ptr;
+		//System.out.println("StateGL20.glVertexAttribPointer(" + "indx = [" + indx + "], size = [" + size + "], type = [" + type + "], normalized = [" + normalized + "], stride = [" + stride + "], ptr = [" + ptr + "]" + ")");
+	}
+
+	static private int getTypeSize(int type) {
+		switch (type) {
+			case GL20.GL_BYTE: return 1;
+			case GL20.GL_UNSIGNED_BYTE: return 1;
+			case GL20.GL_SHORT: return 2;
+			case GL20.GL_UNSIGNED_SHORT: return 2;
+			case GL20.GL_FIXED: return 4;
+			case GL20.GL_FLOAT: return 4;
+		}
+		return -1;
 	}
 
 	@Override
@@ -1394,3 +1448,4 @@ public class StateGL20<TImpl extends StateGL20.Impl> implements GL20Ext {
 		impl.present();
 	}
 }
+

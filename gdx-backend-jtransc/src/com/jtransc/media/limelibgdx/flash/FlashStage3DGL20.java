@@ -6,13 +6,9 @@ import com.jtransc.annotation.haxe.HaxeMethodBody;
 import com.jtransc.media.limelibgdx.GL20Ext;
 import com.jtransc.media.limelibgdx.StateGL20;
 import com.jtransc.media.limelibgdx.flash.agal.Agal;
-import com.jtransc.media.limelibgdx.flash.agal.GlSlToAgal;
 import com.jtransc.media.limelibgdx.glsl.ShaderType;
 
 import java.nio.Buffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.jtransc.media.limelibgdx.StateGL20.*;
@@ -29,7 +25,7 @@ public class FlashStage3DGL20 {
 		native static Context3D getContext3D();
 
 		@Override
-		public void clear(StateGL20.State state, boolean color, boolean depth, boolean stencil) {
+		public void clear(boolean color, boolean depth, boolean stencil) {
 			int mask = 0;
 
 			if (color) mask |= Context3DClearMask.COLOR;
@@ -120,7 +116,6 @@ public class FlashStage3DGL20 {
 
 	@HaxeAvailableOnTargets({"flash"})
 	static class FlashProgram extends StateGL20.Program {
-		Agal.Program agal;
 		Context3D context;
 		Program3D program;
 
@@ -131,20 +126,14 @@ public class FlashStage3DGL20 {
 
 		@Override
 		public void dispose() {
+			super.dispose();
+
 			program.dispose();
 		}
 
 		@Override
 		public void link() {
-			Map<String, String> defines = new HashMap<String, String>();
-			defines.put("GL_ES", "1");
-			defines.put("JTRANSC", "1");
-			defines.put("FLASH", "1");
-
-			this.agal = GlSlToAgal.compile(vertex.source, fragment.source, true, defines);
-
-			//this.agal.vertex.sourceCode = new ArrayList(Arrays.asList("mov v0, va0\nmov v0, vc0\nmul v0.w, va0.w, vc0.x\nmov v1, vc0\nmov v1.xy, va1.xyxx\nm44 op, va2, vc1\n".split("\n")));
-			//this.agal.fragment.sourceCode = new ArrayList(Arrays.asList("tex ft0, v1.xyxx, fs0 <linear mipdisable repeat 2d>\nmul oc, v0, ft0\n".split("\n")));
+			super.link();
 
 			System.out.println("FlashProgram().vertex:");
 			for (String s : agal.vertex.sourceCode) System.out.println(" - " + s);
@@ -161,65 +150,15 @@ public class FlashStage3DGL20 {
 				System.out.println(" - " + e.getKey().name + " = " + e.getValue() + " : " + e.getKey());
 
 
-			this.uniforms.clear();
-			this.attributes.clear();
-			for (Agal.AllocatedLanes e : this.agal.getUniforms().values()) {
-				this.uniforms.add(new ProgramUniform(e.name, e.size, e.type));
-			}
-			for (Agal.AllocatedLanes e : this.agal.getAttributes().values()) {
-				this.attributes.add(new ProgramAttribute(e.name, e.size, e.type));
-			}
-
 			program.upload(As3Utils.toByteArray(agal.vertex.binary), As3Utils.toByteArray(agal.fragment.binary));
-		}
-
-		@Override
-		public String getInfoLog() {
-			return "successful linked";
-		}
-
-		@Override
-		public boolean linked() {
-			return true;
-		}
-
-		@Override
-		public void bindAttribLocation(int index, String name) {
-			boundAttribs[index] = attributes.get(getAttribLocation(name));
 		}
 	}
 
 	@HaxeAvailableOnTargets({"flash"})
 	static public class FlashShader extends Shader {
-		public String source;
-
 		public FlashShader(ShaderType type) {
 			super(type);
-		}
-
-		@Override
-		public void dispose() {
-		}
-
-		@Override
-		public void setSource(String source) {
-			super.setSource(source);
-			System.out.println("FlashShader(" + type + ").setSource('" + source + "')");
-		}
-
-		@Override
-		public void compile() {
-			System.out.println("FlashShader.compile");
-		}
-
-		@Override
-		public String getInfoLog() {
-			return "successful compiled";
-		}
-
-		@Override
-		public boolean compiled() {
-			return true;
+			defines.put("FLASH", "1");
 		}
 	}
 

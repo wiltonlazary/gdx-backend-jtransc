@@ -1,5 +1,6 @@
 package com.jtransc.media.limelibgdx.glsl.ir;
 
+import com.jtransc.media.limelibgdx.glsl.Lanes;
 import com.jtransc.media.limelibgdx.glsl.ast.Type;
 
 public class Operand {
@@ -21,6 +22,10 @@ public class Operand {
 		this.constant = constant;
 		this.name = name;
 		this.swizzle = swizzle;
+	}
+
+	public int[] getLaneIndices() {
+		return Lanes.parse(swizzle, type.getLaneCount());
 	}
 
 	public Operand withoutSwizzle() {

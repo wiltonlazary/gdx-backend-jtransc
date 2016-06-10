@@ -130,7 +130,7 @@ public class AstToSir {
 					out.add(new Sir.Unop(UnaryOperator.fromString(expr.name)));
 					break;
 				default:
-					throw new RuntimeException("Unsupported custom functions");
+					throw new RuntimeException("Unsupported custom functions : " + expr.name);
 			}
 		}
 	}
