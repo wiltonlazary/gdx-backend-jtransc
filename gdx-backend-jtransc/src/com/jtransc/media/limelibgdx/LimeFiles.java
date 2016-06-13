@@ -3,6 +3,7 @@ package com.jtransc.media.limelibgdx;
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.files.FileHandle;
 import com.jtransc.JTranscWrapped;
+import com.jtransc.annotation.JTranscMethodBody;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
 import com.jtransc.io.JTranscSyncIO;
 
@@ -118,9 +119,11 @@ public class LimeFiles implements Files {
 		static private final int BA_HIDDEN    = 0x08;
 
 		@HaxeMethodBody("return lime.Assets.exists(p0._str);")
+		@JTranscMethodBody(target = "js", value = "return libgdx.io.exists(N.istr(p0));")
 		native private boolean exists(String path);
 
 		@HaxeMethodBody("return HaxeArrayByte.fromBytes(lime.Assets.getBytes(p0._str));")
+		@JTranscMethodBody(target = "js", value = "return libgdx.io.readBytes(N.istr(p0));")
 		native private byte[] readBytes(String path, int mode);
 	}
 }

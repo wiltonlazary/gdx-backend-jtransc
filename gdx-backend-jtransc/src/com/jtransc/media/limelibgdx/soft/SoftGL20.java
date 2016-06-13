@@ -50,7 +50,7 @@ public class SoftGL20 {
 		public void drawArrays(int mode, int first, int count) {
 			final Program program = (Program) state.program;
 			final GLBuffer buffer = (GLBuffer) state.arrayBuffer;
-			super.drawArrays(mode, first, count);
+
 			if (mode != GL20.GL_TRIANGLES) throw new RuntimeException("Just rendering triangles");
 
 			runner.attributes = state.attribs;
@@ -78,6 +78,7 @@ public class SoftGL20 {
 			this.runner = runner;
 		}
 
+		// http://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html
 		public void renderTriangle(StateGL20.State state, BitmapData32 backbuffer, int v0, int v1, int v2) {
 			this.state = state;
 			this.backbuffer = backbuffer;

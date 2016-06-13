@@ -4,6 +4,8 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Clipboard;
 import com.jtransc.JTranscSystem;
+import com.jtransc.annotation.JTranscAddFile;
+import com.jtransc.annotation.JTranscMethodBody;
 import com.jtransc.annotation.JTranscNativeClass;
 import com.jtransc.annotation.haxe.*;
 import com.jtransc.io.JTranscIoTools;
@@ -59,6 +61,8 @@ import java.util.Map;
 	"com/badlogic/gdx/utils/arial-15.fnt",
 	"com/badlogic/gdx/utils/arial-15.png"
 })
+//@JTranscMethodBody(target = "js", value = "")
+@JTranscAddFile(target = "js", priority = -3000, process = true, prepend = "js/libgdx.js")
 public class LimeApplication extends GdxApplicationAdapter implements Application {
 	static private final boolean TRACE = false;
 
@@ -112,6 +116,7 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	}
 
 	@HaxeMethodBody("HaxeLimeGdxApplication.app = p0;")
+	@JTranscMethodBody(target = "js", value = "app = p0;")
 	private void setApplicationToLime(LimeApplication app) {
 	}
 

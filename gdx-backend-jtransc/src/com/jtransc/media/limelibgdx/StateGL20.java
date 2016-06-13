@@ -374,6 +374,10 @@ public class StateGL20<TImpl extends StateGL20.Impl> implements GL20Ext {
 		}
 
 		public void drawArrays(int mode, int first, int count) {
+			GLBuffer buffer = createBuffer();
+			//buffer.data();
+			buffer.dispose();
+			throw new RuntimeException("Not implemented yet!");
 		}
 
 		public void finish() {
