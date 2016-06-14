@@ -2,12 +2,25 @@ const {app, BrowserWindow} = require('electron');
 
 let mainWindow;
 
-console.log('electron');
+//console.log('electron');
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
 	if (process.platform != 'darwin') app.quit();
 });
+
+// In main process.
+const {ipcMain} = require('electron');
+ipcMain.on('console.log', (event, arg) => { console.log.apply(console, arg); });
+ipcMain.on('console.warn', (event, arg) => { console.warn.apply(console, arg); });
+ipcMain.on('console.error', (event, arg) => { console.error.apply(console, arg); });
+
+/*
+ipcMain.on('synchronous-message', (event, arg) => {
+	console.log(arg);  // prints "ping"
+	event.returnValue = 'pong';
+});
+*/
 
 // This method will be called when Electron has done everything
 // initialization and ready for creating browser windows.

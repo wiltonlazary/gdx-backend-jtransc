@@ -1,3 +1,16 @@
+if (typeof require !== 'undefined') {
+	var electron = require('electron');
+	if (electron) {
+		var ipcRenderer = electron.ipcRenderer;
+
+		//var oldConsoleLog = console.log;
+
+		console.log = function() { ipcRenderer.send('console.log', Array.from(arguments)); };
+		console.warn = function() { ipcRenderer.send('console.warn', Array.from(arguments)); };
+		console.error = function() { ipcRenderer.send('console.error', Array.from(arguments)); };
+	}
+}
+
 function downloadBytes(url, callback) {
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", url, true);
