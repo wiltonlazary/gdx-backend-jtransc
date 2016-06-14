@@ -68,6 +68,7 @@ libgdx.initCanvas = function() {
 		document.body.appendChild(canvas);
 		document.body.style.padding = '0';
 		document.body.style.margin = '0';
+		document.body.style.overflow = 'hidden';
 		//console.log(gl);
 	}
 

@@ -2,6 +2,8 @@ const {app, BrowserWindow} = require('electron');
 
 let mainWindow;
 
+console.log('electron');
+
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
 	if (process.platform != 'darwin') app.quit();
@@ -11,7 +13,13 @@ app.on('window-all-closed', function() {
 // initialization and ready for creating browser windows.
 app.on('ready', function() {
 	// Create the browser window.
-	mainWindow = new BrowserWindow({width: 800, height: 600, frame:true});
+	mainWindow = new BrowserWindow({
+		title: {{ title|quote }},
+		width: {{ initialWidth }},
+		height: {{ initialHeight }},
+		autoHideMenuBar: true,
+		frame: true,
+	});
 
 	// and load the index.html of the app.
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
@@ -23,4 +31,9 @@ app.on('ready', function() {
 		// when you should delete the corresponding element.
 		mainWindow = null;
 	});
+
+	mainWindow.on('unresponsive', function() {
+		console.log('Window got unresponsive!');
+	});
+
 });

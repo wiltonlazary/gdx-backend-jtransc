@@ -6,15 +6,12 @@ import com.badlogic.gdx.utils.Clipboard;
 import com.jtransc.JTranscSystem;
 import com.jtransc.annotation.JTranscAddFile;
 import com.jtransc.annotation.JTranscMethodBody;
-import com.jtransc.annotation.JTranscNativeClass;
+import com.jtransc.annotation.JTranscRegisterCommand;
+import com.jtransc.annotation.JTranscRunCommand;
 import com.jtransc.annotation.haxe.*;
-import com.jtransc.io.JTranscIoTools;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @HaxeAddFilesTemplate({
 	"HaxeLimeGdxApplication.hx"
@@ -67,7 +64,9 @@ import java.util.Map;
 @JTranscAddFile(target = "js", priority = -3001, process = true, prepend = "js/libgdx_keys.js")
 @JTranscAddFile(target = "js", priority = -3000, process = true, prepend = "js/libgdx.js")
 @JTranscAddFile(target = "js", process = true, src = "js/template/index.html", dst = "index.html")
-@JTranscAddFile(target = "js", process = true, src = "js/template/electron.js", dst = "electron.js")
+@JTranscAddFile(target = "js", process = true, src = "js/template/electron-main.js", dst = "electron-main.js")
+@JTranscRegisterCommand(target = "js", name = "electron", command = "electron", check = { "electron", "--version" }, getFolderCmd = { "npm", "list", "-g" }, install = {"npm", "-g", "install", "electron-prebuilt" })
+@JTranscRunCommand(target = "js", value = { "electron", "{{ outputFolder }}/electron-main.js" })
 public class LimeApplication extends GdxApplicationAdapter implements Application {
 	static private final boolean TRACE = false;
 	//static private final boolean TRACE = true;
