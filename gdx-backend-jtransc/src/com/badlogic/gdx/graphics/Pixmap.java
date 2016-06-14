@@ -128,7 +128,9 @@ public class Pixmap implements Disposable {
 			loadImage((file.file().isAbsolute()) ? file.file().getPath() : LimeFiles.fixpath(file.file().getPath()));
 			//JTranscArrays.swizzle_inplace(data, 24, 16, 8, 0);
 			//JTranscArrays.swizzle_inplace(data, 0, 8, 16, 24);
-			JTranscArrays.swizzle_inplace_reverse(data);
+			if (!JTranscSystem.isPureJs()) {
+				JTranscArrays.swizzle_inplace_reverse(data);
+			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -408,7 +410,12 @@ public class Pixmap implements Disposable {
 	 * @return The pixel color in RGBA8888 format.
 	 */
 	public int getPixel(int x, int y) {
-		return ColorFormat8.transform(ColorFormat8.LIME, ColorFormat8.GDX, _getPixel(x, y));
+		//if (JTranscSystem.isPureJs()) {
+		//	return ColorFormat8.transform(ColorFormat8.PUREJS, ColorFormat8.GDX, _getPixel(x, y));
+		//} else {
+		//	return ColorFormat8.transform(ColorFormat8.LIME, ColorFormat8.GDX, _getPixel(x, y));
+		//}
+		return _getPixel(x, y);
 	}
 
 	/**

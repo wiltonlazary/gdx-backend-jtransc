@@ -1,4 +1,3 @@
-
 function downloadBytes(url, callback) {
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", url, true);
@@ -89,6 +88,7 @@ libgdx.init = function() {
 	libgdx.initCanvas();
 
 	app["{% METHOD com.jtransc.media.limelibgdx.LimeApplication:create %}"]();
+	updateCanvasSize();
 };
 
 libgdx.initOnce = function() {
@@ -106,21 +106,6 @@ libgdx.frame = function() {
 	app["{% METHOD com.jtransc.media.limelibgdx.LimeApplication:render %}"]();
 };
 
-var assets = {};
-var assetsList = [];
-
-function normalizePath(path) {
-	return String(path).replace(/^\/+/, '').replace(/^assets\//, '');
-}
-
-function addAsset(path, size) {
-	var info = { normalizedPath: normalizePath(path), path: path, size: size };
-	assets[normalizePath(path)] = info;
-	assetsList.push(info);
-}
-{% for asset in assetFiles %}
-addAsset({{ asset.path|quote }}, {{ asset.size }});
-{% end %}
 
 libgdx.io = function() {
 };
@@ -144,6 +129,7 @@ function ensureLimeInput() { {% SINIT com.jtransc.media.limelibgdx.LimeInput %} 
 // handle event
 window.addEventListener("optimizedResize", function() {
 	updateCanvasSize();
+	if (app != null) app["{% METHOD com.jtransc.media.limelibgdx.LimeApplication:render %}"]();
 });
 
 document.addEventListener('keydown', function(event) {
