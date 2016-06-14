@@ -65,6 +65,7 @@ import java.util.Map;
 @JTranscAddFile(target = "js", priority = -3000, process = true, prepend = "js/libgdx.js")
 public class LimeApplication extends GdxApplicationAdapter implements Application {
 	static private final boolean TRACE = false;
+	//static private final boolean TRACE = true;
 
 	public LimeApplication(ApplicationListener applicationListener, String title, int width, int height) {
 		super(applicationListener);
@@ -186,7 +187,17 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	@SuppressWarnings("unused")
 	public void create() {
 		super.create();
-		resized(HaxeLimeGdxApplication.instance.getWidth(), HaxeLimeGdxApplication.instance.getHeight());
+		resized(getWidth(), getHeight());
+	}
+
+	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getWidth();")
+	static public int getWidth() {
+		return 640;
+	}
+
+	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getHeight();")
+	static public int getHeight() {
+		return 640;
 	}
 
 	@SuppressWarnings("unused")
@@ -202,15 +213,6 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	@SuppressWarnings("unused")
 	public void resized(int width, int height) {
 		super.resized(width, height);
-	}
-
-	@JTranscNativeClass("HaxeLimeGdxApplication")
-	static public class HaxeLimeGdxApplication {
-		static public HaxeLimeGdxApplication instance;
-
-		native public int getWidth();
-
-		native public int getHeight();
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package com.jtransc.media.limelibgdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
+import com.jtransc.annotation.JTranscMethodBody;
 
 public class LimeInput implements Input {
 	static public boolean[] keys = new boolean[0x200];
@@ -89,6 +90,51 @@ public class LimeInput implements Input {
 		pointers[id].setXY(x, y);
 		pointers[id].releaseButton(0);
 		inputProcessor.touchUp((int)x, (int)y, id, 0);
+	}
+
+	@SuppressWarnings("unused")
+	public void onMouseUp(double x, double y, int button) {
+		lime_onMouseUp(x, y, button);
+	}
+
+	@SuppressWarnings("unused")
+	public void onMouseDown(double x, double y, int button) {
+		lime_onMouseDown(x, y, button);
+	}
+
+	@SuppressWarnings("unused")
+	public void onMouseMove(double x, double y) {
+		lime_onMouseMove(x, y);
+	}
+
+	@SuppressWarnings("unused")
+	void onKeyUp(int keyCode, int modifier) {
+		lime_onKeyUp(keyCode, modifier);
+	}
+
+	@SuppressWarnings("unused")
+	public void onKeyDown(int keyCode, int modifier) {
+		lime_onKeyDown(keyCode, modifier);
+	}
+
+	@SuppressWarnings("unused")
+	public void onKeyTyped(char character) {
+		lime_onKeyTyped(character);
+	}
+
+	@SuppressWarnings("unused")
+	public void onTouchStart(int id, double x, double y) {
+		lime_onTouchStart(id, x, y);
+	}
+
+	@SuppressWarnings("unused")
+	public void onTouchMove(int id, double x, double y) {
+		lime_onTouchMove(id, x, y);
+	}
+
+	@SuppressWarnings("unused")
+	public void onTouchEnd(int id, double x, double y) {
+		lime_onTouchEnd(id, x, y);
 	}
 
 	// Called once per frame1
@@ -191,6 +237,7 @@ public class LimeInput implements Input {
 		return pointers[0].isPressingButton(i);
 	}
 
+	@JTranscMethodBody(target = "js", value = "return p0;")
 	static private int convertKeyCode(int i) {
 		// https://github.com/openfl/lime/blob/develop/lime/ui/KeyCode.hx
 		switch (i) {

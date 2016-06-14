@@ -223,7 +223,7 @@ abstract public class GdxApplicationAdapter implements Application {
 
 	public void create() {
 		applicationListener.create();
-		resized(LimeApplication.HaxeLimeGdxApplication.instance.getWidth(), LimeApplication.HaxeLimeGdxApplication.instance.getHeight());
+		resized(LimeApplication.getWidth(), LimeApplication.getHeight());
 	}
 
 	public void render() {
