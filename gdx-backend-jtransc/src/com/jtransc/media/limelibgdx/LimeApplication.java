@@ -62,6 +62,8 @@ import java.util.Map;
 	"com/badlogic/gdx/utils/arial-15.png"
 })
 //@JTranscMethodBody(target = "js", value = "")
+@JTranscAddFile(target = "js", priority = -3002, process = true, prepend = "js/libgdx_polyfills.js")
+@JTranscAddFile(target = "js", priority = -3001, process = true, prepend = "js/libgdx_keys.js")
 @JTranscAddFile(target = "js", priority = -3000, process = true, prepend = "js/libgdx.js")
 public class LimeApplication extends GdxApplicationAdapter implements Application {
 	static private final boolean TRACE = false;
