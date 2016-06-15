@@ -15,8 +15,17 @@ ipcMain.on('console.log', (event, arg) => { console.log.apply(console, arg); });
 ipcMain.on('console.warn', (event, arg) => { console.warn.apply(console, arg); });
 ipcMain.on('console.error', (event, arg) => { console.error.apply(console, arg); });
 ipcMain.on('window.error', (event, arg) => { console.error.apply(console, arg); });
-ipcMain.on('window.title', (event, arg) => { mainWindow.setTitle(arg[0]); });
-ipcMain.on('window.size', (event, arg) => { mainWindow.setSize(arg[0], arg[1]); });
+ipcMain.on('window.title', (event, arg) => {
+	var title = arg[0];
+	if (title) mainWindow.setTitle(title);
+});
+ipcMain.on('window.size', (event, arg) => {
+	var width = arg[0] | 0;
+	var height = arg[1] | 0;
+	if (width > 0 && height > 0) {
+		mainWindow.setSize(width, height);
+	}
+});
 ipcMain.on('window.show', (event, arg) => { mainWindow.show(); mainWindow.center(); });
 
 

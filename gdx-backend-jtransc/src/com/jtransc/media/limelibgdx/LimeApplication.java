@@ -65,6 +65,8 @@ import java.io.IOException;
 @JTranscAddFile(target = "js", priority = -3000, process = true, prepend = "js/libgdx.js")
 @JTranscAddFile(target = "js", process = true, src = "js/template/index.html", dst = "index.html")
 @JTranscAddFile(target = "js", process = true, src = "js/template/electron-main.js", dst = "electron-main.js")
+@JTranscAddFile(target = "all", process = false, isAsset = true, src = "com/badlogic/gdx/utils/arial-15.fnt", dst = "com/badlogic/gdx/utils/arial-15.fnt")
+@JTranscAddFile(target = "all", process = false, isAsset = true, src = "com/badlogic/gdx/utils/arial-15.png", dst = "com/badlogic/gdx/utils/arial-15.png")
 @JTranscRegisterCommand(target = "js", name = "electron", command = "electron", check = { "electron", "--version" }, getFolderCmd = { "npm", "list", "-g" }, install = {"npm", "-g", "install", "electron-prebuilt" })
 @JTranscRunCommand(target = "js", value = { "electron", "{{ outputFolder }}/electron-main.js" })
 public class LimeApplication extends GdxApplicationAdapter implements Application {

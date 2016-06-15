@@ -107,10 +107,8 @@ libgdx.initCanvas = function() {
 	} catch(e) {
 	}
 
-	updateCanvasSize();
-
-	gl.clearColor(0.0, 0.0, 0.0, 1.0);
-	gl.clear(gl.COLOR_BUFFER_BIT);
+	//gl.clearColor(0.0, 0.0, 0.0, 1.0);
+	//gl.clear(gl.COLOR_BUFFER_BIT);
 };
 
 libgdx.init = function() {
@@ -145,9 +143,15 @@ libgdx.io.exists = function(path) {
 
 libgdx.io.readBytes = function(path) {
 	var asset = assets[normalizePath(path)];
-	if (!asset) throw "Can't find asset '" + normalizePath(path) + "'";
+	if (!asset) {
+		return null;
+		throw "Can't find asset '" + normalizePath(path) + "'";
+	}
 	var bytes = asset.bytes;
-	if (!bytes) throw "Can't find asset bytes " + path;
+	if (!bytes) {
+		return null;
+		throw "Can't find asset bytes " + path;
+	}
 	var out = JA_B.fromTypedArray(bytes);
 	//console.log('readBytes:', out);
 	return out;
