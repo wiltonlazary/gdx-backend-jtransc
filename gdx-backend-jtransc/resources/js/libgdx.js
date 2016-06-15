@@ -1,13 +1,17 @@
+var ipcRenderer = null;
+
 if (typeof require !== 'undefined') {
 	var electron = require('electron');
 	if (electron) {
-		var ipcRenderer = electron.ipcRenderer;
-
-		//var oldConsoleLog = console.log;
-
+		ipcRenderer = electron.ipcRenderer;
 		console.log = function() { ipcRenderer.send('console.log', Array.from(arguments)); };
 		console.warn = function() { ipcRenderer.send('console.warn', Array.from(arguments)); };
 		console.error = function() { ipcRenderer.send('console.error', Array.from(arguments)); };
+		window.onerror = function myErrorHandler(errorMsg, url, lineNumber) {
+            //alert("Error occured: " + errorMsg);//or any message
+            ipcRenderer.send('window.error', Array.from(arguments));
+            return false;
+        }
 	}
 }
 
@@ -48,13 +52,24 @@ function downloadBytesList(urls, callback) {
 	});
 }
 
-
 var gl; // A global variable for the WebGL context
 var GL; // A global variable for the WebGL context
 var app = null;
 var canvas = null;
 
 var libgdx = function() {
+};
+
+libgdx.setTitle = function(title) {
+	if (ipcRenderer != null) ipcRenderer.send('window.title', [title]);
+};
+
+libgdx.setSize = function(width, height) {
+	if (ipcRenderer != null) ipcRenderer.send('window.size', [width, height]);
+};
+
+libgdx.show = function() {
+	if (ipcRenderer != null) ipcRenderer.send('window.show', []);
 };
 
 function updateCanvasSize() {
@@ -158,6 +173,16 @@ document.addEventListener('keyup', function(event) {
 	var kc = transformKeyCode(event.keyCode);
 	//console.log('keyup', event.keyCode, kc);
 	{% SMETHOD com.jtransc.media.limelibgdx.LimeInput:lime_onKeyUp %}(kc, 0);
+}, false);
+
+document.addEventListener('mouseup', function(event) {
+	ensureLimeInput()
+	{% SMETHOD com.jtransc.media.limelibgdx.LimeInput:lime_onMouseUp %}(event.clientX | 0, event.clientY | 0, event.button | 0);
+}, false);
+
+document.addEventListener('mousedown', function(event) {
+	ensureLimeInput()
+	{% SMETHOD com.jtransc.media.limelibgdx.LimeInput:lime_onMouseDown %}(event.clientX | 0, event.clientY | 0, event.button | 0);
 }, false);
 
 downloadBytesList(assetsList.map(function(info) { return info.normalizedPath }), function(bytesList) {

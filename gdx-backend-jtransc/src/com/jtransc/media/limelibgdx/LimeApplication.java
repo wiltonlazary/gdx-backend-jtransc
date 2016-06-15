@@ -75,6 +75,20 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 		super(applicationListener);
 		setApplicationToLime(this);
 		referenceClasses();
+		setTitle(title);
+		setSize(width, height);
+	}
+
+	@JTranscMethodBody(target = "js", value = "libgdx.setTitle(N.istr(p0));")
+	static public void setTitle(String title) {
+	}
+
+	@JTranscMethodBody(target = "js", value = "libgdx.setSize(p0, p1);")
+	static public void setSize(int width, int height) {
+	}
+
+	@JTranscMethodBody(target = "js", value = "libgdx.show();")
+	static public void show() {
 	}
 
 	@Override
@@ -211,8 +225,13 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 		if (Gdx.gl instanceof GL20Ext) {
 			((GL20Ext)Gdx.gl).present();
 		}
-
+		if (firstFrame) {
+			firstFrame = false;
+			show();
+		}
 	}
+
+	private boolean firstFrame = true;
 
 	@SuppressWarnings("unused")
 	public void resized(int width, int height) {

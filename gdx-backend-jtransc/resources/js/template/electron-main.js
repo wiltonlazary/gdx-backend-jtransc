@@ -14,13 +14,11 @@ const {ipcMain} = require('electron');
 ipcMain.on('console.log', (event, arg) => { console.log.apply(console, arg); });
 ipcMain.on('console.warn', (event, arg) => { console.warn.apply(console, arg); });
 ipcMain.on('console.error', (event, arg) => { console.error.apply(console, arg); });
+ipcMain.on('window.error', (event, arg) => { console.error.apply(console, arg); });
+ipcMain.on('window.title', (event, arg) => { mainWindow.setTitle(arg[0]); });
+ipcMain.on('window.size', (event, arg) => { mainWindow.setSize(arg[0], arg[1]); });
+ipcMain.on('window.show', (event, arg) => { mainWindow.show(); mainWindow.center(); });
 
-/*
-ipcMain.on('synchronous-message', (event, arg) => {
-	console.log(arg);  // prints "ping"
-	event.returnValue = 'pong';
-});
-*/
 
 // This method will be called when Electron has done everything
 // initialization and ready for creating browser windows.
@@ -31,6 +29,7 @@ app.on('ready', function() {
 		width: {{ initialWidth }},
 		height: {{ initialHeight }},
 		autoHideMenuBar: true,
+		show: false,
 		frame: true,
 	});
 
