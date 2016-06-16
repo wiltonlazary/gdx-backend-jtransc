@@ -7,7 +7,7 @@ import java.io.ByteArrayOutputStream;
 public class BinWriter {
 	private ByteArrayOutputStream os = new ByteArrayOutputStream();
 	private byte[] data = null;
-	private FastMemory fm = new FastMemory(8);
+	private FastMemory fm = FastMemory.alloc(8);
 
 	public BinWriter() {
 	}

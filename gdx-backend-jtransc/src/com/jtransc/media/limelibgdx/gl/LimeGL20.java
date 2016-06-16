@@ -31,14 +31,14 @@ import java.nio.IntBuffer;
 	"static private function _intArray(a, offset:Int, size:Int) { return HaxeLimeGdxApplication.convertIntArray(a, offset, size); }",
 	"static private function _floatArray(a, offset:Int, size:Int) { return HaxeLimeGdxApplication.convertFloatArray(a, offset, size); }",
 	// GLTexture
-	"static public var lastId = 1000;",
-	"static public var textures = new Map<Int, GLTexture>();",
-	"static public var programs = new Map<Int, GLProgram>();",
-	"static public var shaders = new Map<Int, GLShader>();",
-	"static public var buffers = new Map<Int, GLBuffer>();",
-	"static public var frameBuffers = new Map<Int, GLFramebuffer>();",
-	"static public var renderBuffers = new Map<Int, GLRenderbuffer>();",
-	"static public var uniformLocations = new Map<Int, GLUniformLocation>();",
+	"public var lastId = 1000;",
+	"public var textures = new Map<Int, GLTexture>();",
+	"public var programs = new Map<Int, GLProgram>();",
+	"public var shaders = new Map<Int, GLShader>();",
+	"public var buffers = new Map<Int, GLBuffer>();",
+	"public var frameBuffers = new Map<Int, GLFramebuffer>();",
+	"public var renderBuffers = new Map<Int, GLRenderbuffer>();",
+	"public var uniformLocations = new Map<Int, GLUniformLocation>();",
 })
 public class LimeGL20 extends DummyGL20 implements GL20Ext {
 	static public int bindedTextureId = 0;

@@ -199,25 +199,28 @@ downloadBytesList(assetsList.map(function(info) { return info.normalizedPath }),
 	}, 0);
 });
 
+function _getBufferArray(buffer) {
+	return {% SMETHOD java.nio.internal.BufferInternalUtils:getByteBufferByteArray %}(buffer);
+}
+
 function _buffer(buffer, size) {
-	var _buffer = buffer;
-	if (_buffer["_bb"]) _buffer = _buffer["_bb"]; // Hack! do this fine
-	var jarray = _buffer["{% FIELD java.nio.ByteBuffer:hb %}"];
-	if (!size) size = jarray.length;
-	return new Uint8Array(jarray.data);
-	//return new Uint8Array(jarray.data.buffer, 0, size);
+	var array = _getBufferArray(buffer);
+	if (!size) size = array.length;
+	return new Uint8Array(array.data.buffer);
+	//return new Uint8Array(array.data);
 }
 
 function _floatBuffer(buffer, size) {
-	var jarray = buffer["{% FIELD java.nio.ByteBuffer:hb %}"];
-	if (!size) size = jarray.length;
-	return new Uint8Array(jarray.data);
-	//return new Float32Array(jarray.data.buffer, 0, size);
+	var array = _getBufferArray(buffer);
+	if (!size) size = array.length;
+	//return new Uint8Array(array.data);
+	//return new Uint8Array(array.data.buffer);
+	return new Float32Array(array.data.buffer);
 }
 
 function _floatArray(array, offset, count) {
 	if (!offset) offset = 0;
 	if (!count) count = array.length - offset;
 	//return new Float32Array(array.data, offset, count);
-	return new Float32Array(array.data);
+	return new Float32Array(array.data.buffer);
 }

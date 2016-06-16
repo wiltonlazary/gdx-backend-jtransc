@@ -15,7 +15,7 @@ public class FastMemoryUtils {
 
 	static public FastMemory copy(ByteBuffer buffer) {
 		int size = buffer.limit();
-		FastMemory out = new FastMemory(size * 1);
+		FastMemory out = FastMemory.alloc(size * 1);
 		for (int n = 0; n < size; n++) {
 			out.setAlignedInt8(n, buffer.get(n));
 		}
@@ -24,7 +24,7 @@ public class FastMemoryUtils {
 
 	static public FastMemory copy(FloatBuffer buffer) {
 		int size = buffer.limit();
-		FastMemory out = new FastMemory(size * 4);
+		FastMemory out = FastMemory.alloc(size * 4);
 		for (int n = 0; n < size; n++) {
 			out.setAlignedFloat32(n, buffer.get(n));
 		}

@@ -16,9 +16,9 @@ public class GlSlProgramRunner {
 		new AttributeData(0), new AttributeData(1), new AttributeData(2), new AttributeData(3),
 		new AttributeData(4), new AttributeData(5), new AttributeData(6), new AttributeData(7)
 	};
-	public FastMemory varyings = new FastMemory(1024 * 4 * 4);
-	public FastMemory temps = new FastMemory(1024 * 4 * 4);
-	public FastMemory result = new FastMemory(1024 * 4 * 4);
+	public FastMemory varyings = FastMemory.alloc(1024 * 4 * 4);
+	public FastMemory temps = FastMemory.alloc(1024 * 4 * 4);
+	public FastMemory result = FastMemory.alloc(1024 * 4 * 4);
 
 	public int index;
 
@@ -92,7 +92,7 @@ public class GlSlProgramRunner {
 
 	static private class AttributeData {
 		public int atrib;
-		public FastMemory data = new FastMemory(16 * 4);
+		public FastMemory data = FastMemory.alloc(16 * 4);
 
 		public AttributeData(int index) {
 			this.atrib = index;
