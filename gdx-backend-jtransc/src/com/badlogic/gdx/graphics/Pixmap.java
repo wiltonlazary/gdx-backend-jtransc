@@ -23,6 +23,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.jtransc.JTranscArrays;
 import com.jtransc.JTranscBits;
 import com.jtransc.JTranscSystem;
+import com.jtransc.annotation.JTranscMethodBody;
 import com.jtransc.annotation.JTranscNativeClass;
 import com.jtransc.io.JTranscIoTools;
 import com.jtransc.media.limelibgdx.LimeFiles;
@@ -140,15 +141,29 @@ public class Pixmap implements Disposable {
 		create(width, height, format);
 	}
 
+	@JTranscMethodBody(target = "js", value = {
+		"var image = __decodeImage(p0);",
+		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:data %} = image.data;",
+		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:width %} = image.width;",
+		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:height %} = image.height;",
+	})
+	private void loadImageNativeJs(String path) {
+	}
+
 	private void loadImage(String path) throws IOException {
 		//if (JTranscSystem.isSwf() || !JTranscSystem.usingJTransc()) {
-		if (true) {
+		//if (true) {
+		//if (JTranscSystem.isHaxe()) {
+		//	loadImageNative(path);
+		//}
+		if (JTranscSystem.isPureJs()) {
+			loadImageNativeJs(path);
+		}
+		else {
 			ImageDecoder.BitmapData bitmap = ImageDecoder.decode(JTranscIoTools.readFile(new File(path)));
 			this.data = bitmap.data;
 			this.width = bitmap.width;
 			this.height = bitmap.height;
-		} else {
-			loadImageNative(path);
 		}
 	}
 

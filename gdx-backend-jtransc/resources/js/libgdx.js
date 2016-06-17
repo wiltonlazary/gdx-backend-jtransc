@@ -23,7 +23,24 @@ function downloadBytes(url, callback) {
 	oReq.onload = function (oEvent) {
 	  var arrayBuffer = oReq.response; // Note: not oReq.responseText
 	  if (arrayBuffer) {
-		callback(new Uint8Array(arrayBuffer));
+	  	var array = new Uint8Array(arrayBuffer);
+	  	if (url.match(/(png|jpg)$/)) {
+	  		var img = document.createElement('img');
+			var arrayBufferView = new Uint8Array( this.response );
+			var blob = new Blob( [ arrayBufferView ], { type: "image/jpeg" } );
+			var urlCreator = window.URL || window.webkitURL;
+			var imageUrl = urlCreator.createObjectURL( blob );
+			img.onload = function() {
+				callback(array, img);
+			};
+			img.onerror = function() {
+				callback(array, null);
+			};
+			img.src = imageUrl;
+
+	  	} else {
+			callback(array, null);
+	  	}
 	  } else {
 	  	callback(null);
 	  }
@@ -42,9 +59,9 @@ function downloadBytesList(urls, callback) {
 	var results = new Array(urls.length);
 
 	urls.forEach(function(url, n) {
-		downloadBytes(url, function(bytes) {
+		downloadBytes(url, function(bytes, image) {
 			count++;
-			results[n] = bytes;
+			results[n] = { bytes: bytes, image: image };
 			if (count >= urls.length) {
 				callback(results);
 			}
@@ -190,7 +207,11 @@ document.addEventListener('mousedown', function(event) {
 }, false);
 
 downloadBytesList(assetsList.map(function(info) { return info.normalizedPath }), function(bytesList) {
-	for (var n = 0; n < assetsList.length; n++) assetsList[n].bytes = bytesList[n];
+	for (var n = 0; n < assetsList.length; n++) {
+		assetsList[n].bytes = bytesList[n].bytes;
+		assetsList[n].image = bytesList[n].image;
+		//console.log(assetsList[n].image);
+	}
 	//console.log(assetsList);
 	//console.log(assets);
 	//window.requestAnimationFrame(libgdx.frame);
@@ -223,4 +244,32 @@ function _floatArray(array, offset, count) {
 	if (!count) count = array.length - offset;
 	//return new Float32Array(array.data, offset, count);
 	return new Float32Array(array.data.buffer);
+}
+
+function __convertPixels(input, output, size) {
+	for (var n = 0, m = 0; n < size; n++, m += 4) {
+		output[n] = (input[m + 0] << 24) | (input[m + 1] << 16) | (input[m + 2] << 8) | (input[m + 3] << 0);
+	}
+}
+
+function __decodeImage(path) {
+	var asset = assets[normalizePath(path)];
+	if (!asset) throw 'Unknown asset ' + path;
+	if (!asset.image) throw 'Asset without image ' + path;
+	var image = asset.image;
+	var canvas = document.createElement('canvas');
+	canvas.width = image.width;
+	canvas.height = image.height;
+	var ctx = canvas.getContext("2d");
+	ctx.drawImage(image, 0, 0);
+
+	var idata = ctx.getImageData(0, 0, image.width, image.height);
+	var array = new JA_I(image.width * image.height);
+	__convertPixels(idata.data, array.data, image.width * image.height);
+
+	return {
+		width: image.width,
+		height: image.height,
+		data: array
+	};
 }
