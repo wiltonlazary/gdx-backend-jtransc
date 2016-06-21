@@ -1,0 +1,7 @@
+include (
+    'gdx-backend-jtransc',
+    //'gdx-backend-jtransc-codegen',
+    'gdx-box2d-jtransc',
+    'gdx-controllers-jtransc',
+    'gdx-websockets-jtransc',
+)
