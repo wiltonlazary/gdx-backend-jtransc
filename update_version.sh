@@ -3,5 +3,4 @@ if [ "$1" == '' ]; then
 	exit 1;
 fi
 
-sed -i -e "s/jtranscVersion=\(.*\)/jtranscVersion=$1/g" cuboc-demo/gradle.properties
-mvn -f pom.xml versions:set -DnewVersion=$1
+sed -i -e "s/jtranscVersion=\(.*\)/jtranscVersion=$1/g" gradle.properties
