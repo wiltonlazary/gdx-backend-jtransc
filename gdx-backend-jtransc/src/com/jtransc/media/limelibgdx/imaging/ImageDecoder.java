@@ -31,15 +31,19 @@ public class ImageDecoder {
 	static private char[] PNG_MAGIC = "\u0089\u0050\u004E\u0047".toCharArray();
 	static private char[] JPG_MAGIC = "\u00FF\u00D8\u00FF\u00E0".toCharArray();
 
-	static public boolean checkMagic(byte[] buffer, char[] magic) {
-		for (int n = 0; n < magic.length; n++) if ((byte)buffer[n] != (byte)magic[n]) return false;
+	static public boolean checkMagic(byte[] buffer, int offset, char[] magic) {
+		for (int n = 0; n < magic.length; n++) if ((byte)buffer[offset + n] != (byte)magic[n]) return false;
 		return true;
 	}
 
 	static public Format detect(byte[] buffer) {
+		return detect(buffer, 0, buffer.length);
+	}
+
+	static public Format detect(byte[] buffer, int offset, int length) {
 		System.out.println("ImageDecoder.Format: Length:" + buffer.length + ": Header:" + buffer[0] + "," + buffer[1] + "," + buffer[2] + "," + buffer[3]);
-		if (checkMagic(buffer, PNG_MAGIC)) return Format.PNG;
-		if (checkMagic(buffer, JPG_MAGIC)) return Format.JPEG;
+		if (checkMagic(buffer, offset, PNG_MAGIC)) return Format.PNG;
+		if (checkMagic(buffer, offset, JPG_MAGIC)) return Format.JPEG;
 		return Format.UNKNOWN;
 	}
 
@@ -54,14 +58,18 @@ public class ImageDecoder {
 	}
 
 	static public BitmapData decode(byte[] buffer) {
+		return decode(buffer, 0, buffer.length);
+	}
+
+	static public BitmapData decode(byte[] buffer, int offset, int length) {
 		try {
-			Format format = detect(buffer);
+			Format format = detect(buffer, offset, length);
 			System.out.println("Format: " + format);
 			BitmapData out;
 			double start = JTranscSystem.stamp();
 			switch (format) {
 				case JPEG: {
-					final JPEGDecoder decoder = new JPEGDecoder(new ByteArrayInputStream(buffer));
+					final JPEGDecoder decoder = new JPEGDecoder(new ByteArrayInputStream(buffer, offset, length));
 					final int width = decoder.getImageWidth();
 					final int height = decoder.getImageHeight();
 					final ByteBuffer data = ByteBuffer.allocate(width * height * 4);
@@ -71,7 +79,7 @@ public class ImageDecoder {
 					break;
 				}
 				case PNG: {
-					final PNGDecoder decoder = new PNGDecoder(new ByteArrayInputStream(buffer));
+					final PNGDecoder decoder = new PNGDecoder(new ByteArrayInputStream(buffer, offset, length));
 					final int width = decoder.getWidth();
 					final int height = decoder.getHeight();
 					final ByteBuffer data = ByteBuffer.allocate(width * height * 4);

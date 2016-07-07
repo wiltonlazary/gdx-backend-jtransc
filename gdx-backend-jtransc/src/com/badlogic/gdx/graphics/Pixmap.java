@@ -21,22 +21,19 @@ import com.badlogic.gdx.graphics.g2d.Gdx2DPixmap;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.jtransc.JTranscArrays;
-import com.jtransc.JTranscBits;
 import com.jtransc.JTranscSystem;
 import com.jtransc.annotation.JTranscMethodBody;
 import com.jtransc.annotation.JTranscNativeClass;
+import com.jtransc.annotation.haxe.HaxeMethodBody;
 import com.jtransc.io.JTranscIoTools;
 import com.jtransc.media.limelibgdx.LimeFiles;
 import com.jtransc.media.limelibgdx.imaging.ImageDecoder;
 import com.jtransc.media.limelibgdx.util.ColorFormat8;
-import com.jtransc.annotation.haxe.HaxeAddMembers;
-import com.jtransc.annotation.haxe.HaxeMethodBody;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,7 +49,7 @@ public class Pixmap implements Disposable {
 	public enum Format {
 		Alpha, Intensity, LuminanceAlpha, RGB565, RGBA4444, RGB888, RGBA8888;
 
-		public static int toGdx2DPixmapFormat (Format format) {
+		public static int toGdx2DPixmapFormat(Format format) {
 			if (format == Alpha) return Gdx2DPixmap.GDX2D_FORMAT_ALPHA;
 			if (format == Intensity) return Gdx2DPixmap.GDX2D_FORMAT_ALPHA;
 			if (format == LuminanceAlpha) return Gdx2DPixmap.GDX2D_FORMAT_LUMINANCE_ALPHA;
@@ -63,7 +60,7 @@ public class Pixmap implements Disposable {
 			throw new GdxRuntimeException("Unknown Format: " + format);
 		}
 
-		public static Format fromGdx2DPixmapFormat (int format) {
+		public static Format fromGdx2DPixmapFormat(int format) {
 			if (format == Gdx2DPixmap.GDX2D_FORMAT_ALPHA) return Alpha;
 			if (format == Gdx2DPixmap.GDX2D_FORMAT_LUMINANCE_ALPHA) return LuminanceAlpha;
 			if (format == Gdx2DPixmap.GDX2D_FORMAT_RGB565) return RGB565;
@@ -119,7 +116,7 @@ public class Pixmap implements Disposable {
 	Format format;
 	int id;
 	//IntBuffer buffer;
-	int[]data;
+	int[] data;
 	int color;
 	static Blending blending;
 
@@ -141,6 +138,14 @@ public class Pixmap implements Disposable {
 		create(width, height, format);
 	}
 
+	public Pixmap(byte[] encodedData, int offset, int len) {
+		//throw new GdxRuntimeException("Not implemented Pixmap with encodedData");
+		ImageDecoder.BitmapData bitmap = ImageDecoder.decode(encodedData);
+		this.data = bitmap.data;
+		this.width = bitmap.width;
+		this.height = bitmap.height;
+	}
+
 	@JTranscMethodBody(target = "js", value = {
 		"var image = __decodeImage(p0);",
 		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:data %} = image.data;",
@@ -158,8 +163,7 @@ public class Pixmap implements Disposable {
 		//}
 		if (JTranscSystem.isPureJs()) {
 			loadImageNativeJs(path);
-		}
-		else {
+		} else {
 			ImageDecoder.BitmapData bitmap = ImageDecoder.decode(JTranscIoTools.readFile(new File(path)));
 			this.data = bitmap.data;
 			this.width = bitmap.width;
@@ -170,6 +174,7 @@ public class Pixmap implements Disposable {
 	@JTranscNativeClass("lime.Assets")
 	static public class Assets {
 		native static public Object getImage(String path);
+
 		native static public byte[] getBytes(String path);
 	}
 
