@@ -8,10 +8,7 @@ import com.jtransc.annotation.haxe.HaxeMethodBody;
 import com.jtransc.media.limelibgdx.GL20Ext;
 import com.jtransc.media.limelibgdx.dummy.DummyGL20;
 
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
+import java.nio.*;
 
 // https://github.com/openfl/lime/blob/develop/lime/graphics/opengl/GL.hx
 @HaxeImports({
@@ -62,7 +59,6 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 
 	@HaxeMethodBody("GL.activeTexture(p0);")
 	@JTranscMethodBody(target = "js", value = "GL.activeTexture(p0);")
-
 	native public void glActiveTexture(int texture);
 
 	@HaxeMethodBody("{% SFIELD com.jtransc.media.limelibgdx.gl.LimeGL20:bindedTextureId %} = p1; GL.bindTexture(p0, this.textures.get(p1));")
@@ -71,12 +67,10 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 
 	@HaxeMethodBody("GL.blendFunc(p0, p1);")
 	@JTranscMethodBody(target = "js", value = "GL.blendFunc(p0, p1);")
-
 	native public void glBlendFunc(int sfactor, int dfactor);
 
 	@HaxeMethodBody("GL.clear(p0);")
 	@JTranscMethodBody(target = "js", value = "GL.clear(p0);")
-
 	native private void _glClear(int mask);
 
 	public void glClear(int mask) {
@@ -86,47 +80,38 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 
 	@HaxeMethodBody("GL.clearColor(p0, p1, p2, p3);")
 	@JTranscMethodBody(target = "js", value = "GL.clearColor(p0, p1, p2, p3);")
-
 	native public void glClearColor(float red, float green, float blue, float alpha);
 
 	@HaxeMethodBody("GL.clearDepth(p0);")
 	@JTranscMethodBody(target = "js", value = "GL.clearDepth(p0);")
-
 	native public void glClearDepthf(float depth);
 
 	@HaxeMethodBody("GL.clearStencil(p0);")
 	@JTranscMethodBody(target = "js", value = "GL.clearStencil(p0);")
-
 	native public void glClearStencil(int s);
 
 	@HaxeMethodBody("GL.colorMask(p0, p1, p2, p3);")
 	@JTranscMethodBody(target = "js", value = "GL.colorMask(p0, p1, p2, p3);")
-
 	native public void glColorMask(boolean red, boolean green, boolean blue, boolean alpha);
 
 	@HaxeMethodBody("GL.compressedTexImage2D(p0, p1, p2, p3, p4, p5, _buffer(p7, p6));")
 	@JTranscMethodBody(target = "js", value = "GL.compressedTexImage2D(p0, p1, p2, p3, p4, p5, _buffer(p7, p6));")
-
 	native public void glCompressedTexImage2D(int target, int level, int internalformat, int width, int height, int border, int imageSize, Buffer data);
 
 	@HaxeMethodBody("GL.compressedTexSubImage2D(p0, p1, p2, p3, p4, p5, p6, _buffer(p8, p7));")
 	@JTranscMethodBody(target = "js", value = "GL.compressedTexSubImage2D(p0, p1, p2, p3, p4, p5, p6, _buffer(p8, p7));")
-
 	native public void glCompressedTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format, int imageSize, Buffer data);
 
 	@HaxeMethodBody("GL.copyTexImage2D(p0, p1, p2, p3, p4, p5, p6, p7);")
 	@JTranscMethodBody(target = "js", value = "GL.copyTexImage2D(p0, p1, p2, p3, p4, p5, p6, p7);")
-
 	native public void glCopyTexImage2D(int target, int level, int internalformat, int x, int y, int width, int height, int border);
 
 	@HaxeMethodBody("GL.copyTexSubImage2D(p0, p1, p2, p3, p4, p5, p6, p7);")
 	@JTranscMethodBody(target = "js", value = "GL.copyTexSubImage2D(p0, p1, p2, p3, p4, p5, p6, p7);")
-
 	native public void glCopyTexSubImage2D(int target, int level, int xoffset, int yoffset, int x, int y, int width, int height);
 
 	@HaxeMethodBody("GL.cullFace(p0);")
 	@JTranscMethodBody(target = "js", value = "GL.cullFace(p0);")
-
 	native public void glCullFace(int mode);
 
 	public void glDeleteTextures(int n, IntBuffer textures) {
@@ -135,69 +120,54 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 
 	@HaxeMethodBody("GL.deleteTexture(this.textures.get(p0)); this.textures.remove(p0);")
 	@JTranscMethodBody(target = "js", value = "GL.deleteTexture(this.textures.get(p0)); this.textures.remove(p0);")
-
 	native public void glDeleteTexture(int texture);
 
 	@HaxeMethodBody("GL.depthFunc(p0);")
 	@JTranscMethodBody(target = "js", value = "GL.depthFunc(p0);")
-
 	native public void glDepthFunc(int func);
 
 	@HaxeMethodBody("GL.depthMask(p0);")
 	@JTranscMethodBody(target = "js", value = "GL.depthMask(p0);")
-
 	native public void glDepthMask(boolean flag);
 
 	@HaxeMethodBody("GL.depthRange(p0, p1);")
 	@JTranscMethodBody(target = "js", value = "GL.depthRange(p0, p1);")
-
 	native public void glDepthRangef(float zNear, float zFar);
 
 	@HaxeMethodBody("GL.disable(p0);")
 	@JTranscMethodBody(target = "js", value = "GL.disable(p0);")
-
 	native public void glDisable(int cap);
 
 	@HaxeMethodBody("GL.drawArrays(p0, p1, p2);")
 	@JTranscMethodBody(target = "js", value = "GL.drawArrays(p0, p1, p2);")
-
 	native public void glDrawArrays(int mode, int first, int count);
 
 	//private int tempIndicesBuffer = -1;
 	public void glDrawElements(int mode, int count, int type, Buffer indices) {
-		/*
-		if (tempIndicesBuffer < 0) {
-			tempIndicesBuffer = glGenBuffer();
-		}
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tempIndicesBuffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.limit(), indices, GL_STATIC_DRAW);
-		*/
-		_glDrawElements(mode, count, type, indices.position());
+		int multiply = 1;
+		if (indices instanceof ShortBuffer) multiply = 2;
+		else if (indices instanceof IntBuffer) multiply = 4;
+		_glDrawElements(mode, count, type, indices.position() * multiply);
 	}
 
 	@HaxeMethodBody("GL.drawElements(p0, p1, p2, p3);")
 	@JTranscMethodBody(target = "js", value = "GL.drawElements(p0, p1, p2, p3);")
-
 	native private void _glDrawElements(int mode, int count, int type, int offset);
 
 	@HaxeMethodBody("GL.enable(p0);")
 	@JTranscMethodBody(target = "js", value = "GL.enable(p0);")
-
 	native public void glEnable(int cap);
 
 	@HaxeMethodBody("GL.finish();")
 	@JTranscMethodBody(target = "js", value = "GL.finish();")
-
 	native public void glFinish();
 
 	@HaxeMethodBody("GL.flush();")
 	@JTranscMethodBody(target = "js", value = "GL.flush();")
-
 	native public void glFlush();
 
 	@HaxeMethodBody("GL.frontFace(p0);")
 	@JTranscMethodBody(target = "js", value = "GL.frontFace(p0);")
-
 	native public void glFrontFace(int mode);
 
 	public void glGenTextures(int n, IntBuffer textures) {
@@ -206,17 +176,14 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 
 	@HaxeMethodBody("var id = this.lastId++; var tex = GL.createTexture(); this.textures.set(id, tex); return id;")
 	@JTranscMethodBody(target = "js", value = "var id = this.lastId++; var tex = GL.createTexture(); this.textures.set(id, tex); return id;")
-
 	native public int glGenTexture();
 
 	@HaxeMethodBody("return GL.getError();")
 	@JTranscMethodBody(target = "js", value = "return GL.getError();")
-
 	native public int glGetError();
 
 	@HaxeMethodBody("return GL.getParameter(p0);")
 	@JTranscMethodBody(target = "js", value = "return GL.getParameter(p0);")
-
 	native private int glGetInteger(int pname);
 
 	private int glGetInteger2(int pname) {
@@ -229,12 +196,10 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 
 	@HaxeMethodBody("return GL.getParameter(p0);")
 	@JTranscMethodBody(target = "js", value = "return GL.getParameter(p0);")
-
 	native private boolean glGetBoolean(int pname);
 
 	@HaxeMethodBody("return GL.getParameter(p0);")
 	@JTranscMethodBody(target = "js", value = "return GL.getParameter(p0);")
-
 	native private float glGetFloat(int pname);
 
 	public void glGetIntegerv(int pname, IntBuffer params) {
@@ -243,57 +208,46 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 
 	@HaxeMethodBody("return N.str(cast(GL.getParameter(p0), String));")
 	@JTranscMethodBody(target = "js", value = "return N.str(cast(GL.getParameter(p0), String));")
-
 	native public String glGetString(int name);
 
 	@HaxeMethodBody("GL.hint(p0, p1);")
 	@JTranscMethodBody(target = "js", value = "GL.hint(p0, p1);")
-
 	native public void glHint(int target, int mode);
 
 	@HaxeMethodBody("GL.lineWidth(p0);")
 	@JTranscMethodBody(target = "js", value = "GL.lineWidth(p0);")
-
 	native public void glLineWidth(float width);
 
 	@HaxeMethodBody("GL.pixelStorei(p0, p1);")
 	@JTranscMethodBody(target = "js", value = "GL.pixelStorei(p0, p1);")
-
 	native public void glPixelStorei(int pname, int param);
 
 	@HaxeMethodBody("GL.polygonOffset(p0, p1);")
 	@JTranscMethodBody(target = "js", value = "GL.polygonOffset(p0, p1);")
-
 	native public void glPolygonOffset(float factor, float units);
 
 	@HaxeMethodBody("GL.readPixels(p0, p1, p2, p3, p4, p5, _buffer(p6));")
 	@JTranscMethodBody(target = "js", value = "GL.readPixels(p0, p1, p2, p3, p4, p5, _buffer(p6));")
-
 	native public void glReadPixels(int x, int y, int width, int height, int format, int type, Buffer pixels);
 
 	@HaxeMethodBody("GL.scissor(p0, p1, p2, p3);")
 	@JTranscMethodBody(target = "js", value = "GL.scissor(p0, p1, p2, p3);")
-
 	native public void glScissor(int x, int y, int width, int height);
 
 	@HaxeMethodBody("GL.stencilFunc(p0, p1, p2);")
 	@JTranscMethodBody(target = "js", value = "GL.stencilFunc(p0, p1, p2);")
-
 	native public void glStencilFunc(int func, int ref, int mask);
 
 	@HaxeMethodBody("GL.stencilMask(p0);")
 	@JTranscMethodBody(target = "js", value = "GL.stencilMask(p0);")
-
 	native public void glStencilMask(int mask);
 
 	@HaxeMethodBody("GL.stencilOp(p0, p1, p2);")
 	@JTranscMethodBody(target = "js", value = "GL.stencilOp(p0, p1, p2);")
-
 	native public void glStencilOp(int fail, int zfail, int zpass);
 
 	@HaxeMethodBody("GL.texImage2D(p0, p1, p2, p3, p4, p5, p6, p7, _buffer(p8));")
 	@JTranscMethodBody(target = "js", value = "GL.texImage2D(p0, p1, p2, p3, p4, p5, p6, p7, _buffer(p8));")
-
 	native private void _glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, Buffer pixels);
 
 	public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, Buffer pixels) {
@@ -304,7 +258,6 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 
 	@HaxeMethodBody("GL.texParameterf(p0, p1, p2);")
 	@JTranscMethodBody(target = "js", value = "GL.texParameterf(p0, p1, p2);")
-
 	native private void _glTexParameterf(int target, int pname, float param);
 
 	public void glTexParameterf(int target, int pname, float param) {
@@ -323,12 +276,10 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 
 	@HaxeMethodBody("GL.texSubImage2D(p0, p1, p2, p3, p4, p5, p6, p7, _buffer(p8));")
 	@JTranscMethodBody(target = "js", value = "GL.texSubImage2D(p0, p1, p2, p3, p4, p5, p6, p7, _buffer(p8));")
-
 	native public void glTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format, int type, Buffer pixels);
 
 	@HaxeMethodBody("GL.viewport(p0, p1, p2, p3);")
 	@JTranscMethodBody(target = "js", value = "GL.viewport(p0, p1, p2, p3);")
-
 	native private void _glViewport(int x, int y, int width, int height);
 
 	public void glViewport(int x, int y, int width, int height) {
@@ -338,73 +289,58 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 
 	@HaxeMethodBody("GL.attachShader(this.programs.get(p0), this.shaders.get(p1));")
 	@JTranscMethodBody(target = "js", value = "GL.attachShader(this.programs.get(p0), this.shaders.get(p1));")
-
 	native public void glAttachShader(int program, int shader);
 
 	@HaxeMethodBody("GL.bindAttribLocation(this.programs.get(p0), p1, N.istr(p2));")
 	@JTranscMethodBody(target = "js", value = "GL.bindAttribLocation(this.programs.get(p0), p1, N.istr(p2));")
-
 	native public void glBindAttribLocation(int program, int index, String name);
 
 	@HaxeMethodBody("GL.bindBuffer(p0, this.buffers.get(p1));")
 	@JTranscMethodBody(target = "js", value = "GL.bindBuffer(p0, this.buffers.get(p1));")
-
 	native public void glBindBuffer(int target, int buffer);
-
 
 	@HaxeMethodBody("GL.bindRenderbuffer(p0, this.renderBuffers.get(p1));")
 	@JTranscMethodBody(target = "js", value = "GL.bindRenderbuffer(p0, this.renderBuffers.get(p1));")
-
 	native public void glBindRenderbuffer(int target, int renderbuffer);
 
 	@HaxeMethodBody("GL.blendColor(p0, p1, p2, p3);")
 	@JTranscMethodBody(target = "js", value = "GL.blendColor(p0, p1, p2, p3);")
-
 	native public void glBlendColor(float red, float green, float blue, float alpha);
 
 	@HaxeMethodBody("GL.blendEquation(p0);")
 	@JTranscMethodBody(target = "js", value = "GL.blendEquation(p0);")
-
 	native public void glBlendEquation(int mode);
 
 	@HaxeMethodBody("GL.blendEquationSeparate(p0, p1);")
 	@JTranscMethodBody(target = "js", value = "GL.blendEquationSeparate(p0, p1);")
-
 	native public void glBlendEquationSeparate(int modeRGB, int modeAlpha);
 
 	@HaxeMethodBody("GL.blendFuncSeparate(p0, p1, p2, p3);")
 	@JTranscMethodBody(target = "js", value = "GL.blendFuncSeparate(p0, p1, p2, p3);")
-
 	native public void glBlendFuncSeparate(int srcRGB, int dstRGB, int srcAlpha, int dstAlpha);
 
 	@HaxeMethodBody("GL.bufferData(p0, _buffer(p2, p1), p3);")
 	@JTranscMethodBody(target = "js", value = "GL.bufferData(p0, _buffer(p2, p1), p3);")
-
 	native public void glBufferData(int target, int size, Buffer data, int usage);
 
 	@HaxeMethodBody("GL.bufferSubData(p0, p1, _buffer(p3, p2));")
 	@JTranscMethodBody(target = "js", value = "GL.bufferSubData(p0, p1, _buffer(p3, p2));")
-
 	native public void glBufferSubData(int target, int offset, int size, Buffer data);
 
 	@HaxeMethodBody("GL.compileShader(this.shaders.get(p0));")
 	@JTranscMethodBody(target = "js", value = "GL.compileShader(this.shaders.get(p0));")
-
 	native public void glCompileShader(int shader);
 
 	@HaxeMethodBody("var id = this.lastId++; var program = GL.createProgram(); this.programs.set(id, program); return id;")
 	@JTranscMethodBody(target = "js", value = "var id = this.lastId++; var program = GL.createProgram(); this.programs.set(id, program); return id;")
-
 	native public int glCreateProgram();
 
 	@HaxeMethodBody("var id = this.lastId++; var shader = GL.createShader(p0); this.shaders.set(id, shader); return id;")
 	@JTranscMethodBody(target = "js", value = "var id = this.lastId++; var shader = GL.createShader(p0); this.shaders.set(id, shader); return id;")
-
 	native public int glCreateShader(int type);
 
 	@HaxeMethodBody("GL.deleteBuffer(this.buffers.get(p0));")
 	@JTranscMethodBody(target = "js", value = "GL.deleteBuffer(this.buffers.get(p0));")
-
 	native public void glDeleteBuffer(int buffer);
 
 	public void glDeleteBuffers(int n, IntBuffer buffers) {
@@ -413,12 +349,10 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 
 	@HaxeMethodBody("GL.deleteProgram(this.programs.get(p0)); this.programs.remove(p0);")
 	@JTranscMethodBody(target = "js", value = "GL.deleteProgram(this.programs.get(p0)); this.programs.remove(p0);")
-
 	native public void glDeleteProgram(int program);
 
 	@HaxeMethodBody("GL.deleteRenderbuffer(this.renderBuffers.get(p0)); this.renderBuffers.remove(p0);")
 	@JTranscMethodBody(target = "js", value = "GL.deleteRenderbuffer(this.renderBuffers.get(p0)); this.renderBuffers.remove(p0);")
-
 	native public void glDeleteRenderbuffer(int renderbuffer);
 
 	public void glDeleteRenderbuffers(int n, IntBuffer renderbuffers) {
@@ -427,27 +361,22 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 
 	@HaxeMethodBody("GL.deleteShader(this.shaders.get(p0)); this.shaders.remove(p0);")
 	@JTranscMethodBody(target = "js", value = "GL.deleteShader(this.shaders.get(p0)); this.shaders.remove(p0);")
-
 	native public void glDeleteShader(int shader);
 
 	@HaxeMethodBody("GL.detachShader(this.programs.get(p0), this.shaders.get(p1));")
 	@JTranscMethodBody(target = "js", value = "GL.detachShader(this.programs.get(p0), this.shaders.get(p1));")
-
 	native public void glDetachShader(int program, int shader);
 
 	@HaxeMethodBody("GL.disableVertexAttribArray(p0);")
 	@JTranscMethodBody(target = "js", value = "GL.disableVertexAttribArray(p0);")
-
 	native public void glDisableVertexAttribArray(int index);
 
 	@HaxeMethodBody("GL.drawElements(p0, p1, p2, p3);")
 	@JTranscMethodBody(target = "js", value = "GL.drawElements(p0, p1, p2, p3);")
-
 	native public void glDrawElements(int mode, int count, int type, int indices);
 
 	@HaxeMethodBody("GL.enableVertexAttribArray(p0);")
 	@JTranscMethodBody(target = "js", value = "GL.enableVertexAttribArray(p0);")
-
 	native public void glEnableVertexAttribArray(int index);
 
 	///////////////////////////////////////////////////////
@@ -455,14 +384,11 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 	///////////////////////////////////////////////////////
 	@HaxeMethodBody("var id = this.lastId++; var frameBuffer = GL.createFramebuffer(); this.frameBuffers.set(id, frameBuffer); return id;")
 	@JTranscMethodBody(target = "js", value = "var id = this.lastId++; var frameBuffer = GL.createFramebuffer(); this.frameBuffers.set(id, frameBuffer); return id;")
-
 	native public int glGenFramebuffer();
 
 	@HaxeMethodBody("return GL.isFramebuffer(this.frameBuffers.get(p0));")
 	@JTranscMethodBody(target = "js", value = "return GL.isFramebuffer(this.frameBuffers.get(p0));")
-
 	native public boolean glIsFramebuffer(int framebuffer);
-
 
 	public void glGenFramebuffers(int n, IntBuffer framebuffers) {
 		for (int i = 0; i < n; i++) framebuffers.put(i, glGenFramebuffer());
@@ -470,12 +396,10 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 
 	@HaxeMethodBody("GL.bindFramebuffer(p0, this.frameBuffers.get(p1));")
 	@JTranscMethodBody(target = "js", value = "GL.bindFramebuffer(p0, this.frameBuffers.get(p1));")
-
 	native public void glBindFramebuffer(int target, int framebuffer);
 
 	@HaxeMethodBody("return GL.checkFramebufferStatus(p0);")
 	@JTranscMethodBody(target = "js", value = "return GL.checkFramebufferStatus(p0);")
-
 	native public int glCheckFramebufferStatus(int target);
 
 	@HaxeMethodBody("GL.deleteFramebuffer(frameBuffers.get(p0)); frameBuffers.remove(p0);")
