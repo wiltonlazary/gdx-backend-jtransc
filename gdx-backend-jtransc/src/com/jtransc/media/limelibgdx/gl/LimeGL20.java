@@ -1,6 +1,7 @@
 package com.jtransc.media.limelibgdx.gl;
 
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.jtransc.annotation.JTranscMethodBody;
 import com.jtransc.annotation.haxe.HaxeAddMembers;
 import com.jtransc.annotation.haxe.HaxeImports;
@@ -644,7 +645,7 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 		throw new RuntimeException("Not supported glShaderBinary");
 	}
 
-	@HaxeMethodBody("GL.shaderSource(this.shaders.get(p0), N.istr(p1));")
+	@HaxeMethodBody("GL.shaderSource(this.shaders.get(p0), '#define GL_ES 1\\n' + N.istr(p1));")
 	@JTranscMethodBody(target = "js", value = "GL.shaderSource(this.shaders.get(p0), N.istr(p1));")
 	native public void glShaderSource(int shader, String string);
 
@@ -840,4 +841,20 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 	@HaxeMethodBody("GL.vertexAttribPointer(p0, p1, p2, p3, p4, p5);")
 	@JTranscMethodBody(target = "js", value = "GL.vertexAttribPointer(p0, p1, p2, p3, p4, p5);")
 	native public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride, int ptr);
+
+	@Override
+	@JTranscMethodBody(target = "js", value = {
+		"var target = p0, level = p1, internalformat = p2, width = p3, height = p4, border = p5, format = p6, type = p7, pixmap = p8;",
+
+		"if (pixmap.INT_image) {",
+		"	GL.texImage2D(target, level, internalformat, format, type, pixmap.INT_image);",
+		"} else {",
+		"	var jarray = pixmap['{% FIELD com.badlogic.gdx.graphics.Pixmap:data %}'];",
+		"	var arrayBufferView = new Uint8Array(jarray.data.buffer);",
+		"	GL.texImage2D(target, level, internalformat, width, height, border, format, type, arrayBufferView);",
+		"}",
+	})
+	public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, Pixmap pixmap) {
+		_glTexImage2D(target, level, internalformat, width, height, border, format, type, pixmap.getPixels());
+	}
 }

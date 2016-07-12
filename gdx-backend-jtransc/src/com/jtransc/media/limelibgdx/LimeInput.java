@@ -47,6 +47,11 @@ public class LimeInput implements Input {
 	}
 
 	@SuppressWarnings("unused")
+	static public void lime_onWheel(double x, double y, double z) {
+		inputProcessor.scrolled((int)y);
+	}
+
+	@SuppressWarnings("unused")
 	static public void lime_onKeyUp(int keyCode, int modifier) {
 		//System.out.println("lime_onKeyUp:" + keyCode + "," + modifier);
 		keys[keyCode & 0x1FF] = false;

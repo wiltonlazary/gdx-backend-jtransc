@@ -16,6 +16,7 @@
 
 package com.badlogic.gdx.graphics;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Gdx2DPixmap;
 import com.badlogic.gdx.utils.Disposable;
@@ -29,12 +30,15 @@ import com.jtransc.io.JTranscIoTools;
 import com.jtransc.media.limelibgdx.LimeFiles;
 import com.jtransc.media.limelibgdx.imaging.ImageDecoder;
 import com.jtransc.media.limelibgdx.util.ColorFormat8;
+import com.jtransc.media.limelibgdx.util.ImageInfo;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Pixmap implements Disposable {
@@ -119,6 +123,7 @@ public class Pixmap implements Disposable {
 	int[] data;
 	int color;
 	static Blending blending;
+	private boolean pixelsAvailable = true;
 
 	public Pixmap(FileHandle file) {
 		try {
@@ -139,20 +144,78 @@ public class Pixmap implements Disposable {
 	}
 
 	public Pixmap(byte[] encodedData, int offset, int len) {
-		//throw new GdxRuntimeException("Not implemented Pixmap with encodedData");
-		ImageDecoder.BitmapData bitmap = ImageDecoder.decode(encodedData);
-		this.data = bitmap.data;
-		this.width = bitmap.width;
-		this.height = bitmap.height;
+		loadImage(encodedData, offset, len);
 	}
 
 	@JTranscMethodBody(target = "js", value = {
 		"var image = __decodeImage(p0);",
-		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:data %} = image.data;",
-		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:width %} = image.width;",
-		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:height %} = image.height;",
+		"this.INT_image = image.image;",
+		"this.INT_data = image.data;",
+		"this['{% FIELD com.badlogic.gdx.graphics.Pixmap:data %}'] = image.data;",
+		"this['{% FIELD com.badlogic.gdx.graphics.Pixmap:width %}'] = image.width;",
+		"this['{% FIELD com.badlogic.gdx.graphics.Pixmap:height %}'] = image.height;",
 	})
 	private void loadImageNativeJs(String path) {
+	}
+
+	@JTranscMethodBody(target = "js", value = {
+		"this.INT_image = null;",
+		"this.INT_data = this.{% FIELD com.badlogic.gdx.graphics.Pixmap:data %};",
+	})
+	private void createdEmpty() {
+
+	}
+
+	@JTranscMethodBody(target = "js", value = {
+		"var that = this;",
+		"var image = __decodeImageBytes(p0, p1, p2, p3, p4);",
+		"this.INT_image = image.image;",
+		"this.INT_data = image.data;",
+		"image.image.onload = function() { that['{% METHOD com.badlogic.gdx.graphics.Pixmap:loadedTextureAsync %}'](); };",
+		"this['{% FIELD com.badlogic.gdx.graphics.Pixmap:data %}'] = image.data;",
+		"this['{% FIELD com.badlogic.gdx.graphics.Pixmap:width %}'] = image.width;",
+		"this['{% FIELD com.badlogic.gdx.graphics.Pixmap:height %}'] = image.height;",
+	})
+	private void loadImageNativeJs(byte[] encodedData, int offset, int len, int width, int height) {
+	}
+
+	private boolean loaded = true;
+	private List<Runnable> loadedImageCallbacks = new ArrayList<Runnable>();
+
+	private void loadedTextureAsync() {
+		loaded = true;
+		for (Runnable loadedImage : loadedImageCallbacks) {
+			loadedImage.run();
+		}
+		loadedImageCallbacks.clear();
+	}
+
+	public void onLoadedTextureAsync(Runnable runnable) {
+		if (loaded) {
+			runnable.run();
+		} else {
+			loadedImageCallbacks.add(runnable);
+		}
+	}
+
+	private void ensureLoaded() {
+		if (!pixelsAvailable) {
+			throw new RuntimeException("Can't get pixels for an asynchronous loaded texture");
+		}
+	}
+
+	private void loadImage(byte[] encodedData, int offset, int len) {
+		if (JTranscSystem.isPureJs()) {
+			ImageInfo.Size size = ImageInfo.detect(encodedData, offset, len);
+			pixelsAvailable = false;
+			loaded = false;
+			loadImageNativeJs(encodedData, offset, len, (size != null) ? size.width : 1, (size != null) ? size.height : 1);
+		} else {
+			ImageDecoder.BitmapData bitmap = ImageDecoder.decode(encodedData);
+			this.data = bitmap.data;
+			this.width = bitmap.width;
+			this.height = bitmap.height;
+		}
 	}
 
 	private void loadImage(String path) throws IOException {
@@ -191,6 +254,7 @@ public class Pixmap implements Disposable {
 		this.height = height;
 		this.data = new int[width * height];
 		this.format = Format.RGBA8888;
+		createdEmpty();
 	}
 
 	/**
@@ -329,8 +393,7 @@ public class Pixmap implements Disposable {
 	 * @param x      The target x-coordinate (top left corner)
 	 * @param y      The target y-coordinate (top left corner)
 	 */
-	public void
-	Pixmap(Pixmap pixmap, int x, int y) {
+	public void Pixmap(Pixmap pixmap, int x, int y) {
 		drawPixmap(pixmap, x, y, 0, 0, pixmap.width, pixmap.height);
 	}
 
@@ -347,6 +410,7 @@ public class Pixmap implements Disposable {
 	 */
 	// copyPixels (sourceImage:Image, sourceRect:Rectangle, destPoint:Vector2, alphaImage:Image = null, alphaPoint:Vector2 = null, mergeAlpha:Bool = false):Void
 	public void drawPixmap(Pixmap pixmap, int x, int y, int srcx, int srcy, int srcWidth, int srcHeight) {
+		ensureLoaded();
 		for (int my = 0; my < srcHeight; my++) {
 			for (int mx = 0; mx < srcWidth; mx++) {
 				this._setPixel(x + mx, y + my, pixmap._getPixel(srcx + mx, srcy + my));
@@ -383,6 +447,7 @@ public class Pixmap implements Disposable {
 	 * @param height The height in pixels
 	 */
 	public void fillRectangle(int x, int y, int width, int height) {
+		ensureLoaded();
 		rectangle(x, y, width, height, DrawType.FILL);
 	}
 
@@ -394,6 +459,7 @@ public class Pixmap implements Disposable {
 	 * @param radius The radius in pixels
 	 */
 	public void drawCircle(int x, int y, int radius) {
+		ensureLoaded();
 		circle(x, y, radius, DrawType.STROKE);
 	}
 
@@ -405,6 +471,7 @@ public class Pixmap implements Disposable {
 	 * @param radius The radius in pixels
 	 */
 	public void fillCircle(int x, int y, int radius) {
+		ensureLoaded();
 		circle(x, y, radius, DrawType.FILL);
 	}
 
@@ -419,6 +486,7 @@ public class Pixmap implements Disposable {
 	 * @param y3 The y-coordinate of vertex 3
 	 */
 	public void fillTriangle(int x1, int y1, int x2, int y2, int x3, int y3) {
+		ensureLoaded();
 		triangle(x1, y1, x2, y2, x3, y3, DrawType.FILL);
 	}
 
@@ -430,6 +498,7 @@ public class Pixmap implements Disposable {
 	 * @return The pixel color in RGBA8888 format.
 	 */
 	public int getPixel(int x, int y) {
+		ensureLoaded();
 		//if (JTranscSystem.isPureJs()) {
 		//	return ColorFormat8.transform(ColorFormat8.PUREJS, ColorFormat8.GDX, _getPixel(x, y));
 		//} else {
@@ -445,6 +514,7 @@ public class Pixmap implements Disposable {
 	 * @param y the y-coordinate
 	 */
 	public void drawPixel(int x, int y) {
+		ensureLoaded();
 		drawPixel(x, y, this.color);
 	}
 
@@ -456,6 +526,7 @@ public class Pixmap implements Disposable {
 	 * @param color the color in RGBA8888 format.
 	 */
 	public void drawPixel(int x, int y, int color) {
+		ensureLoaded();
 		_setPixel(x, y, ColorFormat8.transform(ColorFormat8.GDX, ColorFormat8.LIME, color));
 	}
 

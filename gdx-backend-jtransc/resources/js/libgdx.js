@@ -117,15 +117,18 @@ libgdx.initCanvas = function() {
 		//console.log(gl);
 	}
 
+	var attributes = {
+		premultipliedAlpha: true
+	};
+
 	GL = gl = null;
 	try {
 		// Try to grab the standard context. If it fails, fallback to experimental.
-		GL = gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+		GL = gl = canvas.getContext("webgl", attributes) || canvas.getContext("experimental-webgl", attributes);
 	} catch(e) {
 	}
 
-	//gl.clearColor(0.0, 0.0, 0.0, 1.0);
-	//gl.clear(gl.COLOR_BUFFER_BIT);
+	gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
 };
 
 libgdx.init = function() {
@@ -182,28 +185,100 @@ window.addEventListener("optimizedResize", function() {
 	if (app != null) app["{% METHOD com.jtransc.media.limelibgdx.LimeApplication:render %}"]();
 });
 
+/////////////////////////////////////////////////////////////////
+// KEYS
+/////////////////////////////////////////////////////////////////
 document.addEventListener('keydown', function(event) {
-	ensureLimeInput()
+	ensureLimeInput();
 	var kc = transformKeyCode(event.keyCode);
 	//console.log('keydown', event.keyCode, kc);
 	{% SMETHOD com.jtransc.media.limelibgdx.LimeInput:lime_onKeyDown %}(kc, 0);
 }, false);
 
 document.addEventListener('keyup', function(event) {
-	ensureLimeInput()
+	ensureLimeInput();
 	var kc = transformKeyCode(event.keyCode);
 	//console.log('keyup', event.keyCode, kc);
 	{% SMETHOD com.jtransc.media.limelibgdx.LimeInput:lime_onKeyUp %}(kc, 0);
 }, false);
 
+/////////////////////////////////////////////////////////////////
+// MOUSE
+/////////////////////////////////////////////////////////////////
 document.addEventListener('mouseup', function(event) {
-	ensureLimeInput()
+	ensureLimeInput();
 	{% SMETHOD com.jtransc.media.limelibgdx.LimeInput:lime_onMouseUp %}(event.clientX | 0, event.clientY | 0, event.button | 0);
 }, false);
 
 document.addEventListener('mousedown', function(event) {
-	ensureLimeInput()
+	ensureLimeInput();
 	{% SMETHOD com.jtransc.media.limelibgdx.LimeInput:lime_onMouseDown %}(event.clientX | 0, event.clientY | 0, event.button | 0);
+}, false);
+
+document.addEventListener('mousemove', function(event) {
+	ensureLimeInput();
+	{% SMETHOD com.jtransc.media.limelibgdx.LimeInput:lime_onMouseMove %}(event.clientX | 0, event.clientY | 0, event.button | 0);
+}, false);
+
+document.addEventListener('wheel', function(event) {
+	ensureLimeInput();
+
+	//WheelEvent.deltaX Read only
+    //WheelEvent.deltaY Read only
+    //WheelEvent.deltaZ Read only
+    //WheelEvent.deltaMode Read only
+    //DOM_DELTA_PIXEL	0x00	The delta values are specified in pixels.
+    //DOM_DELTA_LINE	0x01	The delta values are specified in lines.
+    //DOM_DELTA_PAGE	0x02	The delta values are specified in pages
+
+	var mult = 1.0;
+	{% SMETHOD com.jtransc.media.limelibgdx.LimeInput:lime_onWheel %}(+event.deltaX * mult, +event.deltaY * mult, +event.deltaZ * mult);
+}, false);
+
+/////////////////////////////////////////////////////////////////
+// TOUCH
+/////////////////////////////////////////////////////////////////
+
+function getTouches(event) {
+	var out = [];
+	var touches = event.changedTouches;
+	for (var n = 0; n < touches.length; n++) {
+		var i = touches.item(n);
+		out.push({
+			//id: (i.identifier|0), // large values on iOS
+			id: (n|0),
+			x: (i.clientX|0),
+			y: (i.clientY|0)
+		});
+	}
+	return out;
+}
+
+document.addEventListener('touchstart', function(event) {
+	ensureLimeInput();
+	var touches = getTouches(event);
+	for (var n = 0; n < touches.length; n++) {
+		var t = touches[n];
+		{% SMETHOD com.jtransc.media.limelibgdx.LimeInput:lime_onTouchStart %}(t.id, t.x, t.y);
+	}
+}, false);
+
+document.addEventListener('touchmove', function(event) {
+	ensureLimeInput();
+	var touches = getTouches(event);
+	for (var n = 0; n < touches.length; n++) {
+		var t = touches[n];
+		{% SMETHOD com.jtransc.media.limelibgdx.LimeInput:lime_onTouchMove %}(t.id, t.x, t.y);
+	}
+}, false);
+
+document.addEventListener('touchend', function(event) {
+	ensureLimeInput();
+	var touches = getTouches(event);
+	for (var n = 0; n < touches.length; n++) {
+		var t = touches[n];
+		{% SMETHOD com.jtransc.media.limelibgdx.LimeInput:lime_onTouchEnd %}(t.id, t.x, t.y);
+	}
 }, false);
 
 downloadBytesList(assetsList.map(function(info) { return info.normalizedPath }), function(bytesList) {
@@ -265,11 +340,40 @@ function __decodeImage(path) {
 
 	var idata = ctx.getImageData(0, 0, image.width, image.height);
 	var array = new JA_I(image.width * image.height);
+	//array.data = new Int32Array(idata.data.buffer);
 	__convertPixels(idata.data, array.data, image.width * image.height);
 
 	return {
 		width: image.width,
 		height: image.height,
+		image: canvas,
 		data: array
 	};
+}
+
+
+function __decodeImageBytes(jbytes, offset, len, width, height) {
+	//var canvas = document.createElement('canvas');
+	//canvas.width = width;
+	//canvas.height = height;
+	//var ctx = canvas.getContext("2d");
+
+	var img = document.createElement('img');
+	var arrayBufferView = new Uint8Array(jbytes.data.buffer, offset, len);
+	var blob = new Blob( [ arrayBufferView ], { type: "image/jpeg" } );
+	var urlCreator = window.URL || window.webkitURL;
+	var imageUrl = urlCreator.createObjectURL( blob );
+	img.onload = function() {
+	};
+	img.onerror = function() {
+	};
+	img.src = imageUrl;
+
+	return {
+		width: width,
+		height: height,
+		image: img,
+		data: new JA_I(width * height)
+	};
+
 }

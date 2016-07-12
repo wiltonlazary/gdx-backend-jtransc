@@ -3,8 +3,30 @@
 <head>
 	<meta charset="utf-8">
 	<title>{{ title }}</title>
-	<script src="./program.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<meta name="HandheldFriendly" content="true" />
+	<style type="text/css">
+		html, body { overflow: hidden; }
+		body { background:black; }
+		html { -webkit-text-size-adjust: none; }
+	</style>
+	<meta name="apple-mobile-web-app-title" content="{{ title }}" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+	<!--
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+	-->
+
+	<script type="text/javascript">
+		// http://blog.teamtreehouse.com/optimizing-mobile-web-apps-ios
+		document.addEventListener('touchmove', function(e) { e.preventDefault(); }, false);
+		if (window.navigator.standalone) {
+			// The app is running in standalone mode.
+		}
+	</script>
+	<script src="./program.js" defer></script>
 </head>
-<body style="background:black;">
+<body>
 </body>
 </html>

@@ -211,11 +211,13 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	}
 
 	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getWidth();")
+	@JTranscMethodBody(target = "js", value = "return window.innerWidth|0;")
 	static public int getWidth() {
 		return 640;
 	}
 
 	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getHeight();")
+	@JTranscMethodBody(target = "js", value = "return window.innerHeight|0;")
 	static public int getHeight() {
 		return 640;
 	}

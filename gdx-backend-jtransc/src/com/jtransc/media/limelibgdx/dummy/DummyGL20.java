@@ -1,6 +1,7 @@
 package com.jtransc.media.limelibgdx.dummy;
 
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.jtransc.media.limelibgdx.GL20Ext;
 
 import java.nio.Buffer;
@@ -659,5 +660,10 @@ public class DummyGL20 implements GL20Ext {
 	@Override
 	public void present() {
 
+	}
+
+	@Override
+	public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, Pixmap pixmap) {
+		glTexImage2D(target, level, internalformat, width, height, border, format, type, pixmap.getPixels());
 	}
 }

@@ -1,6 +1,7 @@
 package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.jtransc.ds.IntPool;
 import com.jtransc.media.limelibgdx.flash.agal.Agal;
 import com.jtransc.media.limelibgdx.flash.agal.GlSlToAgal;
@@ -1450,6 +1451,11 @@ public class StateGL20<TImpl extends StateGL20.Impl> implements GL20Ext {
 	@Override
 	public void present() {
 		impl.present();
+	}
+
+	@Override
+	public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, Pixmap pixmap) {
+		System.out.println("StateGL20.glTexImage2D:pixmap");
 	}
 }
 

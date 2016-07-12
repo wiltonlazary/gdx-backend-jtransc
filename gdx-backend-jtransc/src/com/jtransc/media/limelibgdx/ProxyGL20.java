@@ -1,6 +1,7 @@
 package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
@@ -827,6 +828,15 @@ public class ProxyGL20 implements GL20Ext {
 	public void present() {
 		if (parent instanceof GL20Ext) {
 			((GL20Ext)parent).present();
+		}
+	}
+
+	@Override
+	public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, Pixmap pixmap) {
+		if (parent instanceof GL20Ext) {
+			((GL20Ext)parent).glTexImage2D(target, level, internalformat, width, height, border, format, type, pixmap);
+		} else {
+			throw new RuntimeException("glTexImage2D with pixmap not supported");
 		}
 	}
 }
