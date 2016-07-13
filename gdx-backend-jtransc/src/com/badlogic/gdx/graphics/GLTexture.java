@@ -264,7 +264,9 @@ public abstract class GLTexture implements Disposable {
 
 		Gdx.gl.glPixelStorei(GL20.GL_UNPACK_ALIGNMENT, 1);
 		if (data.useMipMaps()) {
-			MipMapGenerator.generateMipMap(target, pixmap, pixmap.getWidth(), pixmap.getHeight());
+			//MipMapGenerator.generateMipMap(target, pixmap, pixmap.getActualWidth(), pixmap.getActualHeight());
+			Gdx.gl.glTexImage2D(target, 0, pixmap.getGLInternalFormat(), pixmap.getActualWidth(), pixmap.getActualHeight(), 0, pixmap.getGLFormat(), pixmap.getGLType(), pixmap.getPixels());
+			Gdx.gl20.glGenerateMipmap(target);
 		} else {
 			if (Gdx.gl instanceof GL20Ext) {
 				final GL20Ext glex = (GL20Ext) Gdx.gl;
@@ -275,12 +277,12 @@ public abstract class GLTexture implements Disposable {
 					public void run() {
 						int old = LimeGL20.bindedTextureId;
 						glex.glBindTexture(GL20.GL_TEXTURE_2D, bindedTextureId);
-						glex.glTexImage2D(target, miplevel, finalPixmap.getGLInternalFormat(), finalPixmap.getWidth(), finalPixmap.getHeight(), 0, finalPixmap.getGLFormat(), finalPixmap.getGLType(), finalPixmap);
+						glex.glTexImage2D(target, miplevel, finalPixmap.getGLInternalFormat(), finalPixmap.getActualWidth(), finalPixmap.getActualHeight(), 0, finalPixmap.getGLFormat(), finalPixmap.getGLType(), finalPixmap);
 						glex.glBindTexture(GL20.GL_TEXTURE_2D, old);
 					}
 				});
 			} else {
-				Gdx.gl.glTexImage2D(target, miplevel, pixmap.getGLInternalFormat(), pixmap.getWidth(), pixmap.getHeight(), 0, pixmap.getGLFormat(), pixmap.getGLType(), pixmap.getPixels());
+				Gdx.gl.glTexImage2D(target, miplevel, pixmap.getGLInternalFormat(), pixmap.getActualWidth(), pixmap.getActualHeight(), 0, pixmap.getGLFormat(), pixmap.getGLType(), pixmap.getPixels());
 			}
 		}
 		if (disposePixmap) pixmap.dispose();

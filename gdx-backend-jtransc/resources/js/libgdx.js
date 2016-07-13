@@ -327,14 +327,26 @@ function __convertPixels(input, output, size) {
 	}
 }
 
+
+function npot(x) {
+    if (x < 0) return 0;
+    --x;
+    x |= x >> 1;
+    x |= x >> 2;
+    x |= x >> 4;
+    x |= x >> 8;
+    x |= x >> 16;
+    return x + 1;
+}
+
 function __decodeImage(path) {
 	var asset = assets[normalizePath(path)];
 	if (!asset) throw 'Unknown asset ' + path;
 	if (!asset.image) throw 'Asset without image ' + path;
 	var image = asset.image;
 	var canvas = document.createElement('canvas');
-	canvas.width = image.width;
-	canvas.height = image.height;
+	canvas.width = npot(image.width);
+	canvas.height = npot(image.height);
 	var ctx = canvas.getContext("2d");
 	ctx.drawImage(image, 0, 0);
 
@@ -346,17 +358,18 @@ function __decodeImage(path) {
 	return {
 		width: image.width,
 		height: image.height,
+		actualWidth: canvas.width,
+		actualHeight: canvas.height,
 		image: canvas,
 		data: array
 	};
 }
 
-
 function __decodeImageBytes(jbytes, offset, len, width, height) {
-	//var canvas = document.createElement('canvas');
-	//canvas.width = width;
-	//canvas.height = height;
-	//var ctx = canvas.getContext("2d");
+	var canvas = document.createElement('canvas');
+	canvas.width = npot(width);
+	canvas.height = npot(height);
+	var ctx = canvas.getContext("2d");
 
 	var img = document.createElement('img');
 	var arrayBufferView = new Uint8Array(jbytes.data.buffer, offset, len);
@@ -364,6 +377,8 @@ function __decodeImageBytes(jbytes, offset, len, width, height) {
 	var urlCreator = window.URL || window.webkitURL;
 	var imageUrl = urlCreator.createObjectURL( blob );
 	img.onload = function() {
+		ctx.drawImage(img, 0, 0);
+		// write data
 	};
 	img.onerror = function() {
 	};
@@ -372,7 +387,9 @@ function __decodeImageBytes(jbytes, offset, len, width, height) {
 	return {
 		width: width,
 		height: height,
-		image: img,
+		image: canvas,
+		actualWidth: canvas.width,
+		actualHeight: canvas.height,
 		data: new JA_I(width * height)
 	};
 

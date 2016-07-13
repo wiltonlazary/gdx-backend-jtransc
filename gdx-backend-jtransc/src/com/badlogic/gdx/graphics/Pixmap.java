@@ -16,7 +16,6 @@
 
 package com.badlogic.gdx.graphics;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Gdx2DPixmap;
 import com.badlogic.gdx.utils.Disposable;
@@ -117,6 +116,8 @@ public class Pixmap implements Disposable {
 
 	int width;
 	int height;
+	int actualWidth;
+	int actualHeight;
 	Format format;
 	int id;
 	//IntBuffer buffer;
@@ -154,6 +155,8 @@ public class Pixmap implements Disposable {
 		"this['{% FIELD com.badlogic.gdx.graphics.Pixmap:data %}'] = image.data;",
 		"this['{% FIELD com.badlogic.gdx.graphics.Pixmap:width %}'] = image.width;",
 		"this['{% FIELD com.badlogic.gdx.graphics.Pixmap:height %}'] = image.height;",
+		"this['{% FIELD com.badlogic.gdx.graphics.Pixmap:actualWidth %}'] = image.actualWidth;",
+		"this['{% FIELD com.badlogic.gdx.graphics.Pixmap:actualHeight %}'] = image.actualHeight;",
 	})
 	private void loadImageNativeJs(String path) {
 	}
@@ -175,6 +178,8 @@ public class Pixmap implements Disposable {
 		"this['{% FIELD com.badlogic.gdx.graphics.Pixmap:data %}'] = image.data;",
 		"this['{% FIELD com.badlogic.gdx.graphics.Pixmap:width %}'] = image.width;",
 		"this['{% FIELD com.badlogic.gdx.graphics.Pixmap:height %}'] = image.height;",
+		"this['{% FIELD com.badlogic.gdx.graphics.Pixmap:actualWidth %}'] = image.actualWidth;",
+		"this['{% FIELD com.badlogic.gdx.graphics.Pixmap:actualHeight %}'] = image.actualHeight;",
 	})
 	private void loadImageNativeJs(byte[] encodedData, int offset, int len, int width, int height) {
 	}
@@ -213,8 +218,8 @@ public class Pixmap implements Disposable {
 		} else {
 			ImageDecoder.BitmapData bitmap = ImageDecoder.decode(encodedData);
 			this.data = bitmap.data;
-			this.width = bitmap.width;
-			this.height = bitmap.height;
+			this.actualWidth = this.width = bitmap.width;
+			this.actualHeight = this.height = bitmap.height;
 		}
 	}
 
@@ -229,8 +234,8 @@ public class Pixmap implements Disposable {
 		} else {
 			ImageDecoder.BitmapData bitmap = ImageDecoder.decode(JTranscIoTools.readFile(new File(path)));
 			this.data = bitmap.data;
-			this.width = bitmap.width;
-			this.height = bitmap.height;
+			this.actualWidth = this.width = bitmap.width;
+			this.actualHeight = this.height = bitmap.height;
 		}
 	}
 
@@ -304,6 +309,15 @@ public class Pixmap implements Disposable {
 	public int getHeight() {
 		return height;
 	}
+
+	public int getActualWidth() {
+		return actualWidth;
+	}
+
+	public int getActualHeight() {
+		return actualHeight;
+	}
+
 
 	//public Buffer getPixels() {
 	//  return buffer;
