@@ -323,7 +323,17 @@ function _floatArray(array, offset, count) {
 
 function __convertPixels(input, output, size) {
 	for (var n = 0, m = 0; n < size; n++, m += 4) {
-		output[n] = (input[m + 0] << 24) | (input[m + 1] << 16) | (input[m + 2] << 8) | (input[m + 3] << 0);
+		var r = input[m + 0];
+		var g = input[m + 1];
+		var b = input[m + 2];
+		var a = input[m + 3];
+		output[n] = (a << 24) | (r << 16) | (g << 8) | (b << 0);
+		//output[n] = (a << 24) | (g << 16) | (r << 8) | (b << 0);
+		//output[n] = (a << 24) | (a << 16) | (g << 8) | (r << 0);
+
+		//output[n] = (input[m + 0] << 24) | (input[m + 1] << 16) | (input[m + 2] << 8) | (input[m + 3] << 0);
+		//output[n] = (input[m + 0] << 0) | (input[m + 1] << 24) | (input[m + 2] << 16) | (input[m + 3] << 8);
+		//output[n] = (input[m + 0] << 24) | (input[m + 1] << 0) | (input[m + 2] << 8) | (input[m + 3] << 16);
 	}
 }
 
@@ -373,7 +383,7 @@ function __decodeImageBytes(jbytes, offset, len, width, height) {
 
 	var img = document.createElement('img');
 	var arrayBufferView = new Uint8Array(jbytes.data.buffer, offset, len);
-	var blob = new Blob( [ arrayBufferView ], { type: "image/jpeg" } );
+	var blob = new Blob([arrayBufferView], { type: "image/jpeg" });
 	var urlCreator = window.URL || window.webkitURL;
 	var imageUrl = urlCreator.createObjectURL( blob );
 	img.onload = function() {

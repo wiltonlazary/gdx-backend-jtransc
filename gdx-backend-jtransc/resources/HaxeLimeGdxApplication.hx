@@ -65,7 +65,7 @@ class HaxeLimeGdxApplication extends lime.app.Application {
 		throw 'Not implemented convertBuffer!';
     }
 
-    static public function convertIntArray(buf:HaxeArrayInt, offset:Int, size:Int):lime.utils.Int32Array {
+    static public function convertIntArray(buf:JA_I, offset:Int, size:Int):lime.utils.Int32Array {
         var len = buf.length;
         var out = new lime.utils.Int32Array(len);
         for (n in 0 ... len) out[n] = buf.get(n);
