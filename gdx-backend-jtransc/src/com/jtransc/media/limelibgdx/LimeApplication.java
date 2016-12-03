@@ -22,7 +22,7 @@ import java.io.IOException;
 	"    public function new() {\n" +
 	"        super();\n" +
 	"        {{ inits }}\n" +
-	"        {{ mainClass }}.{{ mainMethod }}(HaxeNatives.strArray(HaxeNatives.args()));\n" +
+	"        {{ mainClass }}.{{ mainMethod }}(N.strArray(N.args()));\n" +
 	"    }\n" +
 	"}\n"
 )
@@ -49,7 +49,7 @@ import java.io.IOException;
 	"@limetest.cmd"
 })
 @HaxeAddLibraries({
-	"lime:2.9.1"
+	"lime:3.4.1"
 })
 @HaxeAddAssets({
 	"com/badlogic/gdx/utils/arial-15.fnt",
@@ -181,7 +181,7 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 				private String content = "";
 
 				@Override
-				@HaxeMethodBody("return HaxeNatives.str(lime.system.Clipboard.text);")
+				@HaxeMethodBody("return N.str(lime.system.Clipboard.text);")
 				native public String getContents();
 
 				@Override

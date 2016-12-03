@@ -73,7 +73,7 @@ class HaxeLimeGdxApplication extends lime.app.Application {
         return out;
     }
 
-    static public function convertFloatArray(buf:HaxeArrayFloat, offset:Int, size:Int):lime.utils.Float32Array {
+    static public function convertFloatArray(buf:JA_F, offset:Int, size:Int):lime.utils.Float32Array {
         var len = buf.length;
         var out = new lime.utils.Float32Array(len);
         for (n in 0 ... len) out[n] = buf.get(n);

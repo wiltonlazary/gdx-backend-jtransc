@@ -122,7 +122,7 @@ public class LimeFiles implements Files {
 		@JTranscMethodBody(target = "js", value = "return libgdx.io.exists(N.istr(p0));")
 		native private boolean exists(String path);
 
-		@HaxeMethodBody("return HaxeArrayByte.fromBytes(lime.Assets.getBytes(p0._str));")
+		@HaxeMethodBody("return JA_B.fromBytes(lime.Assets.getBytes(p0._str));")
 		@JTranscMethodBody(target = "js", value = "return libgdx.io.readBytes(N.istr(p0));")
 		native private byte[] readBytes(String path, int mode);
 	}

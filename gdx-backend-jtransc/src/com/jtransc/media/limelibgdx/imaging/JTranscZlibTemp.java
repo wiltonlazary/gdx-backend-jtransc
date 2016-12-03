@@ -21,8 +21,8 @@ public class JTranscZlibTemp {
 	@HaxeMethodBody("return null;")
 	native static private byte[] nativeInflate(byte[] data, int outputSize);
 
-	@HaxeMethodBody(target = "flash", value = "return HaxeArrayByte.fromBytes(haxe.zip.Uncompress.run(p0.getBytes(), p1));")
-	@HaxeMethodBody(target = "sys", value = "return HaxeArrayByte.fromBytes(haxe.zip.Uncompress.run(p0.getBytes(), p1));")
+	@HaxeMethodBody(target = "flash", value = "return JA_B.fromBytes(haxe.zip.Uncompress.run(p0.getBytes(), p1));")
+	@HaxeMethodBody(target = "sys", value = "return JA_B.fromBytes(haxe.zip.Uncompress.run(p0.getBytes(), p1));")
 	static public byte[] uncompress(byte[] data, int outputSize) {
 		try {
 			if (hasNativeInflate()) {

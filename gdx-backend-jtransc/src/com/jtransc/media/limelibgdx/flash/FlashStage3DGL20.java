@@ -1,5 +1,6 @@
 package com.jtransc.media.limelibgdx.flash;
 
+import com.jtransc.annotation.JTranscInvisible;
 import com.jtransc.annotation.JTranscNativeClass;
 import com.jtransc.annotation.haxe.HaxeAvailableOnTargets;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
@@ -14,12 +15,14 @@ import java.util.Map;
 import static com.jtransc.media.limelibgdx.StateGL20.*;
 
 @HaxeAvailableOnTargets({"flash"})
+@JTranscInvisible
 public class FlashStage3DGL20 {
 	static public GL20Ext create() {
 		return new StateGL20(new FlashImpl());
 	}
 
 	@HaxeAvailableOnTargets({"flash"})
+	@JTranscInvisible
 	static private class FlashImpl extends StateGL20.Impl {
 		@HaxeMethodBody("return HaxeLimeGdxApplication.context3D;")
 		native static Context3D getContext3D();
@@ -97,6 +100,7 @@ public class FlashStage3DGL20 {
 	}
 
 	@HaxeAvailableOnTargets({"flash"})
+	@JTranscInvisible
 	static class FlashGLBuffer extends GLBuffer {
 		@Override
 		public void dispose() {
@@ -115,6 +119,7 @@ public class FlashStage3DGL20 {
 	}
 
 	@HaxeAvailableOnTargets({"flash"})
+	@JTranscInvisible
 	static class FlashProgram extends StateGL20.Program {
 		Context3D context;
 		Program3D program;
@@ -155,6 +160,7 @@ public class FlashStage3DGL20 {
 	}
 
 	@HaxeAvailableOnTargets({"flash"})
+	@JTranscInvisible
 	static public class FlashShader extends Shader {
 		public FlashShader(ShaderType type) {
 			super(type);
@@ -163,6 +169,7 @@ public class FlashStage3DGL20 {
 	}
 
 	@HaxeAvailableOnTargets({"flash"})
+	@JTranscInvisible
 	static class FlashTexture extends Texture {
 		final Context3D context;
 		//Textures.Texture internal;
@@ -223,6 +230,7 @@ public class FlashStage3DGL20 {
 
 	@HaxeAvailableOnTargets({"flash"})
 	@JTranscNativeClass("flash.display3D.Context3D")
+	@JTranscInvisible
 	static class Context3D {
 		native public void clear(double red, double green, double blue, double alpha, double depth, int stencil, int mask);
 
@@ -273,6 +281,7 @@ public class FlashStage3DGL20 {
 	// http://wonderfl.net/c/qc87
 	@HaxeAvailableOnTargets({"flash"})
 	@JTranscNativeClass("flash.display3D.Context3DClearMask")
+	@JTranscInvisible
 	static class ClearMask {
 		static public final int COLOR = 1;
 		static public final int DEPTH = 2;
@@ -281,6 +290,7 @@ public class FlashStage3DGL20 {
 	}
 
 	@HaxeAvailableOnTargets({"flash"})
+	@JTranscInvisible
 	static class Textures {
 		@JTranscNativeClass("flash.display3D.textures.Texture")
 		static class Texture {
@@ -306,6 +316,7 @@ public class FlashStage3DGL20 {
 	//}
 
 	@HaxeAvailableOnTargets({"flash"})
+	@JTranscInvisible
 	static class As3Utils {
 		@HaxeMethodBody("return p0.getBytesData();")
 		native static public ByteArray toByteArray(byte[] bytes);
@@ -313,16 +324,19 @@ public class FlashStage3DGL20 {
 
 	@HaxeAvailableOnTargets({"flash"})
 	@JTranscNativeClass("flash.utils.ByteArray")
+	@JTranscInvisible
 	static class ByteArray {
 	}
 
 	@HaxeAvailableOnTargets({"flash"})
 	@JTranscNativeClass("flash.display.BitmapData")
+	@JTranscInvisible
 	static class BitmapData {
 	}
 
 	@HaxeAvailableOnTargets({"flash"})
 	@JTranscNativeClass("flash.display3D.Program3D")
+	@JTranscInvisible
 	static class Program3D {
 		native public void dispose();
 
@@ -330,6 +344,7 @@ public class FlashStage3DGL20 {
 	}
 
 	@HaxeAvailableOnTargets({"flash"})
+	@JTranscInvisible
 	static class Context3DClearMask {
 		static public final int COLOR = 1;
 		static public final int DEPTH = 2;
