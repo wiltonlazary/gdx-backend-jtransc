@@ -83,11 +83,7 @@ public class ImageDecoder {
 					final int width = decoder.getWidth();
 					final int height = decoder.getHeight();
 					final ByteBuffer data = ByteBuffer.allocate(width * height * 4);
-					if (JTranscSystem.isPureJs()) {
-						decoder.decode(data, width * 4, PNGDecoder.Format.RGBA);
-					} else {
-						decoder.decode(data, width * 4, PNGDecoder.Format.ABGR);
-					}
+					decoder.decode(data, width * 4, PNGDecoder.Format.RGBA);
 					data.rewind();
 					out = new BitmapData(toIntArray(data), width, height);
 					break;

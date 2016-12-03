@@ -24,18 +24,16 @@ function downloadBytes(url, callback) {
 	  var arrayBuffer = oReq.response; // Note: not oReq.responseText
 	  if (arrayBuffer) {
 	  	var array = new Uint8Array(arrayBuffer);
-	  	if (url.match(/(png|jpg)$/)) {
+	  	var isPng = url.match(/png$/);
+	  	var isJpg = url.match(/jpg$/);
+	  	if (isPng || isJpg) {
 	  		var img = document.createElement('img');
-			var arrayBufferView = new Uint8Array( this.response );
-			var blob = new Blob( [ arrayBufferView ], { type: "image/jpeg" } );
+			var arrayBufferView = new Uint8Array(this.response);
+			var blob = new Blob([arrayBufferView], { type: isPng ? "image/png" : "image/jpeg" });
 			var urlCreator = window.URL || window.webkitURL;
 			var imageUrl = urlCreator.createObjectURL( blob );
-			img.onload = function() {
-				callback(array, img);
-			};
-			img.onerror = function() {
-				callback(array, null);
-			};
+			img.onload = function() { callback(array, img); };
+			img.onerror = function() { callback(array, null); };
 			img.src = imageUrl;
 
 	  	} else {
@@ -139,10 +137,9 @@ libgdx.init = function() {
 };
 
 libgdx.initOnce = function() {
-	if (!this.initialized) {
-		this.initialized = true;
-		this.init();
-	}
+	if (this.initialized) return;
+	this.initialized = true;
+	this.init();
 };
 
 libgdx.frame = function() {
@@ -306,6 +303,22 @@ function _buffer(buffer, size) {
 	//return new Uint8Array(array.data);
 }
 
+function _arrayCopyRev(inp) {
+	var len = inp.length;
+	var out = new Uint8Array(len);
+	for (var n = 0; n < len; n += 4) {
+		var r = inp[n + 0];
+		var g = inp[n + 1];
+		var b = inp[n + 2];
+		var a = inp[n + 3];
+		out[n + 0] = a;
+		out[n + 1] = b;
+		out[n + 2] = g;
+		out[n + 3] = r;
+	}
+	return out;
+}
+
 function _floatBuffer(buffer, size) {
 	var array = _getBufferArray(buffer);
 	if (!size) size = array.length;
@@ -321,19 +334,13 @@ function _floatArray(array, offset, count) {
 	return new Float32Array(array.data.buffer);
 }
 
-function __convertPixels(input, output, size) {
+function __convertPixels(input, output, size, width, height) {
 	for (var n = 0, m = 0; n < size; n++, m += 4) {
-		var r = input[m + 0];
-		var g = input[m + 1];
-		var b = input[m + 2];
-		var a = input[m + 3];
-		output[n] = (a << 24) | (r << 16) | (g << 8) | (b << 0);
-		//output[n] = (a << 24) | (g << 16) | (r << 8) | (b << 0);
-		//output[n] = (a << 24) | (a << 16) | (g << 8) | (r << 0);
-
-		//output[n] = (input[m + 0] << 24) | (input[m + 1] << 16) | (input[m + 2] << 8) | (input[m + 3] << 0);
-		//output[n] = (input[m + 0] << 0) | (input[m + 1] << 24) | (input[m + 2] << 16) | (input[m + 3] << 8);
-		//output[n] = (input[m + 0] << 24) | (input[m + 1] << 0) | (input[m + 2] << 8) | (input[m + 3] << 16);
+		var r = input[m + 0] & 0xFF;
+		var g = input[m + 1] & 0xFF;
+		var b = input[m + 2] & 0xFF;
+		var a = input[m + 3] & 0xFF;
+		output[n] = (r << 24) | (g << 16) | (b << 8) | (a << 0);
 	}
 }
 
@@ -355,15 +362,21 @@ function __decodeImage(path) {
 	if (!asset.image) throw 'Asset without image ' + path;
 	var image = asset.image;
 	var canvas = document.createElement('canvas');
-	canvas.width = npot(image.width);
-	canvas.height = npot(image.height);
+	canvas.style.width = canvas.width = npot(image.width);
+	canvas.style.height = canvas.height = npot(image.height);
+
+	//canvas.style.width = canvas.width = (image.width);
+	//canvas.style.height = canvas.height = (image.height);
+
 	var ctx = canvas.getContext("2d");
-	ctx.drawImage(image, 0, 0);
+	ctx.imageSmoothingEnabled = false;
+	ctx.drawImage(image, 0, 0, image.width, image.height);
 
 	var idata = ctx.getImageData(0, 0, image.width, image.height);
 	var array = new JA_I(image.width * image.height);
 	//array.data = new Int32Array(idata.data.buffer);
-	__convertPixels(idata.data, array.data, image.width * image.height);
+
+	__convertPixels(idata.data, array.data, image.width * image.height, image.width, image.height);
 
 	return {
 		width: image.width,
@@ -377,9 +390,14 @@ function __decodeImage(path) {
 
 function __decodeImageBytes(jbytes, offset, len, width, height) {
 	var canvas = document.createElement('canvas');
-	canvas.width = npot(width);
-	canvas.height = npot(height);
+	canvas.style.width = canvas.width = npot(width);
+	canvas.style.height = canvas.height = npot(height);
+
+	//canvas.style.width = canvas.width = width;
+	//canvas.style.height = canvas.height = height;
+
 	var ctx = canvas.getContext("2d");
+	ctx.imageSmoothingEnabled = false;
 
 	var img = document.createElement('img');
 	var arrayBufferView = new Uint8Array(jbytes.data.buffer, offset, len);

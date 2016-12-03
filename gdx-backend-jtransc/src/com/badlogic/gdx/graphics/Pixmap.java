@@ -127,14 +127,17 @@ public class Pixmap implements Disposable {
 	private boolean pixelsAvailable = true;
 
 	public Pixmap(FileHandle file) {
-		try {
+		this(file, true);
+	}
 
-			loadImage((file.file().isAbsolute()) ? file.file().getPath() : LimeFiles.fixpath(file.file().getPath()));
+	public Pixmap(FileHandle file, boolean pixelPerfect) {
+		try {
+			loadImage((file.file().isAbsolute()) ? file.file().getPath() : LimeFiles.fixpath(file.file().getPath()), pixelPerfect);
 			//JTranscArrays.swizzle_inplace(data, 24, 16, 8, 0);
 			//JTranscArrays.swizzle_inplace(data, 0, 8, 16, 24);
-			if (!JTranscSystem.isPureJs()) {
-				JTranscArrays.swizzle_inplace_reverse(data);
-			}
+			//if (!JTranscSystem.isPureJs()) {
+			//	JTranscArrays.swizzle_inplace_reverse(data);
+			//}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -149,7 +152,7 @@ public class Pixmap implements Disposable {
 	}
 
 	@JTranscMethodBody(target = "js", value = {
-		"var image = __decodeImage(p0);",
+		"var image = __decodeImage(N.istr(p0));",
 		"this.INT_image = image.image;",
 		"this.INT_data = image.data;",
 		"this['{% FIELD com.badlogic.gdx.graphics.Pixmap:data %}'] = image.data;",
@@ -210,26 +213,29 @@ public class Pixmap implements Disposable {
 	}
 
 	private void loadImage(byte[] encodedData, int offset, int len) {
+		/*
 		if (JTranscSystem.isPureJs()) {
 			ImageInfo.Size size = ImageInfo.detect(encodedData, offset, len);
 			pixelsAvailable = false;
 			loaded = false;
 			loadImageNativeJs(encodedData, offset, len, (size != null) ? size.width : 1, (size != null) ? size.height : 1);
 		} else {
+		*/
 			ImageDecoder.BitmapData bitmap = ImageDecoder.decode(encodedData);
 			this.data = bitmap.data;
 			this.actualWidth = this.width = bitmap.width;
 			this.actualHeight = this.height = bitmap.height;
-		}
+		//}
 	}
 
-	private void loadImage(String path) throws IOException {
+	private void loadImage(String path, boolean pixelPerfect) throws IOException {
 		//if (JTranscSystem.isSwf() || !JTranscSystem.usingJTransc()) {
 		//if (true) {
 		//if (JTranscSystem.isHaxe()) {
 		//	loadImageNative(path);
 		//}
-		if (JTranscSystem.isPureJs()) {
+
+		if (!pixelPerfect && JTranscSystem.isPureJs()) {
 			loadImageNativeJs(path);
 		} else {
 			ImageDecoder.BitmapData bitmap = ImageDecoder.decode(JTranscIoTools.readFile(new File(path)));

@@ -431,9 +431,7 @@ public class PNGDecoder {
 				byte g = curLine[i + 1];
 				byte b = curLine[i + 2];
 				byte a = (byte) 0xFF;
-				if (r == tr && g == tg && b == tb) {
-					a = 0;
-				}
+				if (r == tr && g == tg && b == tb) a = 0;
 				buffer.put(a).put(b).put(g).put(r);
 			}
 		} else {
@@ -453,9 +451,7 @@ public class PNGDecoder {
 				byte g = curLine[i + 1];
 				byte b = curLine[i + 2];
 				byte a = (byte) 0xFF;
-				if (r == tr && g == tg && b == tb) {
-					a = 0;
-				}
+				if (r == tr && g == tg && b == tb) a = 0;
 				buffer.put(r).put(g).put(b).put(a);
 			}
 		} else {
@@ -475,9 +471,7 @@ public class PNGDecoder {
 				byte g = curLine[i + 1];
 				byte b = curLine[i + 2];
 				byte a = (byte) 0xFF;
-				if (r == tr && g == tg && b == tb) {
-					a = 0;
-				}
+				if (r == tr && g == tg && b == tb) a = 0;
 				buffer.put(b).put(g).put(r).put(a);
 			}
 		} else {
@@ -604,7 +598,7 @@ public class PNGDecoder {
 			int val = src[1 + (i >> 3)] & 255;
 			switch (n - i) {
 				default:
-					dst[i + 7] = (byte) ((val) & 1);
+					dst[i + 7] = (byte) ((val >> 0) & 1);
 				case 7:
 					dst[i + 6] = (byte) ((val >> 1) & 1);
 				case 6:

@@ -95,7 +95,7 @@ public interface TextureData {
 			if (file.name().endsWith(".cim")) return new FileTextureData(file, PixmapIO.readCIM(file), format, useMipMaps);
 			if (file.name().endsWith(".etc1")) return new ETC1TextureData(file, useMipMaps);
 			if (file.name().endsWith(".ktx") || file.name().endsWith(".zktx")) return new KTXTextureData(file, useMipMaps);
-			return new FileTextureData(file, new Pixmap(file), format, useMipMaps);
+			return new FileTextureData(file, new Pixmap(file, false), format, useMipMaps);
 		}
 
 	}

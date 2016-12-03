@@ -21,6 +21,7 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.jtransc.media.limelibgdx.LimeFileHandle;
 
+@SuppressWarnings("WeakerAccess")
 public class ResolutionFileResolver implements FileHandleResolver {
 	public static class Resolution {
 		public final int portraitWidth;

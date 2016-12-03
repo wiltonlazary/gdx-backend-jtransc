@@ -45,6 +45,10 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 		return new LimeGL20();
 	}
 
+	public LimeGL20() {
+		_init();
+	}
+
 	@JTranscMethodBody(target = "js", value = {
 		"this.lastId = 1000;",
 		"this.textures = new Map();",
@@ -55,7 +59,7 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 		"this.renderBuffers = new Map();",
 		"this.uniformLocations = new Map();",
 	})
-	public LimeGL20() {
+	private void _init() {
 	}
 
 	@HaxeMethodBody("GL.activeTexture(p0);")
@@ -248,7 +252,7 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 	native public void glStencilOp(int fail, int zfail, int zpass);
 
 	@HaxeMethodBody("GL.texImage2D(p0, p1, p2, p3, p4, p5, p6, p7, _buffer(p8));")
-	@JTranscMethodBody(target = "js", value = "GL.texImage2D(p0, p1, p2, p3, p4, p5, p6, p7, _buffer(p8));")
+	@JTranscMethodBody(target = "js", value = "GL.texImage2D(p0, p1, p2, p3, p4, p5, p6, p7, _arrayCopyRev(_buffer(p8)));")
 	native private void _glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, Buffer pixels);
 
 	public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, Buffer pixels) {
@@ -850,7 +854,7 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 		"	GL.texImage2D(target, level, internalformat, format, type, pixmap.INT_image);",
 		"} else {",
 		"	var jarray = pixmap['{% FIELD com.badlogic.gdx.graphics.Pixmap:data %}'];",
-		"	var arrayBufferView = new Uint8Array(jarray.data.buffer);",
+		"	var arrayBufferView = _arrayCopyRev(new Uint8Array(jarray.data.buffer));",
 		"	GL.texImage2D(target, level, internalformat, width, height, border, format, type, arrayBufferView);",
 		"}",
 	})
