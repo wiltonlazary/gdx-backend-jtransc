@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.zip.CRC32;
 
 /**
  * https://github.com/mattdesl/slim/tree/master/slim/src/slim/texture/io
@@ -41,7 +42,7 @@ public class ImageDecoder {
 	}
 
 	static public Format detect(byte[] buffer, int offset, int length) {
-		System.out.println("ImageDecoder.Format: Length:" + buffer.length + ": Header:" + buffer[0] + "," + buffer[1] + "," + buffer[2] + "," + buffer[3]);
+		//System.out.println("ImageDecoder.Format: Length:" + buffer.length + ": Header:" + buffer[0] + "," + buffer[1] + "," + buffer[2] + "," + buffer[3]);
 		if (checkMagic(buffer, offset, PNG_MAGIC)) return Format.PNG;
 		if (checkMagic(buffer, offset, JPG_MAGIC)) return Format.JPEG;
 		return Format.UNKNOWN;
@@ -63,8 +64,10 @@ public class ImageDecoder {
 
 	static public BitmapData decode(byte[] buffer, int offset, int length) {
 		try {
+			//System.out.printf("ImageDecoder.decode(%d): %08X\n", length, crc32.getValue());
+
 			Format format = detect(buffer, offset, length);
-			System.out.println("Format: " + format);
+			//System.out.println("Format: " + format);
 			BitmapData out;
 			double start = JTranscSystem.stamp();
 			switch (format) {

@@ -125,7 +125,8 @@ public class PNGDecoder {
 			switch (chunkType) {
 				case IDAT: {
 					byte[] compressedData = new byte[chunkLength];
-					readFully(compressedData, 0, compressedData.length);
+					readChunk(compressedData, 0, compressedData.length);
+					//readFully(compressedData, 0, compressedData.length);
 					idat.write(compressedData);
 					break;
 				}
@@ -779,6 +780,7 @@ public class PNGDecoder {
 			int expectedCrc = readInt(buffer, 0);
 			int computedCrc = (int) crc.getValue();
 			if (computedCrc != expectedCrc) {
+				//System.out.println("Invalid CRC");
 				throw new IOException("Invalid CRC");
 			}
 		}
@@ -826,6 +828,7 @@ public class PNGDecoder {
 			if (read < 0) {
 				throw new EOFException();
 			}
+			//chunkRemaining -= read;
 			offset += read;
 			length -= read;
 		} while (length > 0);

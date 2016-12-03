@@ -649,7 +649,8 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 		throw new RuntimeException("Not supported glShaderBinary");
 	}
 
-	@HaxeMethodBody("GL.shaderSource(this.shaders.get(p0), '#define GL_ES 1\\n' + N.istr(p1));")
+	//@HaxeMethodBody("GL.shaderSource(this.shaders.get(p0), '#define GL_ES 1\\n' + N.istr(p1));")
+	@HaxeMethodBody("GL.shaderSource(this.shaders.get(p0), N.istr(p1));")
 	@JTranscMethodBody(target = "js", value = "GL.shaderSource(this.shaders.get(p0), N.istr(p1));")
 	native public void glShaderSource(int shader, String string);
 

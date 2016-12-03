@@ -16,7 +16,7 @@ public class JTranscZlibTemp {
 		"var dst = haxe.io.Bytes.alloc(p1);\n" +
 		"u.execute(src, 0, dst, 0);\n" +
 		"u.close();\n" +
-		"return HaxeByteArray.fromBytes(dst);\n"
+		"return JA_B.fromBytes(dst);\n"
 	)
 	@HaxeMethodBody("return null;")
 	native static private byte[] nativeInflate(byte[] data, int outputSize);
