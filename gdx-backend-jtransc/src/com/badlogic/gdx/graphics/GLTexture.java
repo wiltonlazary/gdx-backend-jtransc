@@ -248,43 +248,44 @@ public abstract class GLTexture implements Disposable {
 		}
 
 		Pixmap pixmap = data.consumePixmap();
-		boolean disposePixmap = data.disposePixmap();
-		if (data.getFormat() != pixmap.getFormat()) {
-			Pixmap tmp = new Pixmap(pixmap.getWidth(), pixmap.getHeight(), data.getFormat());
-			Blending blend = Pixmap.getBlending();
-			Pixmap.setBlending(Blending.None);
-			tmp.drawPixmap(pixmap, 0, 0, 0, 0, pixmap.getWidth(), pixmap.getHeight());
-			Pixmap.setBlending(blend);
-			if (data.disposePixmap()) {
-				pixmap.dispose();
-			}
-			pixmap = tmp;
-			disposePixmap = true;
-		}
 
-		Gdx.gl.glPixelStorei(GL20.GL_UNPACK_ALIGNMENT, 1);
-		if (data.useMipMaps()) {
-			//MipMapGenerator.generateMipMap(target, pixmap, pixmap.getActualWidth(), pixmap.getActualHeight());
-			Gdx.gl.glTexImage2D(target, 0, pixmap.getGLInternalFormat(), pixmap.getActualWidth(), pixmap.getActualHeight(), 0, pixmap.getGLFormat(), pixmap.getGLType(), pixmap.getPixels());
-			Gdx.gl20.glGenerateMipmap(target);
+		if (Gdx.gl instanceof GL20Ext) {
+			final GL20Ext glex = (GL20Ext) Gdx.gl;
+			final int bindedTextureId = LimeGL20.bindedTextureId;
+			Pixmap finalPixmap = pixmap;
+			pixmap.onLoadedTextureAsync(new Runnable() {
+				@Override
+				public void run() {
+					int old = LimeGL20.bindedTextureId;
+					glex.glBindTexture(GL20.GL_TEXTURE_2D, bindedTextureId);
+					glex.glTexImage2D(target, miplevel, finalPixmap.getGLInternalFormat(), finalPixmap.getActualWidth(), finalPixmap.getActualHeight(), 0, finalPixmap.getGLFormat(), finalPixmap.getGLType(), finalPixmap);
+					glex.glBindTexture(GL20.GL_TEXTURE_2D, old);
+				}
+			});
 		} else {
-			if (Gdx.gl instanceof GL20Ext) {
-				final GL20Ext glex = (GL20Ext) Gdx.gl;
-				final int bindedTextureId = LimeGL20.bindedTextureId;
-				Pixmap finalPixmap = pixmap;
-				pixmap.onLoadedTextureAsync(new Runnable() {
-					@Override
-					public void run() {
-						int old = LimeGL20.bindedTextureId;
-						glex.glBindTexture(GL20.GL_TEXTURE_2D, bindedTextureId);
-						glex.glTexImage2D(target, miplevel, finalPixmap.getGLInternalFormat(), finalPixmap.getActualWidth(), finalPixmap.getActualHeight(), 0, finalPixmap.getGLFormat(), finalPixmap.getGLType(), finalPixmap);
-						glex.glBindTexture(GL20.GL_TEXTURE_2D, old);
-					}
-				});
+			boolean disposePixmap = data.disposePixmap();
+			if (data.getFormat() != pixmap.getFormat()) {
+				Pixmap tmp = new Pixmap(pixmap.getWidth(), pixmap.getHeight(), data.getFormat());
+				Blending blend = Pixmap.getBlending();
+				Pixmap.setBlending(Blending.None);
+				tmp.drawPixmap(pixmap, 0, 0, 0, 0, pixmap.getWidth(), pixmap.getHeight());
+				Pixmap.setBlending(blend);
+				if (data.disposePixmap()) {
+					pixmap.dispose();
+				}
+				pixmap = tmp;
+				disposePixmap = true;
+			}
+
+			Gdx.gl.glPixelStorei(GL20.GL_UNPACK_ALIGNMENT, 1);
+			if (data.useMipMaps()) {
+				//MipMapGenerator.generateMipMap(target, pixmap, pixmap.getActualWidth(), pixmap.getActualHeight());
+				Gdx.gl.glTexImage2D(target, 0, pixmap.getGLInternalFormat(), pixmap.getActualWidth(), pixmap.getActualHeight(), 0, pixmap.getGLFormat(), pixmap.getGLType(), pixmap.getPixels());
+				Gdx.gl20.glGenerateMipmap(target);
 			} else {
 				Gdx.gl.glTexImage2D(target, miplevel, pixmap.getGLInternalFormat(), pixmap.getActualWidth(), pixmap.getActualHeight(), 0, pixmap.getGLFormat(), pixmap.getGLType(), pixmap.getPixels());
 			}
+			if (disposePixmap) pixmap.dispose();
 		}
-		if (disposePixmap) pixmap.dispose();
 	}
 }

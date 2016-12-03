@@ -847,6 +847,11 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 	native public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride, int ptr);
 
 	@Override
+	public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, Pixmap pixmap) {
+		System.out.println("glTexImage2D:target=" + target + ",level=" + level + ",internalformat=" + internalformat + ",width=" + width + ",height=" + height + ",border=" + border + ",format=" + format + ",type=" + type + ",pixmap=" + pixmap);
+		_glTexImage2D(target, level, internalformat, width, height, border, format, type, pixmap);
+	}
+
 	@JTranscMethodBody(target = "js", value = {
 		"var target = p0, level = p1, internalformat = p2, width = p3, height = p4, border = p5, format = p6, type = p7, pixmap = p8;",
 
@@ -858,7 +863,7 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 		"	GL.texImage2D(target, level, internalformat, width, height, border, format, type, arrayBufferView);",
 		"}",
 	})
-	public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, Pixmap pixmap) {
+	private void _glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, Pixmap pixmap) {
 		_glTexImage2D(target, level, internalformat, width, height, border, format, type, pixmap.getPixels());
 	}
 }

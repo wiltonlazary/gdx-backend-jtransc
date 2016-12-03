@@ -243,6 +243,9 @@ public class Pixmap implements Disposable {
 			this.actualWidth = this.width = bitmap.width;
 			this.actualHeight = this.height = bitmap.height;
 		}
+
+		System.out.println("loadImage(size): " + this.width + "x" + this.height);
+		System.out.println("loadImage(actualSize): " + this.actualWidth + "x" + this.actualHeight);
 	}
 
 	@JTranscNativeClass("lime.Assets")
@@ -263,6 +266,8 @@ public class Pixmap implements Disposable {
 	private void create(int width, int height, Format format2) {
 		this.width = width;
 		this.height = height;
+		this.actualWidth = width;
+		this.actualHeight = height;
 		this.data = new int[width * height];
 		this.format = Format.RGBA8888;
 		createdEmpty();

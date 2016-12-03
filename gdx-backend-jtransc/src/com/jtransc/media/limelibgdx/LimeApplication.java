@@ -4,10 +4,7 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Clipboard;
 import com.jtransc.JTranscSystem;
-import com.jtransc.annotation.JTranscAddFile;
-import com.jtransc.annotation.JTranscMethodBody;
-import com.jtransc.annotation.JTranscRegisterCommand;
-import com.jtransc.annotation.JTranscRunCommand;
+import com.jtransc.annotation.*;
 import com.jtransc.annotation.haxe.*;
 
 import java.io.File;
@@ -69,6 +66,7 @@ import java.io.IOException;
 @JTranscAddFile(target = "all", process = false, isAsset = true, src = "com/badlogic/gdx/utils/arial-15.png", dst = "com/badlogic/gdx/utils/arial-15.png")
 @JTranscRegisterCommand(target = "js", name = "electron", command = "electron", check = { "electron", "--version" }, getFolderCmd = { "npm", "list", "-g" }, install = {"npm", "-g", "install", "electron-prebuilt" })
 @JTranscRunCommand(target = "js", value = { "electron", "{{ outputFolder }}/electron-main.js" })
+@JTranscAddKeywords(target = "all", value = { "GL", "gl", "app" })
 public class LimeApplication extends GdxApplicationAdapter implements Application {
 	static private final boolean TRACE = false;
 	//static private final boolean TRACE = true;
