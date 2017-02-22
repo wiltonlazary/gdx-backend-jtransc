@@ -6,10 +6,10 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.glutils.GLVersion;
+import com.jtransc.JTranscSystem;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
 import com.jtransc.media.limelibgdx.flash.FlashStage3DGL20;
 import com.jtransc.media.limelibgdx.gl.LimeGL20;
-import com.jtransc.JTranscSystem;
 import com.jtransc.media.limelibgdx.logger.LoggerGL20;
 
 public class LimeGraphics implements Graphics {
@@ -24,21 +24,15 @@ public class LimeGraphics implements Graphics {
 		this.gl = gl;
 	}
 
-	@HaxeMethodBody(target = "flash", value = "return {% SMETHOD com.jtransc.media.limelibgdx.flash.FlashStage3DGL20:create %}();")
+	//@HaxeMethodBody(target = "flash", value = "return {% SMETHOD com.jtransc.media.limelibgdx.flash.FlashStage3DGL20:create %}();")
 	@HaxeMethodBody("return {% SMETHOD com.jtransc.media.limelibgdx.gl.LimeGL20:create %}();")
-	private GL20Ext getInternalGl() {
-		if (JTranscSystem.isSwf()) {
-			return FlashStage3DGL20.create();
-		} else {
-			return LimeGL20.create();
-		}
-	}
+	native private GL20Ext getInternalGl();
 
 	private Monitor2[] monitors = new Monitor2[]{
-			new Monitor2(640, 480, "default")
+		new Monitor2(640, 480, "default")
 	};
 	private DisplayMode2[] displayModes = new DisplayMode2[]{
-			new DisplayMode2(640, 480, 60, 32)
+		new DisplayMode2(640, 480, 60, 32)
 	};
 	public int width = 640;
 	public int height = 480;
@@ -57,12 +51,13 @@ public class LimeGraphics implements Graphics {
 
 	double lastStamp = 0.0;
 	float deltaTime = 0f;
+
 	public void frame() {
 		double currentStamp = JTranscSystem.stamp();
 		frameId++;
 
 		double ms = JTranscSystem.elapsedTime(lastStamp, currentStamp);
-		deltaTime = (float)ms / 1000f;
+		deltaTime = (float) ms / 1000f;
 
 		lastStamp = currentStamp;
 	}
