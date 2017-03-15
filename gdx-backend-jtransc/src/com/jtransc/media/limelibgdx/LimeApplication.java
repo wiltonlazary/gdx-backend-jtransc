@@ -224,7 +224,6 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 
 	@SuppressWarnings("unused")
 	public void render() {
-		LimeInput.lime_frame();
 		super.render();
 		if (Gdx.gl instanceof GL20Ext) {
 			((GL20Ext)Gdx.gl).present();
@@ -233,6 +232,7 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 			firstFrame = false;
 			show();
 		}
+		LimeInput.lime_frame();
 	}
 
 	private boolean firstFrame = true;
