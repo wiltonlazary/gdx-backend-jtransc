@@ -54,19 +54,19 @@ public class LimeInput implements Input {
 	@SuppressWarnings("unused")
 	static public void lime_onKeyUp(int keyCode, int modifier) {
 		//System.out.println("lime_onKeyUp:" + keyCode + "," + modifier);
-		keys[keyCode & 0x1FF] = false;
-		justReleased[keyCode & 0x1FF] = true;
-
-		inputProcessor.keyUp(convertKeyCode(keyCode));
+		int key = convertKeyCode(keyCode);
+		keys[key & 0x1FF] = false;
+		justReleased[key & 0x1FF] = true;
+		inputProcessor.keyUp(key);
 	}
 
 	@SuppressWarnings("unused")
 	static public void lime_onKeyDown(int keyCode, int modifier) {
 		//System.out.println("lime_onKeyDown:" + keyCode + "," + modifier);
-		keys[keyCode & 0x1FF] = true;
-		justPressed[keyCode & 0x1FF] = true;
-
-		inputProcessor.keyDown(convertKeyCode(keyCode));
+		int key = convertKeyCode(keyCode);
+		keys[key & 0x1FF] = true;
+		justPressed[key & 0x1FF] = true;
+		inputProcessor.keyDown(key);
 	}
 
 	@SuppressWarnings("unused")
@@ -246,82 +246,56 @@ public class LimeInput implements Input {
 	static private int convertKeyCode(int i) {
 		// https://github.com/openfl/lime/blob/develop/lime/ui/KeyCode.hx
 		switch (i) {
-			case Keys.ENTER:
-				return 0x0D;
-			case Keys.ESCAPE:
-				return 0x1B;
-			case Keys.SPACE:
-				return 0x20;
-			case Keys.RIGHT:
-				return 0x4000004F;
-			case Keys.LEFT:
-				return 0x40000050;
-			case Keys.DOWN:
-				return 0x40000051;
-			case Keys.UP:
-				return 0x40000052;
-			case Keys.A:
-				return 0x61;
-			case Keys.B:
-				return 0x62;
-			case Keys.C:
-				return 0x63;
-			case Keys.D:
-				return 0x64;
-			case Keys.E:
-				return 0x65;
-			case Keys.F:
-				return 0x66;
-			case Keys.G:
-				return 0x67;
-			case Keys.H:
-				return 0x68;
-			case Keys.I:
-				return 0x69;
-			case Keys.J:
-				return 0x6A;
-			case Keys.K:
-				return 0x6B;
-			case Keys.L:
-				return 0x6C;
-			case Keys.M:
-				return 0x6D;
-			case Keys.N:
-				return 0x6E;
-			case Keys.O:
-				return 0x6F;
-			case Keys.P:
-				return 0x70;
-			case Keys.Q:
-				return 0x71;
-			case Keys.R:
-				return 0x72;
-			case Keys.S:
-				return 0x73;
-			case Keys.T:
-				return 0x74;
-			case Keys.U:
-				return 0x75;
-			case Keys.V:
-				return 0x76;
-			case Keys.W:
-				return 0x77;
-			case Keys.X:
-				return 0x78;
-			case Keys.Y:
-				return 0x79;
-			case Keys.Z:
-				return 0x7A;
+			case 0x0D: return Keys.ENTER;
+			case 0x1B: return Keys.ESCAPE;
+			case 0x20: return Keys.SPACE;
+			case 0x4000004F: return Keys.RIGHT;
+			case 0x40000050: return Keys.LEFT;
+			case 0x40000051: return Keys.DOWN;
+			case 0x40000052: return Keys.UP;
+			case 0x61: return Keys.A;
+			case 0x62: return Keys.B;
+			case 0x63: return Keys.C;
+			case 0x64: return Keys.D;
+			case 0x65: return Keys.E;
+			case 0x66: return Keys.F;
+			case 0x67: return Keys.G;
+			case 0x68: return Keys.H;
+			case 0x69: return Keys.I;
+			case 0x6A: return Keys.J;
+			case 0x6B: return Keys.K;
+			case 0x6C: return Keys.L;
+			case 0x6D: return Keys.M;
+			case 0x6E: return Keys.N;
+			case 0x6F: return Keys.O;
+			case 0x70: return Keys.P;
+			case 0x71: return Keys.Q;
+			case 0x72: return Keys.R;
+			case 0x73: return Keys.S;
+			case 0x74: return Keys.T;
+			case 0x75: return Keys.U;
+			case 0x76: return Keys.V;
+			case 0x77: return Keys.W;
+			case 0x78: return Keys.X;
+			case 0x79: return Keys.Y;
+			case 0x80: return Keys.Z;
 		}
-		return i & 0x1FF;
+		return Keys.UNKNOWN;
 	}
 
 	private boolean checkKeyArray(boolean[] array, int i) {
 		if (i < 0) {
-			for (int n = 0; n < array.length; n++) if (array[n]) return true;
+			for (int n = 0; n < array.length; n++) {
+				if (array[n]) {
+					return true;
+				}
+				return false;
+			}
+		}
+		if (i >= array.length) {
 			return false;
 		}
-		return array[convertKeyCode(i) & 0x1FF];
+		return array[i];
 	}
 
 	@Override
