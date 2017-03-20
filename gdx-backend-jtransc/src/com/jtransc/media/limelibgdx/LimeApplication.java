@@ -113,6 +113,17 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 		return new LimeGraphics(TRACE);
 	}
 
+	private ApplicationLogger applicationLogger;
+	@Override
+	public void setApplicationLogger(ApplicationLogger logger) {
+		this.applicationLogger = logger;
+	}
+
+	@Override
+	public ApplicationLogger getApplicationLogger() {
+		return applicationLogger;
+	}
+
 	// @TODO: mark package to include!
 	static private void referenceClasses() {
 		//new com.badlogic.gdx.graphics.g2d.BitmapFont();
