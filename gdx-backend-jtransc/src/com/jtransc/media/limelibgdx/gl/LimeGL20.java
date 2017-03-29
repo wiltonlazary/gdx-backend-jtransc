@@ -99,8 +99,8 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 	@JTranscMethodBody(target = "js", value = "GL.colorMask(p0, p1, p2, p3);")
 	native public void glColorMask(boolean red, boolean green, boolean blue, boolean alpha);
 
-	@HaxeMethodBody("GL.compressedTexImage2D(p0, p1, p2, p3, p4, p5, _buffer(p7, p6));")
-	@JTranscMethodBody(target = "js", value = "GL.compressedTexImage2D(p0, p1, p2, p3, p4, p5, _buffer(p7, p6));")
+	@HaxeMethodBody("GL.compressedTexImage2D(p0, p1, p2, p3, p4, p5, p6, _buffer(p7, p6));")
+	@JTranscMethodBody(target = "js", value = "GL.compressedTexImage2D(p0, p1, p2, p3, p4, p5, p6, _buffer(p7, p6));")
 	native public void glCompressedTexImage2D(int target, int level, int internalformat, int width, int height, int border, int imageSize, Buffer data);
 
 	@HaxeMethodBody("GL.compressedTexSubImage2D(p0, p1, p2, p3, p4, p5, p6, _buffer(p8, p7));")
@@ -324,12 +324,12 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 	@JTranscMethodBody(target = "js", value = "GL.blendFuncSeparate(p0, p1, p2, p3);")
 	native public void glBlendFuncSeparate(int srcRGB, int dstRGB, int srcAlpha, int dstAlpha);
 
-	@HaxeMethodBody("GL.bufferData(p0, _buffer(p2, p1), p3);")
-	@JTranscMethodBody(target = "js", value = "GL.bufferData(p0, _buffer(p2, p1), p3);")
+	@HaxeMethodBody("GL.bufferData(p0, p1, _buffer(p2, p1), p3);")
+	@JTranscMethodBody(target = "js", value = "GL.bufferData(p0, p1, _buffer(p2, p1), p3);")
 	native public void glBufferData(int target, int size, Buffer data, int usage);
 
-	@HaxeMethodBody("GL.bufferSubData(p0, p1, _buffer(p3, p2));")
-	@JTranscMethodBody(target = "js", value = "GL.bufferSubData(p0, p1, _buffer(p3, p2));")
+	@HaxeMethodBody("GL.bufferSubData(p0, p1, p2, _buffer(p3, p2));")
+	@JTranscMethodBody(target = "js", value = "GL.bufferSubData(p0, p1, p2, _buffer(p3, p2));")
 	native public void glBufferSubData(int target, int offset, int size, Buffer data);
 
 	@HaxeMethodBody("GL.compileShader(this.shaders.get(p0));")
@@ -690,80 +690,80 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 	@JTranscMethodBody(target = "js", value = "GL.uniform1f(this.uniformLocations.get(p0), p1);")
 	native public void glUniform1f(int location, float x);
 
-	@HaxeMethodBody("GL.uniform1fv(this.uniformLocations.get(p0), _floatBuffer(p2, p1));")
-	@JTranscMethodBody(target = "js", value = "GL.uniform1fv(this.uniformLocations.get(p0), _floatBuffer(p2, p1));")
+	@HaxeMethodBody("GL.uniform1fv(this.uniformLocations.get(p0), p1, _floatBuffer(p2, p1));")
+	@JTranscMethodBody(target = "js", value = "GL.uniform1fv(this.uniformLocations.get(p0), p1, _floatBuffer(p2, p1));")
 	native public void glUniform1fv(int location, int count, FloatBuffer v);
 
-	@HaxeMethodBody("GL.uniform1fv(this.uniformLocations.get(p0), _floatArray(p2, p3, p1));")
-	@JTranscMethodBody(target = "js", value = "GL.uniform1fv(this.uniformLocations.get(p0), _floatArray(p2, p3, p1));")
+	@HaxeMethodBody("GL.uniform1fv(this.uniformLocations.get(p0), p1, _floatArray(p2, p3, p1));")
+	@JTranscMethodBody(target = "js", value = "GL.uniform1fv(this.uniformLocations.get(p0), p1, _floatArray(p2, p3, p1));")
 	native public void glUniform1fv(int location, int count, float[] v, int offset);
 
 	@HaxeMethodBody("GL.uniform1i(this.uniformLocations.get(p0), p1);")
 	@JTranscMethodBody(target = "js", value = "GL.uniform1i(this.uniformLocations.get(p0), p1);")
 	native public void glUniform1i(int location, int x);
 
-	@HaxeMethodBody("GL.uniform1iv(this.uniformLocations.get(p0), _intBuffer(p2, p1));")
-	@JTranscMethodBody(target = "js", value = "GL.uniform1iv(this.uniformLocations.get(p0), _intBuffer(p2, p1));")
+	@HaxeMethodBody("GL.uniform1iv(this.uniformLocations.get(p0), p1, _intBuffer(p2, p1));")
+	@JTranscMethodBody(target = "js", value = "GL.uniform1iv(this.uniformLocations.get(p0), p1, _intBuffer(p2, p1));")
 	native public void glUniform1iv(int location, int count, IntBuffer v);
 
-	@HaxeMethodBody("GL.uniform1iv(this.uniformLocations.get(p0), _intArray(p2, p3, p1));")
-	@JTranscMethodBody(target = "js", value = "GL.uniform1iv(this.uniformLocations.get(p0), _intArray(p2, p3, p1));")
+	@HaxeMethodBody("GL.uniform1iv(this.uniformLocations.get(p0), p1, _intArray(p2, p3, p1));")
+	@JTranscMethodBody(target = "js", value = "GL.uniform1iv(this.uniformLocations.get(p0), p1, _intArray(p2, p3, p1));")
 	native public void glUniform1iv(int location, int count, int[] v, int offset);
 
 	@HaxeMethodBody("GL.uniform2f(this.uniformLocations.get(p0), p1, p2);")
 	@JTranscMethodBody(target = "js", value = "GL.uniform2f(this.uniformLocations.get(p0), p1, p2);")
 	native public void glUniform2f(int location, float x, float y);
 
-	@HaxeMethodBody("GL.uniform2fv(this.uniformLocations.get(p0), _floatBuffer(p2, p1));")
-	@JTranscMethodBody(target = "js", value = "GL.uniform2fv(this.uniformLocations.get(p0), _floatBuffer(p2, p1));")
+	@HaxeMethodBody("GL.uniform2fv(this.uniformLocations.get(p0), p1, _floatBuffer(p2, p1));")
+	@JTranscMethodBody(target = "js", value = "GL.uniform2fv(this.uniformLocations.get(p0), p1, _floatBuffer(p2, p1));")
 	native public void glUniform2fv(int location, int count, FloatBuffer v);
 
-	@HaxeMethodBody("GL.uniform2fv(this.uniformLocations.get(p0), _floatArray(p2, p3, p1));")
-	@JTranscMethodBody(target = "js", value = "GL.uniform2fv(this.uniformLocations.get(p0), _floatArray(p2, p3, p1));")
+	@HaxeMethodBody("GL.uniform2fv(this.uniformLocations.get(p0), p1, _floatArray(p2, p3, p1));")
+	@JTranscMethodBody(target = "js", value = "GL.uniform2fv(this.uniformLocations.get(p0), p1, _floatArray(p2, p3, p1));")
 	native public void glUniform2fv(int location, int count, float[] v, int offset);
 
 	@HaxeMethodBody("GL.uniform2i(this.uniformLocations.get(p0), p1, p2);")
 	@JTranscMethodBody(target = "js", value = "GL.uniform2i(this.uniformLocations.get(p0), p1, p2);")
 	native public void glUniform2i(int location, int x, int y);
 
-	@HaxeMethodBody("GL.uniform2iv(this.uniformLocations.get(p0), _intBuffer(p2, p1));")
-	@JTranscMethodBody(target = "js", value = "GL.uniform2iv(this.uniformLocations.get(p0), _intBuffer(p2, p1));")
+	@HaxeMethodBody("GL.uniform2iv(this.uniformLocations.get(p0), p1, _intBuffer(p2, p1));")
+	@JTranscMethodBody(target = "js", value = "GL.uniform2iv(this.uniformLocations.get(p0), p1, _intBuffer(p2, p1));")
 	native public void glUniform2iv(int location, int count, IntBuffer v);
 
-	@HaxeMethodBody("GL.uniform2iv(this.uniformLocations.get(p0), _intArray(p2, p3, p1));")
-	@JTranscMethodBody(target = "js", value = "GL.uniform2iv(this.uniformLocations.get(p0), _intArray(p2, p3, p1));")
+	@HaxeMethodBody("GL.uniform2iv(this.uniformLocations.get(p0), p1, _intArray(p2, p3, p1));")
+	@JTranscMethodBody(target = "js", value = "GL.uniform2iv(this.uniformLocations.get(p0), p1, _intArray(p2, p3, p1));")
 	native public void glUniform2iv(int location, int count, int[] v, int offset);
 
 	@HaxeMethodBody("GL.uniform3f(this.uniformLocations.get(p0), p1, p2, p3);")
 	@JTranscMethodBody(target = "js", value = "GL.uniform3f(this.uniformLocations.get(p0), p1, p2, p3);")
 	native public void glUniform3f(int location, float x, float y, float z);
 
-	@HaxeMethodBody("GL.uniform3fv(this.uniformLocations.get(p0), _floatBuffer(p2, p1));")
-	@JTranscMethodBody(target = "js", value = "GL.uniform3fv(this.uniformLocations.get(p0), _floatBuffer(p2, p1));")
+	@HaxeMethodBody("GL.uniform3fv(this.uniformLocations.get(p0), p1, _floatBuffer(p2, p1));")
+	@JTranscMethodBody(target = "js", value = "GL.uniform3fv(this.uniformLocations.get(p0), p1, _floatBuffer(p2, p1));")
 	native public void glUniform3fv(int location, int count, FloatBuffer v);
 
-	@HaxeMethodBody("GL.uniform3fv(this.uniformLocations.get(p0), _floatArray(p2, p3, p1));")
-	@JTranscMethodBody(target = "js", value = "GL.uniform3fv(this.uniformLocations.get(p0), _floatArray(p2, p3, p1));")
+	@HaxeMethodBody("GL.uniform3fv(this.uniformLocations.get(p0), p1, _floatArray(p2, p3, p1));")
+	@JTranscMethodBody(target = "js", value = "GL.uniform3fv(this.uniformLocations.get(p0), p1, _floatArray(p2, p3, p1));")
 	native public void glUniform3fv(int location, int count, float[] v, int offset);
 
 	@HaxeMethodBody("GL.uniform3i(this.uniformLocations.get(p0), p1, p2, p3);")
 	@JTranscMethodBody(target = "js", value = "GL.uniform3i(this.uniformLocations.get(p0), p1, p2, p3);")
 	native public void glUniform3i(int location, int x, int y, int z);
 
-	@HaxeMethodBody("GL.uniform3iv(this.uniformLocations.get(p0), _intBuffer(p2, p1));")
-	@JTranscMethodBody(target = "js", value = "GL.uniform3iv(this.uniformLocations.get(p0), _intBuffer(p2, p1));")
+	@HaxeMethodBody("GL.uniform3iv(this.uniformLocations.get(p0), p1, _intBuffer(p2, p1));")
+	@JTranscMethodBody(target = "js", value = "GL.uniform3iv(this.uniformLocations.get(p0), p1, _intBuffer(p2, p1));")
 	native public void glUniform3iv(int location, int count, IntBuffer v);
 
-	@HaxeMethodBody("GL.uniform3iv(this.uniformLocations.get(p0), _intArray(p2, p3, p1));")
-	@JTranscMethodBody(target = "js", value = "GL.uniform3iv(this.uniformLocations.get(p0), _intArray(p2, p3, p1));")
+	@HaxeMethodBody("GL.uniform3iv(this.uniformLocations.get(p0), p1, _intArray(p2, p3, p1));")
+	@JTranscMethodBody(target = "js", value = "GL.uniform3iv(this.uniformLocations.get(p0), p1, _intArray(p2, p3, p1));")
 	native public void glUniform3iv(int location, int count, int[] v, int offset);
 
 	@HaxeMethodBody("GL.uniform4f(this.uniformLocations.get(p0), p1, p2, p3, p4);")
 	@JTranscMethodBody(target = "js", value = "GL.uniform4f(this.uniformLocations.get(p0), p1, p2, p3, p4);")
 	native public void glUniform4f(int location, float x, float y, float z, float w);
 
-	@HaxeMethodBody("GL.uniform4fv(this.uniformLocations.get(p0), _floatBuffer(p2, p1));")
-	@JTranscMethodBody(target = "js", value = "GL.uniform4fv(this.uniformLocations.get(p0), _floatBuffer(p2, p1));")
+	@HaxeMethodBody("GL.uniform4fv(this.uniformLocations.get(p0), p1, _floatBuffer(p2, p1));")
+	@JTranscMethodBody(target = "js", value = "GL.uniform4fv(this.uniformLocations.get(p0), p1, _floatBuffer(p2, p1));")
 	native public void glUniform4fv(int location, int count, FloatBuffer v);
 
 	public void glUniform4fv(int location, int count, float[] v, int offset) {
@@ -774,36 +774,36 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 	@JTranscMethodBody(target = "js", value = "GL.uniform4i(this.uniformLocations.get(p0), p1, p2, p3, p4);")
 	native public void glUniform4i(int location, int x, int y, int z, int w);
 
-	@HaxeMethodBody("GL.uniform4iv(this.uniformLocations.get(p0), _intBuffer(p2, p1));")
-	@JTranscMethodBody(target = "js", value = "GL.uniform4iv(this.uniformLocations.get(p0), _intBuffer(p2, p1));")
+	@HaxeMethodBody("GL.uniform4iv(this.uniformLocations.get(p0), p1, _intBuffer(p2, p1));")
+	@JTranscMethodBody(target = "js", value = "GL.uniform4iv(this.uniformLocations.get(p0), p1, _intBuffer(p2, p1));")
 	native public void glUniform4iv(int location, int count, IntBuffer v);
 
 	public void glUniform4iv(int location, int count, int[] v, int offset) {
 		glUniform4iv(location, count, IntBuffer.wrap(v, offset, count));
 	}
 
-	@HaxeMethodBody("GL.uniformMatrix2fv(this.uniformLocations.get(p0), p2, _floatBuffer(p3, p1));")
-	@JTranscMethodBody(target = "js", value = "GL.uniformMatrix2fv(this.uniformLocations.get(p0), p2, _floatBuffer(p3, p1));")
+	@HaxeMethodBody("GL.uniformMatrix2fv(this.uniformLocations.get(p0), p1, p2, _floatBuffer(p3, p1));")
+	@JTranscMethodBody(target = "js", value = "GL.uniformMatrix2fv(this.uniformLocations.get(p0), p1, p2, _floatBuffer(p3, p1));")
 	native public void glUniformMatrix2fv(int location, int count, boolean transpose, FloatBuffer value);
 
 	public void glUniformMatrix2fv(int location, int count, boolean transpose, float[] value, int offset) {
 		glUniformMatrix2fv(location, count, transpose, FloatBuffer.wrap(value, offset, value.length - offset));
 	}
 
-	@HaxeMethodBody("GL.uniformMatrix3fv(this.uniformLocations.get(p0), p2, _floatBuffer(p3, p1));")
-	@JTranscMethodBody(target = "js", value = "GL.uniformMatrix3fv(this.uniformLocations.get(p0), p2, _floatBuffer(p3, p1));")
+	@HaxeMethodBody("GL.uniformMatrix3fv(this.uniformLocations.get(p0), p1, p2, _floatBuffer(p3, p1));")
+	@JTranscMethodBody(target = "js", value = "GL.uniformMatrix3fv(this.uniformLocations.get(p0), p1, p2, _floatBuffer(p3, p1));")
 	native public void glUniformMatrix3fv(int location, int count, boolean transpose, FloatBuffer value);
 
-	@HaxeMethodBody("GL.uniformMatrix3fv(this.uniformLocations.get(p0), p2, _floatArray(p3, p4, p1));")
-	@JTranscMethodBody(target = "js", value = "GL.uniformMatrix3fv(this.uniformLocations.get(p0), p2, _floatArray(p3, p4, p1));")
+	@HaxeMethodBody("GL.uniformMatrix3fv(this.uniformLocations.get(p0), p1, p2, _floatArray(p3, p4, p1));")
+	@JTranscMethodBody(target = "js", value = "GL.uniformMatrix3fv(this.uniformLocations.get(p0), p1, p2, _floatArray(p3, p4, p1));")
 	native public void glUniformMatrix3fv(int location, int count, boolean transpose, float[] value, int offset);
 
-	@HaxeMethodBody("GL.uniformMatrix4fv(this.uniformLocations.get(p0), p2, _floatBuffer(p3, p1));")
-	@JTranscMethodBody(target = "js", value = "GL.uniformMatrix4fv(this.uniformLocations.get(p0), p2, _floatBuffer(p3, p1));")
+	@HaxeMethodBody("GL.uniformMatrix4fv(this.uniformLocations.get(p0), p1, p2, _floatBuffer(p3, p1));")
+	@JTranscMethodBody(target = "js", value = "GL.uniformMatrix4fv(this.uniformLocations.get(p0), p1, p2, _floatBuffer(p3, p1));")
 	native public void glUniformMatrix4fv(int location, int count, boolean transpose, FloatBuffer value);
 
-	@HaxeMethodBody("GL.uniformMatrix4fv(this.uniformLocations.get(p0), p2, _floatArray(p3, p4, p1));")
-	@JTranscMethodBody(target = "js", value = "GL.uniformMatrix4fv(this.uniformLocations.get(p0), p2, _floatArray(p3, p4, p1));")
+	@HaxeMethodBody("GL.uniformMatrix4fv(this.uniformLocations.get(p0), p1, p2, _floatArray(p3, p4, p1));")
+	@JTranscMethodBody(target = "js", value = "GL.uniformMatrix4fv(this.uniformLocations.get(p0), p1, p2, _floatArray(p3, p4, p1));")
 	native public void glUniformMatrix4fv(int location, int count, boolean transpose, float[] value, int offset);
 
 	@HaxeMethodBody("GL.vertexAttrib1f(p0, p1);")
