@@ -418,7 +418,7 @@ public class Pixmap implements Disposable {
 	 * @param x      The target x-coordinate (top left corner)
 	 * @param y      The target y-coordinate (top left corner)
 	 */
-	public void Pixmap(Pixmap pixmap, int x, int y) {
+	public void drawPixmap(Pixmap pixmap, int x, int y) {
 		drawPixmap(pixmap, x, y, 0, 0, pixmap.width, pixmap.height);
 	}
 
