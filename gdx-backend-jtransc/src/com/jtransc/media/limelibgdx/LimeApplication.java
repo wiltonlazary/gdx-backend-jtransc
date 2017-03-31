@@ -49,10 +49,7 @@ import java.io.IOException;
 	"@limetest.cmd"
 })
 @HaxeAddLibraries({
-	"lime:4.0.2"
-	//"lime:3.7.4"
-	//"lime:3.4.1"
-	//"lime:2.9.1"
+	"lime:4.0.3"
 })
 @HaxeAddAssets({
 	"com/badlogic/gdx/utils/arial-15.fnt",
