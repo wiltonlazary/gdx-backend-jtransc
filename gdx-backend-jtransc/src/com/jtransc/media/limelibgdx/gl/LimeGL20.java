@@ -79,7 +79,6 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 	native private void _glClear(int mask);
 
 	public void glClear(int mask) {
-		//glClearColor(1f, 0f, 0f, 1f);
 		_glClear(mask);
 	}
 
@@ -857,7 +856,7 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 		"var target = p0, level = p1, internalformat = p2, width = p3, height = p4, border = p5, format = p6, type = p7, pixmap = p8;",
 
 		"if (pixmap.INT_image) {",
-		"	GL.texImage2D(target, level, internalformat, format, type, pixmap.INT_image);",
+		"	GL.texImage2D(target, level, internalformat, width, height, border, format, type, pixmap.INT_image);",
 		"} else {",
 		"	var jarray = pixmap['{% FIELD com.badlogic.gdx.graphics.Pixmap:data %}'];",
 		"	var arrayBufferView = _arrayCopyRev(new Uint8Array(jarray.data.buffer));",

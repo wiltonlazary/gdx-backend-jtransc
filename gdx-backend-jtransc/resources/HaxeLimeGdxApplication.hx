@@ -87,7 +87,9 @@ class HaxeLimeGdxApplication extends lime.app.Application {
     static public function loopLoop(update: Void -> Void, render: Void -> Void) {
     }
 
+	public var preloadComplete:Bool = false;
     public override function onPreloadComplete():Void {
+    	preloadComplete = true;
         //switch (renderer.context) {
         //	case FLASH(sprite): #if flash initializeFlash(sprite); #end
         //	case OPENGL (gl):
@@ -99,7 +101,7 @@ class HaxeLimeGdxApplication extends lime.app.Application {
     public override function render(renderer:lime.graphics.Renderer) {
         super.render(renderer);
         if (app != null) {
-            if (!initializingListener) {
+            if (!initializingListener && preloadComplete) {
                 initializingListener = true;
                 switch (renderer.context) {
 					#if flash
