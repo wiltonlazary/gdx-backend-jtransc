@@ -102,8 +102,8 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 	@JTranscMethodBody(target = "js", value = "GL.compressedTexImage2D(p0, p1, p2, p3, p4, p5, p6, _buffer(p7, p6));")
 	native public void glCompressedTexImage2D(int target, int level, int internalformat, int width, int height, int border, int imageSize, Buffer data);
 
-	@HaxeMethodBody("GL.compressedTexSubImage2D(p0, p1, p2, p3, p4, p5, p6, _buffer(p8, p7));")
-	@JTranscMethodBody(target = "js", value = "GL.compressedTexSubImage2D(p0, p1, p2, p3, p4, p5, p6, _buffer(p8, p7));")
+	@HaxeMethodBody("GL.compressedTexSubImage2D(p0, p1, p2, p3, p4, p5, p6, p7, _buffer(p8, p7));")
+	@JTranscMethodBody(target = "js", value = "GL.compressedTexSubImage2D(p0, p1, p2, p3, p4, p5, p6, p7, _buffer(p8, p7));")
 	native public void glCompressedTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format, int imageSize, Buffer data);
 
 	@HaxeMethodBody("GL.copyTexImage2D(p0, p1, p2, p3, p4, p5, p6, p7);")

@@ -21,7 +21,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
-import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
 /** <p>
@@ -104,7 +103,7 @@ public class IndexBufferObject implements IndexData {
         buffer.flip();
 
         if (isBound) {
-            Gdx.gl20.glBufferData(GL20.GL_ELEMENT_ARRAY_BUFFER, buffer.limit(), buffer, usage);
+            Gdx.gl20.glBufferData(GL20.GL_ELEMENT_ARRAY_BUFFER, buffer.limit() * 2, buffer, usage);
             isDirty = false;
         }
     }
@@ -116,7 +115,7 @@ public class IndexBufferObject implements IndexData {
         buffer.flip();
 
         if (isBound) {
-            Gdx.gl20.glBufferData(GL20.GL_ELEMENT_ARRAY_BUFFER, buffer.limit(), buffer, usage);
+            Gdx.gl20.glBufferData(GL20.GL_ELEMENT_ARRAY_BUFFER, buffer.limit() * 2, buffer, usage);
             isDirty = false;
         }
     }
@@ -130,7 +129,7 @@ public class IndexBufferObject implements IndexData {
         buffer.position(pos);
 
         if (isBound) {
-            Gdx.gl20.glBufferData(GL20.GL_ELEMENT_ARRAY_BUFFER, buffer.limit(), buffer, usage);
+            Gdx.gl20.glBufferData(GL20.GL_ELEMENT_ARRAY_BUFFER, buffer.limit() * 2, buffer, usage);
             isDirty = false;
         }
     }
@@ -152,7 +151,7 @@ public class IndexBufferObject implements IndexData {
 
         Gdx.gl20.glBindBuffer(GL20.GL_ELEMENT_ARRAY_BUFFER, bufferHandle);
         if (isDirty) {
-            Gdx.gl20.glBufferData(GL20.GL_ELEMENT_ARRAY_BUFFER, buffer.limit(), buffer, usage);
+            Gdx.gl20.glBufferData(GL20.GL_ELEMENT_ARRAY_BUFFER, buffer.limit() * 2, buffer, usage);
             isDirty = false;
         }
         isBound = true;

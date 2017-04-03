@@ -1,6 +1,5 @@
 package com.badlogic.gdx.graphics.glutils;
 
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -96,7 +95,7 @@ public class VertexBufferObjectWithVAO implements VertexData {
 
 	private void bufferChanged() {
 		if (isBound) {
-			Gdx.gl20.glBufferData(GL20.GL_ARRAY_BUFFER, buffer.limit(), buffer, usage);
+			Gdx.gl20.glBufferData(GL20.GL_ARRAY_BUFFER, buffer.limit() * 4, buffer, usage);
 			isDirty = false;
 		}
 	}
@@ -185,7 +184,7 @@ public class VertexBufferObjectWithVAO implements VertexData {
 		if (isDirty) {
 			gl.glBindBuffer(GL20.GL_ARRAY_BUFFER, bufferHandle);
 			buffer.limit(buffer.limit());
-			gl.glBufferData(GL20.GL_ARRAY_BUFFER, buffer.limit(), buffer, usage);
+			gl.glBufferData(GL20.GL_ARRAY_BUFFER, buffer.limit() * 4, buffer, usage);
 			isDirty = false;
 		}
 	}
