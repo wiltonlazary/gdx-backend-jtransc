@@ -123,7 +123,7 @@ public class Pixmap implements Disposable {
 	//IntBuffer buffer;
 	int[] data;
 	int color;
-	static Blending blending;
+	private Blending blending;
 	private boolean pixelsAvailable = true;
 
 	public Pixmap(FileHandle file) {
@@ -276,15 +276,16 @@ public class Pixmap implements Disposable {
 	/**
 	 * Sets the type of {@link Blending} to be used for all operations. Default is {@link Blending#SourceOver}.
 	 *
-	 * @param blending the blending type
+	 * @param _blending the blending type
 	 */
-	public static void setBlending(Blending blending) {
+	public void setBlending(Blending _blending) {
+		this.blending = _blending;
 	}
 
 	/**
 	 * @return the currently set {@link Blending}
 	 */
-	public static Blending getBlending() {
+	public Blending getBlending() {
 		return blending;
 	}
 
