@@ -86,8 +86,8 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 	@JTranscMethodBody(target = "js", value = "GL.clearColor(p0, p1, p2, p3);")
 	native public void glClearColor(float red, float green, float blue, float alpha);
 
-	@HaxeMethodBody("GL.clearDepth(p0);")
-	@JTranscMethodBody(target = "js", value = "GL.clearDepth(p0);")
+	@HaxeMethodBody("GL.clearDepthf(p0);")
+	@JTranscMethodBody(target = "js", value = "GL.clearDepthf(p0);")
 	native public void glClearDepthf(float depth);
 
 	@HaxeMethodBody("GL.clearStencil(p0);")
