@@ -134,8 +134,8 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 	@JTranscMethodBody(target = "js", value = "GL.depthMask(p0);")
 	native public void glDepthMask(boolean flag);
 
-	@HaxeMethodBody("GL.depthRange(p0, p1);")
-	@JTranscMethodBody(target = "js", value = "GL.depthRange(p0, p1);")
+	@HaxeMethodBody("GL.depthRangef(p0, p1);")
+	@JTranscMethodBody(target = "js", value = "GL.depthRangef(p0, p1);")
 	native public void glDepthRangef(float zNear, float zFar);
 
 	@HaxeMethodBody("GL.disable(p0);")
