@@ -89,13 +89,21 @@ public class LimeFiles implements Files {
 		@Override
 		public JTranscSyncIO.ImplStream open(String path, int mode) {
 			String pathFixed = fixpath(path);
-			System.out.println("JTranscSyncIOLimeImpl.open: " + pathFixed + " || " + path);
-			byte[] bytes = readBytes(pathFixed, mode);
-			if (bytes == null) {
-				System.out.println("Can't find: " + pathFixed);
-				throw new RuntimeException(new FileNotFoundException(path));
+			System.out.println("JTranscSyncIOLimeImpl.open: " + pathFixed + " || " + path + " in mode " + mode);
+			if (mode == JTranscSyncIO.O_RDWR) {
+				try {
+					return super.open(path, mode);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			} else {
+				byte[] bytes = readBytes(pathFixed, mode);
+				if (bytes == null) {
+					System.out.println("Can't find: " + pathFixed);
+					throw new RuntimeException(new FileNotFoundException(path));
+				}
+				return new JTranscSyncIO.ByteStream(bytes);
 			}
-			return new JTranscSyncIO.ByteStream(bytes);
 		}
 
 		@Override

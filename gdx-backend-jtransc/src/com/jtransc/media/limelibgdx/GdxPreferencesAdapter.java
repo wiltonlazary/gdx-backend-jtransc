@@ -2,6 +2,7 @@ package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
 
 import java.io.IOException;
@@ -22,7 +23,8 @@ public abstract class GdxPreferencesAdapter implements Preferences {
 
 	// Default generic storage!
 	protected String loadString(String name) throws IOException {
-		return Gdx.files.absolute(Gdx.files.getLocalStoragePath() + "/" + name + ".prefs").readString();
+		FileHandle fileHandle = Gdx.files.absolute(Gdx.files.getLocalStoragePath() + "/" + name + ".prefs");
+		return fileHandle.exists() ? fileHandle.readString() : null;
 	}
 
 	protected void storeString(String name, String prefs) throws IOException {
