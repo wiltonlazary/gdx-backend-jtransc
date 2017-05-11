@@ -5,32 +5,36 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
 import com.jtransc.annotation.JTranscMethodBody;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class LimeInput implements Input {
 	static public boolean[] keys = new boolean[0x200];
 	static public boolean[] justPressed = new boolean[0x200];
 	static public boolean[] justReleased = new boolean[0x200];
 
-	static Pointer[] pointers;
+	static HashMap<Integer, Pointer> pointers = new HashMap<>();
 
 	static private InputProcessor inputProcessor = new InputAdapter();
 
 	static {
-		pointers = new Pointer[16];
-		for (int n = 0; n < pointers.length; n++) pointers[n] = new Pointer();
+		pointers.put(0, new Pointer());
 	}
 
 	@SuppressWarnings("unused")
 	static public void lime_onMouseUp(double x, double y, int button) {
-		pointers[0].setXY(x, y);
-		pointers[0].releaseButton(button);
+		Pointer p = pointers.get(0);
+		p.setXY(x, y);
+		p.releaseButton(button);
 		//System.out.println("lime_onMouseUp:" + x + "," + y + "," + button);
 		inputProcessor.touchUp((int)x, (int)y, 0, button);
 	}
 
 	@SuppressWarnings("unused")
 	static public void lime_onMouseDown(double x, double y, int button) {
-		pointers[0].setXY(x, y);
-		pointers[0].pressButton(button);
+		Pointer p = pointers.get(0);
+		p.setXY(x, y);
+		p.pressButton(button);
 		//System.out.println("lime_onMouseDown:" + x + "," + y + "," + button);
 
 		inputProcessor.touchDown((int)x, (int)y, 0, button);
@@ -38,8 +42,9 @@ public class LimeInput implements Input {
 
 	@SuppressWarnings("unused")
 	static public void lime_onMouseMove(double x, double y) {
-		pointers[0].setXY(x, y);
-		if (pointers[0].isPressingAnyButton()) {
+		Pointer p = pointers.get(0);
+		p.setXY(x, y);
+		if (p.isPressingAnyButton()) {
 			inputProcessor.touchDragged((int)x, (int)y, 0);
 		} else {
 			inputProcessor.mouseMoved((int)x, (int)y);
@@ -77,23 +82,24 @@ public class LimeInput implements Input {
 	@SuppressWarnings("unused")
 	static public void lime_onTouchStart(int id, double x, double y) {
 		System.out.println("lime_onTouchStart:" + id + "," + x + "," + y);
-		pointers[id].setXY(x, y);
-		pointers[id].pressButton(0);
+		Pointer p = new Pointer();
+		p.setXY(x, y);
+		p.pressButton(0);
+		pointers.put(id, p);
 		inputProcessor.touchDown((int)x, (int)y, id, 0);
 	}
 
 	@SuppressWarnings("unused")
 	static public void lime_onTouchMove(int id, double x, double y) {
 		System.out.println("lime_onTouchMove:" + id + "," + x + "," + y);
-		pointers[id].setXY(x, y);
+		pointers.get(id).setXY(x, y);
 		inputProcessor.touchDragged((int)x, (int)y, id);
 	}
 
 	@SuppressWarnings("unused")
 	static public void lime_onTouchEnd(int id, double x, double y) {
 		System.out.println("lime_onTouchEnd:" + id + "," + x + "," + y);
-		pointers[id].setXY(x, y);
-		pointers[id].releaseButton(0);
+		pointers.remove(id);
 		inputProcessor.touchUp((int)x, (int)y, id, 0);
 	}
 
@@ -146,7 +152,9 @@ public class LimeInput implements Input {
 	static public void lime_frame() {
 		for (int n = 0; n < justPressed.length; n++) justPressed[n] = false;
 		for (int n = 0; n < justReleased.length; n++) justReleased[n] = false;
-		for (int n = 0; n < pointers.length; n++) pointers[n].frame();
+		for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()){
+			entry.getValue().frame();
+		}
 	}
 
 	// @TODO: https://github.com/openfl/lime/blob/develop/lime/system/Sensor.hx
@@ -187,7 +195,7 @@ public class LimeInput implements Input {
 
 	@Override
 	public int getX(int i) {
-		return (int) pointers[i].getX();
+		return pointers.get(i) == null ? 0 : (int)pointers.get(i).getX();
 	}
 
 	@Override
@@ -197,7 +205,7 @@ public class LimeInput implements Input {
 
 	@Override
 	public int getDeltaX(int i) {
-		return (int) pointers[i].getDeltaX();
+		return pointers.get(i) == null ? 0 : (int)pointers.get(i).getDeltaX();
 	}
 
 	@Override
@@ -207,7 +215,7 @@ public class LimeInput implements Input {
 
 	@Override
 	public int getY(int i) {
-		return (int) pointers[i].getY();
+		return pointers.get(i) == null ? 0 : (int)pointers.get(i).getY();
 	}
 
 	@Override
@@ -217,29 +225,33 @@ public class LimeInput implements Input {
 
 	@Override
 	public int getDeltaY(int i) {
-		return (int) pointers[i].getDeltaY();
+		return pointers.get(i) == null ? 0 : (int)pointers.get(i).getDeltaY();
 	}
 
 	@Override
 	public boolean isTouched() {
-		for (int n = 0; n < pointers.length; n++) if (pointers[n].isPressingAnyButton()) return true;
+		for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()){
+			if (entry.getValue().isPressingAnyButton())  return true;
+		}
 		return false;
 	}
 
 	@Override
 	public boolean justTouched() {
-		for (int n = 0; n < pointers.length; n++) if (pointers[n].justPressedAnyButton()) return true;
+		for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()){
+			if (entry.getValue().justPressedAnyButton())  return true;
+		}
 		return false;
 	}
 
 	@Override
 	public boolean isTouched(int i) {
-		return pointers[i].isPressingAnyButton();
+		return pointers.get(i) != null && pointers.get(i).isPressingAnyButton();
 	}
 
 	@Override
 	public boolean isButtonPressed(int i) {
-		return pointers[0].isPressingButton(i);
+		return pointers.get(0).isPressingButton(i);
 	}
 
 	@JTranscMethodBody(target = "js", value = "return p0;")
