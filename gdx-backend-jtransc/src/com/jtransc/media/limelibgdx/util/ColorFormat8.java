@@ -27,15 +27,39 @@ public class ColorFormat8 {
 	}
 
 	public int make(byte r, byte g, byte b, byte a) {
-		return ((r & 0xFF) << rShift) | ((g & 0xFF) << gShift) | ((b & 0xFF) << bShift) | ((a & 0xFF) << aShift);
+		return ((r & 0xFF) << rShift) |
+			((g & 0xFF) << gShift) |
+			((b & 0xFF) << bShift) |
+			((a & 0xFF) << aShift);
 	}
 
 	public int make(int r, int g, int b, int a) {
-		return ((r & 0xFF) << rShift) | ((g & 0xFF) << gShift) | ((b & 0xFF) << bShift) | ((a & 0xFF) << aShift);
+		return ((r & 0xFF) << rShift) |
+			((g & 0xFF) << gShift) |
+			((b & 0xFF) << bShift) |
+			((a & 0xFF) << aShift);
 	}
 
-	public byte getR(int color) { return (byte)(color >>> rShift); }
-	public byte getG(int color) { return (byte)(color >>> gShift); }
-	public byte getB(int color) { return (byte)(color >>> bShift); }
-	public byte getA(int color) { return (byte)(color >>> aShift); }
+	public int make(float r, float g, float b, float a) {
+		return (((int) (r * 0xFF) & 0xFF) << rShift) |
+			(((int) (g * 0xFF) & 0xFF) << gShift) |
+			(((int) (b * 0xFF) & 0xFF) << bShift) |
+			(((int) (a * 0xFF) & 0xFF) << aShift);
+	}
+
+	public byte getR(int color) {
+		return (byte) (color >>> rShift);
+	}
+
+	public byte getG(int color) {
+		return (byte) (color >>> gShift);
+	}
+
+	public byte getB(int color) {
+		return (byte) (color >>> bShift);
+	}
+
+	public byte getA(int color) {
+		return (byte) (color >>> aShift);
+	}
 }

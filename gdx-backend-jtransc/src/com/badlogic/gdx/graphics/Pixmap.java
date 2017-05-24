@@ -23,13 +23,11 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.jtransc.JTranscArrays;
 import com.jtransc.JTranscSystem;
 import com.jtransc.annotation.JTranscMethodBody;
-import com.jtransc.annotation.JTranscNativeClass;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
 import com.jtransc.io.JTranscIoTools;
 import com.jtransc.media.limelibgdx.LimeFiles;
 import com.jtransc.media.limelibgdx.imaging.ImageDecoder;
 import com.jtransc.media.limelibgdx.util.ColorFormat8;
-import com.jtransc.media.limelibgdx.util.ImageInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,49 +48,58 @@ public class Pixmap implements Disposable {
 	 * @author mzechner
 	 */
 	public enum Format {
-		Alpha, Intensity, LuminanceAlpha, RGB565, RGBA4444, RGB888, RGBA8888;
+		Alpha(1, GL20.GL_ALPHA, GL20.GL_UNSIGNED_BYTE, Gdx2DPixmap.GDX2D_FORMAT_ALPHA),
+		Intensity(1, GL20.GL_ALPHA, GL20.GL_UNSIGNED_BYTE, Gdx2DPixmap.GDX2D_FORMAT_ALPHA),
+		LuminanceAlpha(2, GL20.GL_LUMINANCE_ALPHA, GL20.GL_UNSIGNED_BYTE, Gdx2DPixmap.GDX2D_FORMAT_LUMINANCE_ALPHA),
+		RGB565(2, GL20.GL_RGB, GL20.GL_UNSIGNED_SHORT_5_6_5, Gdx2DPixmap.GDX2D_FORMAT_RGB565),
+		RGBA4444(2, GL20.GL_RGBA, GL20.GL_UNSIGNED_SHORT_4_4_4_4, Gdx2DPixmap.GDX2D_FORMAT_RGBA4444),
+		RGB888(3, GL20.GL_RGB, GL20.GL_UNSIGNED_BYTE, Gdx2DPixmap.GDX2D_FORMAT_RGB888),
+		RGBA8888(4, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, Gdx2DPixmap.GDX2D_FORMAT_RGBA8888);
 
-		public static int toGdx2DPixmapFormat(Format format) {
-			if (format == Alpha) return Gdx2DPixmap.GDX2D_FORMAT_ALPHA;
-			if (format == Intensity) return Gdx2DPixmap.GDX2D_FORMAT_ALPHA;
-			if (format == LuminanceAlpha) return Gdx2DPixmap.GDX2D_FORMAT_LUMINANCE_ALPHA;
-			if (format == RGB565) return Gdx2DPixmap.GDX2D_FORMAT_RGB565;
-			if (format == RGBA4444) return Gdx2DPixmap.GDX2D_FORMAT_RGBA4444;
-			if (format == RGB888) return Gdx2DPixmap.GDX2D_FORMAT_RGB888;
-			if (format == RGBA8888) return Gdx2DPixmap.GDX2D_FORMAT_RGBA8888;
-			throw new GdxRuntimeException("Unknown Format: " + format);
+		private int bytesPerPixel;
+		private int glFormat;
+		private int glType;
+		private int gdx2dPixmapFormat;
+
+		Format(int bytesPerPixel, int glFormat, int glType, int gdx2dPixmapFormat) {
+			this.bytesPerPixel = bytesPerPixel;
+			this.glFormat = glFormat;
+			this.glType = glType;
+			this.gdx2dPixmapFormat = gdx2dPixmapFormat;
 		}
 
-		public static Format fromGdx2DPixmapFormat(int format) {
-			if (format == Gdx2DPixmap.GDX2D_FORMAT_ALPHA) return Alpha;
-			if (format == Gdx2DPixmap.GDX2D_FORMAT_LUMINANCE_ALPHA) return LuminanceAlpha;
-			if (format == Gdx2DPixmap.GDX2D_FORMAT_RGB565) return RGB565;
-			if (format == Gdx2DPixmap.GDX2D_FORMAT_RGBA4444) return RGBA4444;
-			if (format == Gdx2DPixmap.GDX2D_FORMAT_RGB888) return RGB888;
-			if (format == Gdx2DPixmap.GDX2D_FORMAT_RGBA8888) return RGBA8888;
-			throw new GdxRuntimeException("Unknown Gdx2DPixmap Format: " + format);
+		public int getBytesPerPixel() {
+			return bytesPerPixel;
+		}
+
+		public int getGlFormat() {
+			return glFormat;
+		}
+
+		public int getGlType() {
+			return glType;
+		}
+
+		public static int toGdx2DPixmapFormat(Format format) {
+			return format.gdx2dPixmapFormat;
+		}
+
+		public static Format fromGdx2DPixmapFormat(int gdx2dPixmapFormat) {
+			for (Format format : Format.values()) {
+				if (format.gdx2dPixmapFormat == gdx2dPixmapFormat) {
+					return format;
+				}
+			}
+
+			throw new GdxRuntimeException("Unknown Gdx2DPixmap Format: " + gdx2dPixmapFormat);
 		}
 
 		public static int toGlFormat(Format format) {
-			if (format == Alpha) return GL20.GL_ALPHA;
-			if (format == Intensity) return GL20.GL_ALPHA;
-			if (format == LuminanceAlpha) return GL20.GL_LUMINANCE_ALPHA;
-			if (format == RGB565) return GL20.GL_RGB;
-			if (format == RGB888) return GL20.GL_RGB;
-			if (format == RGBA4444) return GL20.GL_RGBA;
-			if (format == RGBA8888) return GL20.GL_RGBA;
-			throw new GdxRuntimeException("unknown format: " + format);
+			return format.getGlFormat();
 		}
 
 		public static int toGlType(Format format) {
-			if (format == Alpha) return GL20.GL_UNSIGNED_BYTE;
-			if (format == Intensity) return GL20.GL_UNSIGNED_BYTE;
-			if (format == LuminanceAlpha) return GL20.GL_UNSIGNED_BYTE;
-			if (format == RGB565) return GL20.GL_UNSIGNED_SHORT_5_6_5;
-			if (format == RGB888) return GL20.GL_UNSIGNED_BYTE;
-			if (format == RGBA4444) return GL20.GL_UNSIGNED_SHORT_4_4_4_4;
-			if (format == RGBA8888) return GL20.GL_UNSIGNED_BYTE;
-			throw new GdxRuntimeException("unknown format: " + format);
+			return format.getGlType();
 		}
 	}
 
@@ -118,10 +125,11 @@ public class Pixmap implements Disposable {
 	int height;
 	int actualWidth;
 	int actualHeight;
-	Format format;
+	Format format = Format.RGBA8888;
 	int id;
 	//IntBuffer buffer;
 	int[] data;
+	byte[] byteData;
 	int color;
 	private Blending blending;
 	private boolean pixelsAvailable = true;
@@ -133,11 +141,6 @@ public class Pixmap implements Disposable {
 	public Pixmap(FileHandle file, boolean pixelPerfect) {
 		try {
 			loadImage((file.file().isAbsolute()) ? file.file().getPath() : LimeFiles.fixpath(file.file().getPath()), pixelPerfect);
-			//JTranscArrays.swizzle_inplace(data, 24, 16, 8, 0);
-			//JTranscArrays.swizzle_inplace(data, 0, 8, 16, 24);
-			//if (!JTranscSystem.isPureJs()) {
-			//	JTranscArrays.swizzle_inplace_reverse(data);
-			//}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -212,29 +215,32 @@ public class Pixmap implements Disposable {
 		}
 	}
 
+	@HaxeMethodBody(
+		"var image = lime.graphics.Image.fromBytes(p0.getBytes());\n" +
+			"var array = haxe.io.UInt8Array.fromBytes(image.data.toBytes());\n" +
+			"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:byteData %} = new JA_B(array.length, array);\n" +
+			"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:width %} = image.width;\n" +
+			"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:height %} = image.height;\n" +
+			"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:actualWidth %} = image.width;\n" +
+			"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:actualHeight %} = image.height;\n"
+	)
 	private void loadImage(byte[] encodedData, int offset, int len) {
-		/*
-		if (JTranscSystem.isPureJs()) {
-			ImageInfo.Size size = ImageInfo.detect(encodedData, offset, len);
-			pixelsAvailable = false;
-			loaded = false;
-			loadImageNativeJs(encodedData, offset, len, (size != null) ? size.width : 1, (size != null) ? size.height : 1);
-		} else {
-		*/
-			ImageDecoder.BitmapData bitmap = ImageDecoder.decode(encodedData);
-			this.data = bitmap.data;
-			this.actualWidth = this.width = bitmap.width;
-			this.actualHeight = this.height = bitmap.height;
-		//}
+		ImageDecoder.BitmapData bitmap = ImageDecoder.decode(encodedData);
+		this.data = bitmap.data;
+		this.actualWidth = this.width = bitmap.width;
+		this.actualHeight = this.height = bitmap.height;
 	}
 
+	@HaxeMethodBody(
+		"var image = lime.graphics.Image.fromFile(p0._str);\n" +
+			"var array = haxe.io.UInt8Array.fromBytes(image.data.toBytes());\n" +
+			"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:byteData %} = new JA_B(array.length, array);\n" +
+			"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:width %} = image.width;\n" +
+			"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:height %} = image.height;\n" +
+			"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:actualWidth %} = image.width;\n" +
+			"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:actualHeight %} = image.height;\n"
+	)
 	private void loadImage(String path, boolean pixelPerfect) throws IOException {
-		//if (JTranscSystem.isSwf() || !JTranscSystem.usingJTransc()) {
-		//if (true) {
-		//if (JTranscSystem.isHaxe()) {
-		//	loadImageNative(path);
-		//}
-
 		if (!pixelPerfect && JTranscSystem.isPureJs()) {
 			loadImageNativeJs(path);
 		} else {
@@ -243,33 +249,20 @@ public class Pixmap implements Disposable {
 			this.actualWidth = this.width = bitmap.width;
 			this.actualHeight = this.height = bitmap.height;
 		}
-
-		System.out.println("loadImage(size): " + this.width + "x" + this.height);
-		System.out.println("loadImage(actualSize): " + this.actualWidth + "x" + this.actualHeight);
 	}
 
-	@JTranscNativeClass("lime.Assets")
-	static public class Assets {
-		native static public Object getImage(String path);
-
-		native static public byte[] getBytes(String path);
-	}
-
-	@HaxeMethodBody("" +
-		"var image = lime.Assets.getImage(p0._str);" +
-		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:data %} = JA_I.fromBytes(image.getPixels(image.rect));" +
-		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:width %} = image.width;" +
-		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:height %} = image.height;"
-	)
-	native private void loadImageNative(String path);
-
-	private void create(int width, int height, Format format2) {
+	private void create(int width, int height, Format format) {
 		this.width = width;
 		this.height = height;
 		this.actualWidth = width;
 		this.actualHeight = height;
-		this.data = new int[width * height];
-		this.format = Format.RGBA8888;
+		if (JTranscSystem.isPureJs()) {
+			this.data = new int[width * height];
+			this.format = Format.RGBA8888;
+		} else {
+			this.byteData = new byte[width * height * format.bytesPerPixel];
+			this.format = format;
+		}
 		createdEmpty();
 	}
 
@@ -303,15 +296,15 @@ public class Pixmap implements Disposable {
 	}
 
 	public int getGLInternalFormat() {
-		return GL20.GL_RGBA;
+		return format.getGlFormat();
 	}
 
 	public int getGLFormat() {
-		return GL20.GL_RGBA;
+		return format.getGlFormat();
 	}
 
 	public int getGLType() {
-		return GL20.GL_UNSIGNED_BYTE;
+		return format.getGlType();
 	}
 
 	public int getWidth() {
@@ -331,18 +324,18 @@ public class Pixmap implements Disposable {
 	}
 
 
-	//public Buffer getPixels() {
-	//  return buffer;
-	//}
-
 	public ByteBuffer getPixels() {
-		//return ByteBuffer.wrap(this._getPixels());
+		if (byteData != null) {
+			return ByteBuffer.wrap(byteData);
+		}
+
 		return ByteBuffer.wrap(JTranscArrays.copyReinterpretReversed(this.data)).order(ByteOrder.LITTLE_ENDIAN);
 	}
 
 	@Override
 	public void dispose() {
-		pixmaps.remove(id);
+		// don't used
+		//pixmaps.remove(id);
 	}
 
 	/**
@@ -363,7 +356,7 @@ public class Pixmap implements Disposable {
 	 * @param a The alpha component.
 	 */
 	public void setColor(float r, float g, float b, float a) {
-		color = ColorFormat8.GDX.make((int) (r * 255), (int) (g * 255), (int) (b * 255), (int) (a * 255));
+		color = ColorFormat8.GDX.make(r, g, b, a);
 	}
 
 	/**
@@ -573,11 +566,126 @@ public class Pixmap implements Disposable {
 	}
 
 	private int _getPixel(int x, int y) {
+		if (byteData != null) {
+			switch (format) {
+				case Alpha:
+				case Intensity:
+					return ColorFormat8.GDX.make(0, 0, 0, byteData[y * width + x]);
+
+				case LuminanceAlpha: {
+					int offset = y * width * format.bytesPerPixel + x * format.bytesPerPixel;
+					return ColorFormat8.GDX.make(0, 0, byteData[offset], byteData[offset + 1]);
+				}
+
+				case RGB565: {
+					int offset = y * width * format.bytesPerPixel + x * format.bytesPerPixel;
+					short color = (short) (((byteData[offset] & 0xFF) << 8) | (byteData[offset + 1] & 0xFF));
+
+					int r5 = (color & 0xf800) >> 11;
+					int g6 = (color & 0x07e0) >> 5;
+					int b5 = color & 0x001f;
+
+					int r8 = (r5 * 527 + 23) >> 6;
+					int g8 = (g6 * 259 + 33) >> 6;
+					int b8 = (b5 * 527 + 23) >> 6;
+
+					return ColorFormat8.GDX.make(r8, g8, b8, 255);
+				}
+
+				case RGBA4444: {
+					int offset = y * width * format.bytesPerPixel + x * format.bytesPerPixel;
+					int color = byteData[offset] & 0xFF;
+					int r4 = (color & 0xF0) >> 4;
+					int g4 = (color & 0x0F);
+					color = byteData[offset + 1] & 0xFF;
+					int b4 = (color & 0xF0) >> 4;
+					int a4 = (color & 0x0F);
+
+					int r8 = r4 | (r4 >> 4);
+					int g8 = g4 | (g4 >> 4);
+					int b8 = b4 | (b4 >> 4);
+					int a8 = a4 | (a4 >> 4);
+
+					return ColorFormat8.GDX.make(r8, g8, b8, a8);
+				}
+
+				case RGB888: {
+					int offset = y * width * format.bytesPerPixel + x * format.bytesPerPixel;
+					return ColorFormat8.GDX.make(byteData[offset], byteData[offset + 1], byteData[offset + 2], 255);
+				}
+
+				case RGBA8888: {
+					int offset = y * width * format.bytesPerPixel + x * format.bytesPerPixel;
+					return ColorFormat8.GDX.make(byteData[offset], byteData[offset + 1], byteData[offset + 2], byteData[offset + 3]);
+				}
+			}
+		}
+
 		return data[y * width + x];
 	}
 
 	private void _setPixel(int x, int y, int color) {
+		if (byteData != null) {
+			switch (format) {
+				case Alpha:
+				case Intensity:
+					byteData[y * width + x] = ColorFormat8.GDX.getA(color);
+					return;
+
+				case LuminanceAlpha: {
+					int offset = y * width * format.bytesPerPixel + x * format.bytesPerPixel;
+					byteData[offset] = ColorFormat8.GDX.getB(color);
+					byteData[offset + 1] = ColorFormat8.GDX.getA(color);
+					return;
+				}
+
+				case RGB565: {
+					int offset = y * width * format.bytesPerPixel + x * format.bytesPerPixel;
+
+					int r8 = (ColorFormat8.GDX.getR(color) & 0xFF);
+					int g8 = (ColorFormat8.GDX.getG(color) & 0xFF);
+					int b8 = (ColorFormat8.GDX.getB(color) & 0xFF);
+
+					int r5 = (r8 * 249 + 1014) >> 11;
+					int g6 = (g8 * 253 + 505) >> 10;
+					int b5 = (b8 * 249 + 1014) >> 11;
+
+					int rgb565 = (r5 << 11) | (g6 << 5) | (b5);
+
+					byteData[offset] = (byte) ((rgb565 & 0xff00) >> 8);
+					byteData[offset + 1] = (byte) (rgb565 & 0xFF);
+					return;
+				}
+
+				case RGBA4444: {
+					int offset = y * width * format.bytesPerPixel + x * format.bytesPerPixel;
+					int r4 = (ColorFormat8.GDX.getR(color) & 0xFF) >> 4;
+					int g4 = (ColorFormat8.GDX.getG(color) & 0xFF) >> 4;
+					int b4 = (ColorFormat8.GDX.getB(color) & 0xFF) >> 4;
+					int a4 = (ColorFormat8.GDX.getA(color) & 0xFF) >> 4;
+					byteData[offset] = (byte) ((r4 << 4) | g4);
+					byteData[offset + 1] = (byte) ((b4 << 4) | a4);
+					return;
+				}
+
+				case RGB888: {
+					int offset = y * width * format.bytesPerPixel + x * format.bytesPerPixel;
+					byteData[offset] = ColorFormat8.GDX.getR(color);
+					byteData[offset + 1] = ColorFormat8.GDX.getG(color);
+					byteData[offset + 2] = ColorFormat8.GDX.getB(color);
+					return;
+				}
+
+				case RGBA8888: {
+					int offset = y * width * format.bytesPerPixel + x * format.bytesPerPixel;
+					byteData[offset] = ColorFormat8.GDX.getR(color);
+					byteData[offset + 1] = ColorFormat8.GDX.getG(color);
+					byteData[offset + 2] = ColorFormat8.GDX.getB(color);
+					byteData[offset + 3] = ColorFormat8.GDX.getB(color);
+					return;
+				}
+			}
+		}
 		data[y * width + x] = color;
 	}
-
 }
