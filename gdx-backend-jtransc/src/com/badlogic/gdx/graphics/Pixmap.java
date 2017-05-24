@@ -23,7 +23,6 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.jtransc.JTranscArrays;
 import com.jtransc.JTranscSystem;
 import com.jtransc.annotation.JTranscMethodBody;
-import com.jtransc.annotation.JTranscNativeClass;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
 import com.jtransc.io.JTranscIoTools;
 import com.jtransc.media.limelibgdx.LimeFiles;
