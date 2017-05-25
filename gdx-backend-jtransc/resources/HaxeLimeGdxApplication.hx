@@ -91,53 +91,67 @@ class HaxeLimeGdxApplication extends lime.app.Application {
 
     static public function fastConvertByteBuffer(buf:{% CLASS java.nio.ByteBuffer %}) {
 		var ja_b = buf.{% METHOD java.nio.ByteBuffer:array:()[B %}();
-		var bytes = ja_b.getBytes();
+		var bytes = ja_b.data;
 		return lime.utils.UInt8Array.fromBytes(bytes);
     }
 
     static public function fastConvertShortBuffer(buf:{% CLASS java.nio.ShortBuffer %}) {
-    	var bytes : haxe.io.Bytes;
     	if(Std.is(buf, {% CLASS java.nio.ByteBufferAsShortBuffer %})) {
     		var shortBuffer = cast(buf, {% CLASS java.nio.ByteBufferAsShortBuffer %});
 			var byteBuffer = shortBuffer.{% METHOD java.nio.ByteBufferAsShortBuffer:getByteBuffer:()Ljava.nio.ByteBuffer; %}();
     		var ja_b = byteBuffer.{% METHOD java.nio.ByteBuffer:array:()[B %}();
-    		bytes = ja_b.getBytes();
+    		return lime.utils.Int16Array.fromBytes(ja_b.data);
     	} else {
-			var ja_s = buf.{% METHOD java.nio.ShortBuffer:array:()[S %}();
-			bytes = ja_s.getBytes();
+    		var ja_s = buf.{% METHOD java.nio.ShortBuffer:array:()[S %}();
+    		var length = ja_s.length;
+			var out = new lime.utils.Int16Array(length);
+			for (n in 0 ... length) out[n] = ja_s.get(n);
+			return out;
 		}
-		return lime.utils.Int16Array.fromBytes(bytes);
     }
 
     static public function fastConvertIntBuffer(buf:{% CLASS java.nio.IntBuffer %}) {
-    	var bytes : haxe.io.Bytes;
-
     	if(Std.is(buf, {% CLASS java.nio.ByteBufferAsIntBuffer %})) {
     		var intBuffer = cast(buf, {% CLASS java.nio.ByteBufferAsIntBuffer %});
 			var byteBuffer = intBuffer.{% METHOD java.nio.ByteBufferAsIntBuffer:getByteBuffer:()Ljava.nio.ByteBuffer; %}();
     		var ja_b = byteBuffer.{% METHOD java.nio.ByteBuffer:array:()[B %}();
-    		bytes = ja_b.getBytes();
+    		return lime.utils.Int32Array.fromBytes(ja_b.data);
     	} else {
-			var ja_i = buf.{% METHOD java.nio.IntBuffer:array:()[I %}();
-			bytes = ja_i.getBytes();
+    		var ja_i = buf.{% METHOD java.nio.IntBuffer:array:()[I %}();
+    		var length = ja_i.length;
+			var out = new lime.utils.Int32Array(length);
+			for (n in 0 ... length) out[n] = ja_i.get(n);
+			return out;
 		}
-		return lime.utils.Int32Array.fromBytes(bytes);
     }
 
     static public function fastConvertFloatBuffer(buf:{% CLASS java.nio.FloatBuffer %}) {
-		var ja_f = buf.{% METHOD java.nio.FloatBuffer:array:()[F %}();
-		var bytes = ja_f.getBytes();
-		return lime.utils.Float32Array.fromBytes(bytes);
+    	if(Std.is(buf, {% CLASS java.nio.ByteBufferAsFloatBuffer %})) {
+    		var floatBuffer = cast(buf, {% CLASS java.nio.ByteBufferAsFloatBuffer %});
+			var byteBuffer = floatBuffer.{% METHOD java.nio.ByteBufferAsFloatBuffer:getByteBuffer:()Ljava.nio.ByteBuffer; %}();
+    		var ja_b = byteBuffer.{% METHOD java.nio.ByteBuffer:array:()[B %}();
+    		return lime.utils.Float32Array.fromBytes(ja_b.data);
+		} else {
+			var ja_f = buf.{% METHOD java.nio.FloatBuffer:array:()[F %}();
+			var length = ja_f.length;
+			var out = new lime.utils.Float32Array(length);
+			for (n in 0 ... length) out[n] = ja_f.get(n);
+			return out;
+		}
     }
 
     static public function fastConvertIntArray(ja_i:JA_I, offset:Int, size:Int):lime.utils.Int32Array {
-        var bytes = ja_i.getBytes();
-        return lime.utils.Int32Array.fromBytes(bytes, offset, size);
+		var length = ja_i.length;
+		var out = new lime.utils.Int32Array(length);
+		for (n in 0 ... length) out[n] = ja_i.get(n);
+		return out;
     }
 
     static public function fastConvertFloatArray(ja_f:JA_F, offset:Int, size:Int):lime.utils.Float32Array {
-        var bytes = ja_f.getBytes();
-        return lime.utils.Float32Array.fromBytes(bytes, offset, size);
+    	var length = ja_f.length;
+		var out = new lime.utils.Float32Array(length);
+		for (n in 0 ... length) out[n] = ja_f.get(n);
+		return out;
     }
 
     static public function loopInit(init: Void -> Void) {

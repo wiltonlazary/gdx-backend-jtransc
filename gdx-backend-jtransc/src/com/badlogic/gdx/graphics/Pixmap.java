@@ -217,12 +217,12 @@ public class Pixmap implements Disposable {
 
 	@HaxeMethodBody(
 		"var image = lime.graphics.Image.fromBytes(p0.getBytes());\n" +
-			"var array = haxe.io.UInt8Array.fromBytes(image.data.toBytes());\n" +
-			"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:byteData %} = new JA_B(array.length, array);\n" +
-			"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:width %} = image.width;\n" +
-			"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:height %} = image.height;\n" +
-			"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:actualWidth %} = image.width;\n" +
-			"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:actualHeight %} = image.height;\n"
+		"var bytes = image.data.toBytes();\n" +
+		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:byteData %} = new JA_B(bytes.length, bytes);\n" +
+		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:width %} = image.width;\n" +
+		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:height %} = image.height;\n" +
+		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:actualWidth %} = image.width;\n" +
+		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:actualHeight %} = image.height;\n"
 	)
 	private void loadImage(byte[] encodedData, int offset, int len) {
 		ImageDecoder.BitmapData bitmap = ImageDecoder.decode(encodedData);
@@ -233,12 +233,12 @@ public class Pixmap implements Disposable {
 
 	@HaxeMethodBody(
 		"var image = lime.graphics.Image.fromFile(p0._str);\n" +
-			"var array = haxe.io.UInt8Array.fromBytes(image.data.toBytes());\n" +
-			"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:byteData %} = new JA_B(array.length, array);\n" +
-			"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:width %} = image.width;\n" +
-			"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:height %} = image.height;\n" +
-			"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:actualWidth %} = image.width;\n" +
-			"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:actualHeight %} = image.height;\n"
+		"var bytes = image.data.toBytes();\n" +
+		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:byteData %} = new JA_B(bytes.length, bytes);\n" +
+		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:width %} = image.width;\n" +
+		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:height %} = image.height;\n" +
+		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:actualWidth %} = image.width;\n" +
+		"this.{% FIELD com.badlogic.gdx.graphics.Pixmap:actualHeight %} = image.height;\n"
 	)
 	private void loadImage(String path, boolean pixelPerfect) throws IOException {
 		if (!pixelPerfect && JTranscSystem.isPureJs()) {
