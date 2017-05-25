@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -41,6 +42,7 @@ public class GdxApplicationAdapterTest {
 		}
 	}, "test", 10, 10);
 
+	@Ignore("Need run as native app")
 	@Test
 	public void testPostRunnable() throws Exception {
 		app.postRunnable(() -> {
@@ -58,6 +60,7 @@ public class GdxApplicationAdapterTest {
 		app.render();
 	}
 
+	@Ignore("Need run as native app")
 	@Test
 	public void testClipboard() throws Exception {
 		final String str = "hello";
@@ -65,11 +68,13 @@ public class GdxApplicationAdapterTest {
 		Assert.assertEquals(str, app.getClipboard().getContents());
 	}
 
+	@Ignore("Need run as native app")
 	@Test
 	public void testGraphics() throws Exception {
 		app.getGraphics().getGLVersion();
 	}
 
+	@Ignore("Need run as native app")
 	@Test
 	public void testPixmap() throws Exception {
 		Pixmap pixmap1 = new Pixmap(128, 128, Pixmap.Format.RGBA8888);
