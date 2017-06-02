@@ -239,7 +239,6 @@ public class Timer {
 			resume();
 		}
 
-		private final int deltaCheck = 100;
 		public void run () {
 			while (true) {
 				synchronized (instances) {
@@ -255,13 +254,10 @@ public class Timer {
 						}
 					}
 
+					if (files != Gdx.files) return;
+
 					try {
-						while (waitMillis > 0) {
-							if (files != Gdx.files) return;
-							long sleep = Math.min(waitMillis, deltaCheck);
-							Thread.sleep(sleep);
-							waitMillis -= deltaCheck;
-						}
+						if (waitMillis > 0) instances.wait(waitMillis);
 					} catch (InterruptedException ignored) {
 					}
 				}
