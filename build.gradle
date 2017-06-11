@@ -1,3 +1,7 @@
+plugins {
+	id "com.jfrog.bintray" version "1.7.3"
+}
+
 allprojects { project ->
 	//task hello << {task ->
 	//	println "I'm $task.project.name: ${task.project.ext.jtranscVersion}"
@@ -26,6 +30,25 @@ allprojects { project ->
 //		compile project(':jtransc-media-core')
 //	}
 //}
+
+
+task travisDeploy(dependsOn: ['bintrayUpload']) {
+	doLast {
+		println("Deployed!")
+	}
+}
+
+task snapshotTask() {
+}
+
+task releaseTask() {
+}
+
+if ("$jtranscVersion".endsWith("-snapshot")) {
+	travisDeploy.dependsOn('snapshotTask')
+} else {
+	travisDeploy.dependsOn('releaseTask')
+}
 
 task wrapper(type: Wrapper) {
 	gradleVersion = '3.4.1'
