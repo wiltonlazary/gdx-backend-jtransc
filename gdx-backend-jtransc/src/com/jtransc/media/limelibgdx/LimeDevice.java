@@ -11,7 +11,7 @@ public class LimeDevice {
 		return false;
 	}
 
-	@HaxeMethodBody(target = "android", value = "return true;")
+	@HaxeMethodBody(target = "ios", value = "return true;")
 	@HaxeMethodBody("return false;")
 	static public boolean isIos() {
 		return false;
