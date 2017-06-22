@@ -119,7 +119,7 @@ public class LimeGraphics implements Graphics {
 
 	@Override
 	public GraphicsType getType() {
-		return GraphicsType.WebGL;
+		return LimeDevice.getGraphicsType();
 	}
 
 	@Override

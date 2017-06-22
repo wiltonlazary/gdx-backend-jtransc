@@ -13,7 +13,7 @@ abstract public class GdxApplicationAdapter implements Application {
 	private Queue<Runnable> postRunnableList = new Queue<>();
 	private Queue<Runnable> postRunnableListCopy = new Queue<>();
 	private int logLevel = LOG_DEBUG;
-	private ApplicationType type = ApplicationType.WebGL;
+	private ApplicationType type = ApplicationType.Desktop;
 
 	final private ApplicationListener applicationListener;
 	final private Audio audio;
