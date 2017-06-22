@@ -36,7 +36,6 @@ import java.io.IOException;
 	@HaxeAddSubtarget(name = "ios"),
 	@HaxeAddSubtarget(name = "linux"),
 	@HaxeAddSubtarget(name = "mac"),
-	@HaxeAddSubtarget(name = "tizen"),
 	@HaxeAddSubtarget(name = "tvos"),
 	@HaxeAddSubtarget(name = "webos"),
 	@HaxeAddSubtarget(name = "windows"),
