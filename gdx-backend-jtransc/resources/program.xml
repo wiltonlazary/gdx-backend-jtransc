@@ -27,8 +27,24 @@
 	<source path="src" />
 	<assets path="{{ tempAssetsDir }}" rename="assets" embed="{{ embedResources }}" exclude="*.ttf|*.fla|*.zip|*.swf" type="binary" />
 
-	{% if hasIcon %}
-		<icon path="{{ settings.icon }}" />
+	{% if extra.androidIcon %}
+	<define name="androidIcon" />
+	{% end %}
+	{% if extra.iosIcon %}
+	<define name="iosIcon" />
+	{% end %}
+	<icon path="{{ extra.androidIcon  }}" if="android androidIcon"/>
+	<icon path="{{ extra.iosIcon  }}" if="ios iosIcon"/>
+	{% if hasIcon  %}
+	<icon path="{{ settings.icon }}" unless="androidIcon || iosIcon" />
+	{% end %}
+
+	{% if extra.prerenderedIcon %}
+	<config:ios prerendered-icon="false" />
+	{% end %}
+
+	{% if extra.deploymentVersion %}
+	<config:ios deployment="{{ extra.deploymentVersion }}" />
 	{% end %}
 
 	{% if extra.certificate_path %}

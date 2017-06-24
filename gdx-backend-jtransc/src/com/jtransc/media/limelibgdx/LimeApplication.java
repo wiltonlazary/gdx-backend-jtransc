@@ -48,7 +48,7 @@ import java.io.IOException;
 	"@limetest.cmd"
 })
 @HaxeAddLibraries({
-	"lime:5.1.0"
+	"lime:5.2.1"
 })
 @HaxeAddAssets({
 	"com/badlogic/gdx/utils/arial-15.fnt",
@@ -238,7 +238,14 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 		}
 		if (firstFrame) {
 			firstFrame = false;
+			if (SHOW_FPS) {
+				frameRate = new FrameRate();
+			}
 			show();
+		}
+		if (SHOW_FPS) {
+			frameRate.update();
+			frameRate.render();
 		}
 		LimeInput.lime_frame();
 	}
@@ -248,6 +255,9 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	@SuppressWarnings("unused")
 	public void resized(int width, int height) {
 		super.resized(width, height);
+		if (SHOW_FPS && frameRate != null) {
+			frameRate.resize(width, height);
+		}
 	}
 
 	@Override
@@ -263,10 +273,16 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	@Override
 	public void onDisposed() {
 		super.onDisposed();
+		if (SHOW_FPS) {
+			frameRate.dispose();
+		}
 	}
 
 	@Override
 	protected ApplicationType createApplicationType() {
 		return LimeDevice.getType();
 	}
+
+	private static final boolean SHOW_FPS = false;
+	private FrameRate frameRate;
 }
