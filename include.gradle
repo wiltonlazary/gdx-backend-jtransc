@@ -29,7 +29,7 @@ dependencies {
 	testCompile 'junit:junit:4.12'
 }
 
-if (System.getenv("CI") == null) {
+if (System.getenv("JTRANCS_DEPLOY") != null) {
 	task javadoc2(type: Javadoc) {
 		failOnError = false
 	}

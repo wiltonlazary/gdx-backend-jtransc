@@ -1,1 +1,1 @@
-gradle install uploadArchives
+JTRANCS_DEPLOY=1 ./gradlew install uploadArchives
