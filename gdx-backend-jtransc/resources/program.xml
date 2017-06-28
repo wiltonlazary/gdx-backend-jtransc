@@ -43,7 +43,7 @@
 	{% end %}
 
 	{% if extra.prerenderedIcon %}
-	<config:ios prerenderedIcon="{{ extra.prerenderedIcon }}" />
+	<config:ios prerendered-icon="{{ extra.prerenderedIcon }}" />
 	{% end %}
 
 	{% if extra.deploymentVersion %}
