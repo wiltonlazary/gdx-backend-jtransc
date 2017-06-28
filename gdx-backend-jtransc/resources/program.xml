@@ -8,6 +8,9 @@
 	<window fullscreen="false" resizable="true" borderless="false" vsync="false" hardware="true" allow-shaders="true" require-shaders="true" depth-buffer="false" stencil-buffer="true" orientation="{{ orientation }}" highdpi="true" allow-high-dpi="true" />
 	<window fullscreen="true" if="mobile" />
 	<window fps="60" unless="js" />
+	{% if extra.fps %}
+	<window fps="{{ extra.fps }}" unless="js" />
+	{% end %}
 	<window fps="0" if="js" />
 	<window width="0" height="0" if="html5" />
 
