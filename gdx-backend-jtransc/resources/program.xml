@@ -36,14 +36,14 @@
 	{% if extra.iosIcon %}
 	<define name="iosIcon" />
 	{% end %}
-	<icon path="{{ extra.androidIcon  }}" if="android androidIcon"/>
-	<icon path="{{ extra.iosIcon  }}" if="ios iosIcon"/>
+	<icon path="{{ extra.androidIcon }}" if="android androidIcon"/>
+	<icon path="{{ extra.iosIcon }}" if="ios iosIcon"/>
 	{% if hasIcon  %}
 	<icon path="{{ settings.icon }}" unless="androidIcon || iosIcon" />
 	{% end %}
 
 	{% if extra.prerenderedIcon %}
-	<config:ios prerendered-icon="false" />
+	<config:ios prerenderedIcon="{{ extra.prerenderedIcon }}" />
 	{% end %}
 
 	{% if extra.deploymentVersion %}
