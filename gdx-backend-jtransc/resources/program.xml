@@ -30,14 +30,21 @@
 	<source path="src" />
 	<assets path="{{ tempAssetsDir }}" rename="assets" embed="{{ embedResources }}" exclude="*.ttf|*.fla|*.zip|*.swf" type="binary" />
 
-	{% if extra.androidIcon %}
+	{% if androidIcons %}
 	<define name="androidIcon" />
 	{% end %}
-	{% if extra.iosIcon %}
+	{% if iosIcons %}
 	<define name="iosIcon" />
 	{% end %}
-	<icon path="{{ extra.androidIcon }}" if="android androidIcon"/>
-	<icon path="{{ extra.iosIcon }}" if="ios iosIcon"/>
+
+	{% for androidIconPath in androidIcons %}
+	<icon path="{{ androidIconPath }}" if="android androidIcon"/>
+	{% end %}
+
+	{% for iosIconPath in iosIcons %}
+	<icon path="{{ iosIconPath }}" if="ios iosIcon"/>
+	{% end %}
+
 	{% if hasIcon  %}
 	<icon path="{{ settings.icon }}" unless="androidIcon || iosIcon" />
 	{% end %}
@@ -48,6 +55,10 @@
 
 	{% if extra.deploymentVersion %}
 	<config:ios deployment="{{ extra.deploymentVersion }}" />
+	{% end %}
+
+	{% for splashScreen in splashScreens %}
+	<splashScreen path="{{ splashScreen }}" />
 	{% end %}
 
 	{% if extra.certificate_path %}
