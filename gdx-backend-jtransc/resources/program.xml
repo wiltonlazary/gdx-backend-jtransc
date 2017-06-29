@@ -58,6 +58,10 @@
 	<config:ios deployment="{{ extra.deploymentVersion }}" />
 	{% end %}
 
+	{% if extra.ios_devices %}
+	<config:ios devices="{{ extra.ios_devices }}" if="ios" />
+	{% end %}
+
 	{% for splashScreen in splashScreens %}
 	<splashScreen path="{{ splashScreen }}" />
 	{% end %}
