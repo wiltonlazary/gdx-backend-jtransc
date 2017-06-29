@@ -4,6 +4,7 @@ import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
+import com.jtransc.annotation.haxe.HaxeMethodBody;
 import com.jtransc.media.limelibgdx.LimeGraphics;
 
 public class LwjglApplicationConfiguration {
@@ -27,8 +28,8 @@ public class LwjglApplicationConfiguration {
 	public int audioDeviceBufferSize = 512;
 	public int audioDeviceBufferCount = 9;
 	public Color initialBackgroundColor = Color.BLACK;
-	public int foregroundFPS = 60;
-	public int backgroundFPS = 60;
+	public int foregroundFPS = getFramesPerSecond();
+	public int backgroundFPS = getFramesPerSecond();
 	public boolean allowSoftwareMode = false;
 	public String preferencesDirectory = ".prefs/";
 	public Files.FileType preferencesFileType = Files.FileType.External;
@@ -66,8 +67,16 @@ public class LwjglApplicationConfiguration {
 		this.fullscreen = true;
 	}
 
+	@HaxeMethodBody("" +
+		"{% if extra.fps %} return {{ extra.fps }}; {% end %}" +
+		"{% if !extra.fps %} return false; {% end %}"
+	)
+	private static int getFramesPerSecond() {
+		return 60;
+	}
+
 	public static Graphics.DisplayMode getDesktopDisplayMode() {
-		return new LimeGraphics.DisplayMode2(640, 480, 60, 32);
+		return new LimeGraphics.DisplayMode2(640, 480, getFramesPerSecond(), 32);
 	}
 
 	public static Graphics.DisplayMode[] getDisplayModes() {

@@ -3,6 +3,9 @@ import lime.ui.Window;
 import lime.ui.Touch;
 import lime.ui.KeyCode;
 import lime.graphics.Renderer;
+import lime.system.Display;
+import lime.system.DisplayMode;
+import lime.system.System;
 
 typedef LimeInput = {% CLASS com.jtransc.media.limelibgdx.LimeInput %};
 
@@ -21,8 +24,19 @@ class HaxeLimeGdxApplication extends lime.app.Application {
 	static public var gl: lime.graphics.GLRenderContext;
 	#end
 
-	public function getWidth() return window.width;
-	public function getHeight() return window.height;
+	public function getWindowWidth() {
+		return window.width;
+	}
+	public function getWindowHeight() {
+		return window.height;
+	}
+
+	public function getDisplayWidth(id:Int) {
+		return System.getDisplay(id).currentMode.width;
+	}
+	public function getDisplayHeight(id:Int) {
+		return System.getDisplay(id).currentMode.height;
+	}
 
     static public function convertByteBuffer(buf:{% CLASS java.nio.ByteBuffer %}, size = -1) {
         var len = buf.{% METHOD java.nio.ByteBuffer:limit:()I %}();

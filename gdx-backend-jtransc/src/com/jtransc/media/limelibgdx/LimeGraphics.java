@@ -18,7 +18,12 @@ public class LimeGraphics implements Graphics {
 	//final private GL20 gl = new LoggerGL20(new LimeGL20());
 	int frameId = 0;
 
-	public LimeGraphics(boolean trace) {
+	private static int initWidth = 640;
+	private static int initHeight = 480;
+
+	public LimeGraphics(int width, int height, boolean trace) {
+		initWidth = width;
+		initHeight = height;
 		GL20Ext gl = getInternalGl();
 		if (trace) gl = new LoggerGL20(gl);
 		this.gl = gl;
@@ -32,7 +37,7 @@ public class LimeGraphics implements Graphics {
 		new Monitor2(640, 480, "default")
 	};
 	private DisplayMode2[] displayModes = new DisplayMode2[]{
-		new DisplayMode2(640, 480, 60, 32)
+		new DisplayMode2(640, 480, getFramesPerSecond(), 32)
 	};
 	public int width = 640;
 	public int height = 480;
@@ -79,22 +84,22 @@ public class LimeGraphics implements Graphics {
 
 	@Override
 	public int getWidth() {
-		return LimeApplication.getWidth();
+		return initWidth;
 	}
 
 	@Override
 	public int getHeight() {
-		return LimeApplication.getHeight();
+		return initHeight;
 	}
 
 	@Override
 	public int getBackBufferWidth() {
-		return getWidth();
+		return initWidth;
 	}
 
 	@Override
 	public int getBackBufferHeight() {
-		return getHeight();
+		return initHeight;
 	}
 
 	@Override
@@ -112,6 +117,10 @@ public class LimeGraphics implements Graphics {
 		return deltaTime;
 	}
 
+	@HaxeMethodBody("" +
+		"{% if extra.fps %} return {{ extra.fps }}; {% end %}" +
+		"{% if !extra.fps %} return false; {% end %}"
+	)
 	@Override
 	public int getFramesPerSecond() {
 		return 60;
@@ -257,6 +266,10 @@ public class LimeGraphics implements Graphics {
 
 	}
 
+	@HaxeMethodBody("" +
+		"{% if fullscreen %} return {{ fullscreen }}; {% end %}" +
+		"{% if !fullscreen %} return false; {% end %}"
+	)
 	@Override
 	public boolean isFullscreen() {
 		return false;

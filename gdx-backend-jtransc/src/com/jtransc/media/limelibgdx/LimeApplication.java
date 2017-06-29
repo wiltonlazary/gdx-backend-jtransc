@@ -71,7 +71,7 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	//static private final boolean TRACE = true;
 
 	public LimeApplication(ApplicationListener applicationListener, String title, int width, int height) {
-		super(applicationListener);
+		super(applicationListener, width, height);
 		setApplicationToLime(this);
 		referenceClasses();
 		setTitle(title);
@@ -106,8 +106,8 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	}
 
 	@Override
-	protected LimeGraphics createGraphics() {
-		return new LimeGraphics(TRACE);
+	protected LimeGraphics createGraphics(int width, int height) {
+		return new LimeGraphics(width, height, TRACE);
 	}
 
 	private ApplicationLogger applicationLogger;
@@ -212,23 +212,29 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 		return new LimeAudio();
 	}
 
-	@SuppressWarnings("unused")
-	public void create() {
-		super.create();
-		resized(getWidth(), getHeight());
-	}
-
-	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getWidth();")
+	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getWindowWidth();")
 	@JTranscMethodBody(target = "js", value = "return window.innerWidth|0;")
-	static public int getWidth() {
+	static public int getWindowWidth() {
 		return 640;
 	}
 
-	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getHeight();")
+	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getWindowHeight();")
 	@JTranscMethodBody(target = "js", value = "return window.innerHeight|0;")
-	static public int getHeight() {
+	static public int getWindowHeight() {
+		return 480;
+	}
+
+	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getDisplayWidth(0);")
+	public static int getDisplayWidth() {
 		return 640;
 	}
+
+	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getDisplayHeight(0);")
+	public static int getDisplayHeight() {
+		return 480;
+	}
+
+	private boolean firstFrame = true;
 
 	@SuppressWarnings("unused")
 	public void render() {
@@ -248,16 +254,6 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 			frameRate.render();
 		}
 		LimeInput.lime_frame();
-	}
-
-	private boolean firstFrame = true;
-
-	@SuppressWarnings("unused")
-	public void resized(int width, int height) {
-		super.resized(width, height);
-		if (isShowFPS() && frameRate != null) {
-			frameRate.resize(width, height);
-		}
 	}
 
 	@Override
