@@ -59,7 +59,7 @@
 	{% end %}
 
 	{% if extra.ios_devices %}
-	<config:ios devices="{{ extra.ios_devices }}" if="ios" />
+	<config:ios devices="{{ extra.ios_devices }}" />
 	{% end %}
 
 	{% for splashScreen in splashScreens %}
