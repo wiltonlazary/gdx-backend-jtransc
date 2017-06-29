@@ -69,7 +69,12 @@
 		{%if extra.certificate_password %} password="{{ extra.certificate_password }}"{% end %}
 		{%if extra.certificate_alias %} alias="{{ extra.certificate_alias }}"{% end %}
 		{%if extra.certificate_password %} alias-password="{{ extra.certificate_password }}"{% end %}
+		if="android"
 	/>
+	{% end %}
+
+	{% if extra.certificate_team_id %}
+	<certificate team-id="{{ extra.certificate_team_id }}" if="ios" />
 	{% end %}
 
 	<haxelib name="lime" />
