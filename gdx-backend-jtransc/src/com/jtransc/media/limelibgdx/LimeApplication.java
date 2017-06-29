@@ -238,12 +238,12 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 		}
 		if (firstFrame) {
 			firstFrame = false;
-			if (SHOW_FPS) {
+			if (isShowFPS()) {
 				frameRate = new FrameRate();
 			}
 			show();
 		}
-		if (SHOW_FPS) {
+		if (isShowFPS()) {
 			frameRate.update();
 			frameRate.render();
 		}
@@ -255,7 +255,7 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	@SuppressWarnings("unused")
 	public void resized(int width, int height) {
 		super.resized(width, height);
-		if (SHOW_FPS && frameRate != null) {
+		if (isShowFPS() && frameRate != null) {
 			frameRate.resize(width, height);
 		}
 	}
@@ -273,7 +273,7 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	@Override
 	public void onDisposed() {
 		super.onDisposed();
-		if (SHOW_FPS) {
+		if (isShowFPS()) {
 			frameRate.dispose();
 		}
 	}
@@ -283,6 +283,12 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 		return LimeDevice.getType();
 	}
 
-	private static final boolean SHOW_FPS = false;
+	@HaxeMethodBody("" +
+		"{% if extra.showFPS %} return {{ extra.showFPS }}; {% end %}" +
+		"{% if !extra.showFPS %} return false; {% end %}"
+	)
+	private static boolean isShowFPS() {
+		return false;
+	}
 	private FrameRate frameRate;
 }
