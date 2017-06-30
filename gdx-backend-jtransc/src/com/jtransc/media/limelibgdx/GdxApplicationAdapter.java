@@ -225,6 +225,8 @@ abstract public class GdxApplicationAdapter implements Application {
 		applicationListener.create();
 		if (graphics.isFullscreen()) {
 			resized(LimeApplication.getDisplayWidth(), LimeApplication.getDisplayHeight());
+		} else {
+			resized(LimeApplication.getWindowWidth(), LimeApplication.getWindowHeight());
 		}
 	}
 
@@ -234,9 +236,7 @@ abstract public class GdxApplicationAdapter implements Application {
 		graphics.frame();
 	}
 
-	public void resized(int width, int height) {
-		// TODO: need more test, see as broken logic
-//		Gdx.gl.glViewport(0, 0, width, height);
-//		applicationListener.resize(width, height);
+	private void resized(int width, int height) {
+		applicationListener.resize(graphics.getWidth(), graphics.getHeight());
 	}
 }
