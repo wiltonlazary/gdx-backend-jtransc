@@ -68,10 +68,11 @@ public class LwjglApplicationConfiguration {
 	}
 
 	@HaxeMethodBody("" +
-		"{% if extra.fps %} return {{ extra.fps }}; {% end %}" +
-		"{% if !extra.fps %} return false; {% end %}"
+		"{% if extra.fps %} return {{ extra.fps }};" +
+		"{% else %} return 60;" +
+		"{% end %}"
 	)
-	private static int getFramesPerSecond() {
+	public static int getFramesPerSecond() {
 		return 60;
 	}
 

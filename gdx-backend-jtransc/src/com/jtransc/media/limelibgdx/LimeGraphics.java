@@ -1,6 +1,7 @@
 package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.Graphics;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
@@ -123,13 +124,9 @@ public class LimeGraphics implements Graphics {
 		return deltaTime;
 	}
 
-	@HaxeMethodBody("" +
-		"{% if extra.fps %} return {{ extra.fps }}; {% end %}" +
-		"{% if !extra.fps %} return false; {% end %}"
-	)
 	@Override
 	public int getFramesPerSecond() {
-		return 60;
+		return LwjglApplicationConfiguration.getFramesPerSecond();
 	}
 
 	@Override
@@ -273,8 +270,8 @@ public class LimeGraphics implements Graphics {
 	}
 
 	@HaxeMethodBody("" +
-		"{% if fullscreen %} return {{ fullscreen }}; {% end %}" +
-		"{% if !fullscreen %} return false; {% end %}"
+		"{% if fullscreen %} return {{ fullscreen }};" +
+		"{% else %} return false; {% end %}"
 	)
 	@Override
 	public boolean isFullscreen() {
