@@ -1,6 +1,7 @@
 package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.Graphics;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
@@ -18,7 +19,12 @@ public class LimeGraphics implements Graphics {
 	//final private GL20 gl = new LoggerGL20(new LimeGL20());
 	int frameId = 0;
 
-	public LimeGraphics(boolean trace) {
+	private static int initWidth = 640;
+	private static int initHeight = 480;
+
+	public LimeGraphics(int width, int height, boolean trace) {
+		initWidth = width;
+		initHeight = height;
 		GL20Ext gl = getInternalGl();
 		if (trace) gl = new LoggerGL20(gl);
 		this.gl = gl;
@@ -29,16 +35,16 @@ public class LimeGraphics implements Graphics {
 	native private GL20Ext getInternalGl();
 
 	private Monitor2[] monitors = new Monitor2[]{
-		new Monitor2(640, 480, "default")
+		new Monitor2(defaultWidth, defaultHeight, "default")
 	};
 	private DisplayMode2[] displayModes = new DisplayMode2[]{
-		new DisplayMode2(640, 480, 60, 32)
+		new DisplayMode2(defaultWidth, defaultHeight, getFramesPerSecond(), 32)
 	};
-	public int width = 640;
-	public int height = 480;
+	public static final int defaultWidth = 640;
+	public static final int defaultHeight = 480;
 
 	static public class Monitor2 extends Monitor {
-		public Monitor2(int virtualX, int virtualY, String name) {
+		Monitor2(int virtualX, int virtualY, String name) {
 			super(virtualX, virtualY, name);
 		}
 	}
@@ -52,7 +58,7 @@ public class LimeGraphics implements Graphics {
 	double lastStamp = 0.0;
 	float deltaTime = 0f;
 
-	public void frame() {
+	void frame() {
 		double currentStamp = JTranscSystem.stamp();
 		frameId++;
 
@@ -79,22 +85,28 @@ public class LimeGraphics implements Graphics {
 
 	@Override
 	public int getWidth() {
-		return LimeApplication.getWidth();
+		return initWidth;
 	}
 
 	@Override
 	public int getHeight() {
-		return LimeApplication.getHeight();
+		return initHeight;
 	}
 
 	@Override
 	public int getBackBufferWidth() {
-		return getWidth();
+		if (isFullscreen()) {
+			return LimeApplication.getDisplayWidth();
+		}
+		return LimeApplication.getWindowWidth();
 	}
 
 	@Override
 	public int getBackBufferHeight() {
-		return getHeight();
+		if (isFullscreen()) {
+			return LimeApplication.getDisplayHeight();
+		}
+		return LimeApplication.getWindowHeight();
 	}
 
 	@Override
@@ -114,7 +126,7 @@ public class LimeGraphics implements Graphics {
 
 	@Override
 	public int getFramesPerSecond() {
-		return 60;
+		return LwjglApplicationConfiguration.getFramesPerSecond();
 	}
 
 	@Override
@@ -257,6 +269,10 @@ public class LimeGraphics implements Graphics {
 
 	}
 
+	@HaxeMethodBody("" +
+		"{% if fullscreen %} return {{ fullscreen }};" +
+		"{% else %} return false; {% end %}"
+	)
 	@Override
 	public boolean isFullscreen() {
 		return false;

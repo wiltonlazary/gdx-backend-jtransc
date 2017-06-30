@@ -1,17 +1,17 @@
 package com.jtransc.media.limelibgdx;
 
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.*;
 import com.jtransc.annotation.JTranscMethodBody;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class LimeInput implements Input {
-	static public boolean[] keys = new boolean[0x200];
-	static public boolean[] justPressed = new boolean[0x200];
-	static public boolean[] justReleased = new boolean[0x200];
+	private static boolean[] keys = new boolean[0x200];
+	private static boolean[] justPressed = new boolean[0x200];
+	private static boolean[] justReleased = new boolean[0x200];
+
+	private static final boolean LIME_INPUT_DEBUG = false;
 
 	static HashMap<Integer, Pointer> pointers = new HashMap<>();
 
@@ -21,44 +21,75 @@ public class LimeInput implements Input {
 		pointers.put(0, new Pointer());
 	}
 
-	@SuppressWarnings("unused")
-	static public void lime_onMouseUp(double x, double y, int button) {
-		Pointer p = pointers.get(0);
-		p.setXY(x, y);
-		p.releaseButton(button);
-		//System.out.println("lime_onMouseUp:" + x + "," + y + "," + button);
-		inputProcessor.touchUp((int)x, (int)y, 0, button);
-	}
-
-	@SuppressWarnings("unused")
-	static public void lime_onMouseDown(double x, double y, int button) {
-		Pointer p = pointers.get(0);
-		p.setXY(x, y);
-		p.pressButton(button);
-		//System.out.println("lime_onMouseDown:" + x + "," + y + "," + button);
-
-		inputProcessor.touchDown((int)x, (int)y, 0, button);
-	}
-
-	@SuppressWarnings("unused")
-	static public void lime_onMouseMove(double x, double y) {
-		Pointer p = pointers.get(0);
-		p.setXY(x, y);
-		if (p.isPressingAnyButton()) {
-			inputProcessor.touchDragged((int)x, (int)y, 0);
+	private static int toLogicalX(double realX) {
+		float realWidth;
+		if (Gdx.graphics.isFullscreen()) {
+			realWidth = LimeApplication.getDisplayWidth();
 		} else {
-			inputProcessor.mouseMoved((int)x, (int)y);
+			realWidth = LimeApplication.getWindowWidth();
+		}
+		return (int) (realX * (Gdx.graphics.getWidth() / realWidth));
+	}
+
+	private static int toLogicalY(double realY) {
+		float realHeight;
+		if (Gdx.graphics.isFullscreen()) {
+			realHeight = LimeApplication.getDisplayHeight();
+		} else {
+			realHeight = LimeApplication.getWindowHeight();
+		}
+		return (int) (realY * (Gdx.graphics.getHeight() / realHeight));
+	}
+
+	@SuppressWarnings("unused")
+	public static void lime_onMouseUp(double x, double y, int button) {
+		if (LIME_INPUT_DEBUG) {
+			System.out.println("lime_onMouseUp(" + x + "," + y + "," + button + ")");
+		}
+		int localX = toLogicalX(x);
+		int localY = toLogicalY(y);
+		Pointer p = pointers.get(0);
+		p.setXY(localX, localY);
+		p.releaseButton(button);
+		inputProcessor.touchUp(localX, localY, 0, button);
+	}
+
+	@SuppressWarnings("unused")
+	public static void lime_onMouseDown(double x, double y, int button) {
+		if (LIME_INPUT_DEBUG) {
+			System.out.println("lime_onMouseDown(" + x + "," + y + "," + button + ")");
+		}
+		int localX = toLogicalX(x);
+		int localY = toLogicalY(y);
+		Pointer p = pointers.get(0);
+		p.setXY(localX, localY);
+		p.pressButton(button);
+		inputProcessor.touchDown(localX, localY, 0, button);
+	}
+
+	@SuppressWarnings("unused")
+	public static void lime_onMouseMove(double x, double y) {
+		int localX = toLogicalX(x);
+		int localY = toLogicalY(y);
+		Pointer p = pointers.get(0);
+		p.setXY(localX, localY);
+		if (p.isPressingAnyButton()) {
+			inputProcessor.touchDragged(localX, localY, 0);
+		} else {
+			inputProcessor.mouseMoved(localX, localY);
 		}
 	}
 
 	@SuppressWarnings("unused")
 	static public void lime_onWheel(double x, double y, double z) {
-		inputProcessor.scrolled((int)y);
+		inputProcessor.scrolled(toLogicalY(y));
 	}
 
 	@SuppressWarnings("unused")
-	static public void lime_onKeyUp(int keyCode, int modifier) {
-		//System.out.println("lime_onKeyUp:" + keyCode + "," + modifier);
+	public static void lime_onKeyUp(int keyCode, int modifier) {
+		if (LIME_INPUT_DEBUG) {
+			System.out.println("lime_onKeyUp(" + keyCode + "," + modifier + ")");
+		}
 		int key = convertKeyCode(keyCode);
 		keys[key & 0x1FF] = false;
 		justReleased[key & 0x1FF] = true;
@@ -66,8 +97,10 @@ public class LimeInput implements Input {
 	}
 
 	@SuppressWarnings("unused")
-	static public void lime_onKeyDown(int keyCode, int modifier) {
-		//System.out.println("lime_onKeyDown:" + keyCode + "," + modifier);
+	public static void lime_onKeyDown(int keyCode, int modifier) {
+		if (LIME_INPUT_DEBUG) {
+			System.out.println("lime_onKeyDown(" + keyCode + "," + modifier + ")");
+		}
 		int key = convertKeyCode(keyCode);
 		keys[key & 0x1FF] = true;
 		justPressed[key & 0x1FF] = true;
@@ -76,31 +109,56 @@ public class LimeInput implements Input {
 
 	@SuppressWarnings("unused")
 	static public void lime_onKeyTyped(char character) {
+		if (LIME_INPUT_DEBUG) {
+			System.out.println("lime_onKeyTyped(" + character + ")");
+		}
 		inputProcessor.keyTyped(character);
 	}
 
 	@SuppressWarnings("unused")
-	static public void lime_onTouchStart(int id, double x, double y) {
-		System.out.println("lime_onTouchStart:" + id + "," + x + "," + y);
+	public static void lime_onTouchStart(int id, double x, double y) {
+		if (LIME_INPUT_DEBUG) {
+			System.out.println("lime_onTouchStart(" + id + "," + x + "," + y + ")");
+		}
+		// TODO: fix out of bounds on real device
+		if (LimeDevice.getType() == Application.ApplicationType.iOS) {
+			return;
+		}
+		int localX = toLogicalX(x);
+		int localY = toLogicalY(y);
 		Pointer p = new Pointer();
-		p.setXY(x, y);
+		p.setXY(localX, localY);
 		p.pressButton(0);
 		pointers.put(id, p);
-		inputProcessor.touchDown((int)x, (int)y, id, 0);
+		inputProcessor.touchDown(localX, localY, id, 0);
 	}
 
 	@SuppressWarnings("unused")
-	static public void lime_onTouchMove(int id, double x, double y) {
-		System.out.println("lime_onTouchMove:" + id + "," + x + "," + y);
-		pointers.get(id).setXY(x, y);
-		inputProcessor.touchDragged((int)x, (int)y, id);
+	public static void lime_onTouchMove(int id, double x, double y) {
+		if (LIME_INPUT_DEBUG) {
+			System.out.println("lime_onTouchMove(" + id + "," + x + "," + y + ")");
+		}
+		// TODO: fix out of bounds on real device
+		if (LimeDevice.getType() == Application.ApplicationType.iOS) {
+			return;
+		}
+		int localX = toLogicalX(x);
+		int localY = toLogicalY(y);
+		pointers.get(id).setXY(localX, localY);
+		inputProcessor.touchDragged(localX, localY, id);
 	}
 
 	@SuppressWarnings("unused")
-	static public void lime_onTouchEnd(int id, double x, double y) {
-		System.out.println("lime_onTouchEnd:" + id + "," + x + "," + y);
+	public static void lime_onTouchEnd(int id, double x, double y) {
+		if (LIME_INPUT_DEBUG) {
+			System.out.println("lime_onTouchEnd(" + id + "," + x + "," + y + ")");
+		}
+		// TODO: fix out of bounds on real device
+		if (LimeDevice.getType() == Application.ApplicationType.iOS) {
+			return;
+		}
 		pointers.remove(id);
-		inputProcessor.touchUp((int)x, (int)y, id, 0);
+		inputProcessor.touchUp(toLogicalX(x), toLogicalY(y), id, 0);
 	}
 
 	@SuppressWarnings("unused")
@@ -149,10 +207,10 @@ public class LimeInput implements Input {
 	}
 
 	// Called once per frame1
-	static public void lime_frame() {
+	public static void lime_frame() {
 		for (int n = 0; n < justPressed.length; n++) justPressed[n] = false;
 		for (int n = 0; n < justReleased.length; n++) justReleased[n] = false;
-		for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()){
+		for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
 			entry.getValue().frame();
 		}
 	}
@@ -195,7 +253,7 @@ public class LimeInput implements Input {
 
 	@Override
 	public int getX(int i) {
-		return pointers.get(i) == null ? 0 : (int)pointers.get(i).getX();
+		return pointers.get(i) == null ? 0 : (int) pointers.get(i).getX();
 	}
 
 	@Override
@@ -205,7 +263,7 @@ public class LimeInput implements Input {
 
 	@Override
 	public int getDeltaX(int i) {
-		return pointers.get(i) == null ? 0 : (int)pointers.get(i).getDeltaX();
+		return pointers.get(i) == null ? 0 : (int) pointers.get(i).getDeltaX();
 	}
 
 	@Override
@@ -215,7 +273,7 @@ public class LimeInput implements Input {
 
 	@Override
 	public int getY(int i) {
-		return pointers.get(i) == null ? 0 : (int)pointers.get(i).getY();
+		return pointers.get(i) == null ? 0 : (int) pointers.get(i).getY();
 	}
 
 	@Override
@@ -225,21 +283,21 @@ public class LimeInput implements Input {
 
 	@Override
 	public int getDeltaY(int i) {
-		return pointers.get(i) == null ? 0 : (int)pointers.get(i).getDeltaY();
+		return pointers.get(i) == null ? 0 : (int) pointers.get(i).getDeltaY();
 	}
 
 	@Override
 	public boolean isTouched() {
-		for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()){
-			if (entry.getValue().isPressingAnyButton())  return true;
+		for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
+			if (entry.getValue().isPressingAnyButton()) return true;
 		}
 		return false;
 	}
 
 	@Override
 	public boolean justTouched() {
-		for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()){
-			if (entry.getValue().justPressedAnyButton())  return true;
+		for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
+			if (entry.getValue().justPressedAnyButton()) return true;
 		}
 		return false;
 	}
@@ -255,42 +313,75 @@ public class LimeInput implements Input {
 	}
 
 	@JTranscMethodBody(target = "js", value = "return p0;")
-	static private int convertKeyCode(int i) {
+	private static int convertKeyCode(int i) {
 		// https://github.com/openfl/lime/blob/develop/lime/ui/KeyCode.hx
 		switch (i) {
-			case 0x0D: return Keys.ENTER;
-			case 0x1B: return Keys.ESCAPE;
-			case 0x20: return Keys.SPACE;
-			case 0x4000004F: return Keys.RIGHT;
-			case 0x40000050: return Keys.LEFT;
-			case 0x40000051: return Keys.DOWN;
-			case 0x40000052: return Keys.UP;
-			case 0x61: return Keys.A;
-			case 0x62: return Keys.B;
-			case 0x63: return Keys.C;
-			case 0x64: return Keys.D;
-			case 0x65: return Keys.E;
-			case 0x66: return Keys.F;
-			case 0x67: return Keys.G;
-			case 0x68: return Keys.H;
-			case 0x69: return Keys.I;
-			case 0x6A: return Keys.J;
-			case 0x6B: return Keys.K;
-			case 0x6C: return Keys.L;
-			case 0x6D: return Keys.M;
-			case 0x6E: return Keys.N;
-			case 0x6F: return Keys.O;
-			case 0x70: return Keys.P;
-			case 0x71: return Keys.Q;
-			case 0x72: return Keys.R;
-			case 0x73: return Keys.S;
-			case 0x74: return Keys.T;
-			case 0x75: return Keys.U;
-			case 0x76: return Keys.V;
-			case 0x77: return Keys.W;
-			case 0x78: return Keys.X;
-			case 0x79: return Keys.Y;
-			case 0x80: return Keys.Z;
+			case 0x0D:
+				return Keys.ENTER;
+			case 0x1B:
+				return Keys.ESCAPE;
+			case 0x20:
+				return Keys.SPACE;
+			case 0x4000004F:
+				return Keys.RIGHT;
+			case 0x40000050:
+				return Keys.LEFT;
+			case 0x40000051:
+				return Keys.DOWN;
+			case 0x40000052:
+				return Keys.UP;
+			case 0x61:
+				return Keys.A;
+			case 0x62:
+				return Keys.B;
+			case 0x63:
+				return Keys.C;
+			case 0x64:
+				return Keys.D;
+			case 0x65:
+				return Keys.E;
+			case 0x66:
+				return Keys.F;
+			case 0x67:
+				return Keys.G;
+			case 0x68:
+				return Keys.H;
+			case 0x69:
+				return Keys.I;
+			case 0x6A:
+				return Keys.J;
+			case 0x6B:
+				return Keys.K;
+			case 0x6C:
+				return Keys.L;
+			case 0x6D:
+				return Keys.M;
+			case 0x6E:
+				return Keys.N;
+			case 0x6F:
+				return Keys.O;
+			case 0x70:
+				return Keys.P;
+			case 0x71:
+				return Keys.Q;
+			case 0x72:
+				return Keys.R;
+			case 0x73:
+				return Keys.S;
+			case 0x74:
+				return Keys.T;
+			case 0x75:
+				return Keys.U;
+			case 0x76:
+				return Keys.V;
+			case 0x77:
+				return Keys.W;
+			case 0x78:
+				return Keys.X;
+			case 0x79:
+				return Keys.Y;
+			case 0x80:
+				return Keys.Z;
 		}
 		return Keys.UNKNOWN;
 	}
@@ -322,27 +413,22 @@ public class LimeInput implements Input {
 
 	@Override
 	public void getTextInput(TextInputListener textInputListener, String s, String s1, String s2) {
-
 	}
 
 	@Override
 	public void setOnscreenKeyboardVisible(boolean b) {
-
 	}
 
 	@Override
 	public void vibrate(int i) {
-
 	}
 
 	@Override
 	public void vibrate(long[] longs, int i) {
-
 	}
 
 	@Override
 	public void cancelVibrate() {
-
 	}
 
 	@Override
@@ -362,7 +448,6 @@ public class LimeInput implements Input {
 
 	@Override
 	public void getRotationMatrix(float[] floats) {
-
 	}
 
 	@Override
@@ -372,7 +457,6 @@ public class LimeInput implements Input {
 
 	@Override
 	public void setCatchBackKey(boolean b) {
-
 	}
 
 	@Override
@@ -391,12 +475,12 @@ public class LimeInput implements Input {
 
 	@Override
 	public void setInputProcessor(InputProcessor inputProcessor) {
-		this.inputProcessor = inputProcessor;
+		LimeInput.inputProcessor = inputProcessor;
 	}
 
 	@Override
 	public InputProcessor getInputProcessor() {
-		return this.inputProcessor;
+		return inputProcessor;
 	}
 
 	@Override
@@ -426,7 +510,6 @@ public class LimeInput implements Input {
 
 	@Override
 	public void setCursorPosition(int i, int i1) {
-
 	}
 
 	private static class Pointer {

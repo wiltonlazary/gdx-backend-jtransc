@@ -5,9 +5,13 @@
 	<app swf-version="11.8" />
 
 	<window width="{{ initialWidth }}" height="{{ initialHeight }}" background="#FFFFFF" />
-	<window fullscreen="false" resizable="true" borderless="false" vsync="false" hardware="true" allow-shaders="true" require-shaders="true" depth-buffer="false" stencil-buffer="true" orientation="{{ orientation }}" highdpi="true" allow-high-dpi="true" />
+	<window fullscreen="{{ fullscreen }}" resizable="{{ resizable }}" borderless="{{ borderless }}" vsync="{{ vsync }}" hardware="true" allow-shaders="true" require-shaders="true" depth-buffer="false" stencil-buffer="true" orientation="{{ orientation }}" allow-high-dpi="false" />
 	<window fullscreen="true" if="mobile" />
+	<window fullscreen="false" if="js" />
 	<window fps="60" unless="js" />
+	{% if extra.fps %}
+	<window fps="{{ extra.fps }}" unless="js" />
+	{% end %}
 	<window fps="0" if="js" />
 	<window width="0" height="0" if="html5" />
 
@@ -27,24 +31,39 @@
 	<source path="src" />
 	<assets path="{{ tempAssetsDir }}" rename="assets" embed="{{ embedResources }}" exclude="*.ttf|*.fla|*.zip|*.swf" type="binary" />
 
-	{% if extra.androidIcon %}
+	{% if androidIcons %}
 	<define name="androidIcon" />
 	{% end %}
-	{% if extra.iosIcon %}
+	{% if iosIcons %}
 	<define name="iosIcon" />
 	{% end %}
-	<icon path="{{ extra.androidIcon  }}" if="android androidIcon"/>
-	<icon path="{{ extra.iosIcon  }}" if="ios iosIcon"/>
+
+	{% for androidIconPath in androidIcons %}
+	<icon path="{{ androidIconPath }}" if="android androidIcon"/>
+	{% end %}
+
+	{% for iosIconPath in iosIcons %}
+	<icon path="{{ iosIconPath }}" if="ios iosIcon"/>
+	{% end %}
+
 	{% if hasIcon  %}
 	<icon path="{{ settings.icon }}" unless="androidIcon || iosIcon" />
 	{% end %}
 
 	{% if extra.prerenderedIcon %}
-	<config:ios prerendered-icon="false" />
+	<config:ios prerendered-icon="{{ extra.prerenderedIcon }}" />
 	{% end %}
 
 	{% if extra.deploymentVersion %}
 	<config:ios deployment="{{ extra.deploymentVersion }}" />
+	{% end %}
+
+	{% if extra.ios_devices %}
+	<config:ios devices="{{ extra.ios_devices }}" />
+	{% end %}
+
+	{% for splashScreen in splashScreens %}
+	<splashScreen path="{{ splashScreen }}" />
 	{% end %}
 
 	{% if extra.certificate_path %}
@@ -54,7 +73,12 @@
 		{%if extra.certificate_password %} password="{{ extra.certificate_password }}"{% end %}
 		{%if extra.certificate_alias %} alias="{{ extra.certificate_alias }}"{% end %}
 		{%if extra.certificate_password %} alias-password="{{ extra.certificate_password }}"{% end %}
+		if="android"
 	/>
+	{% end %}
+
+	{% if extra.certificate_team_id %}
+	<certificate team-id="{{ extra.certificate_team_id }}" if="ios" />
 	{% end %}
 
 	<haxelib name="lime" />

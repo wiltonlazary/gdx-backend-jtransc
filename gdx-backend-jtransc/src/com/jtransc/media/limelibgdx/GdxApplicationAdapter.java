@@ -22,12 +22,12 @@ abstract public class GdxApplicationAdapter implements Application {
 	final private LimeFiles files;
 	final private LimeNet net;
 
-	public GdxApplicationAdapter(ApplicationListener applicationListener) {
+	public GdxApplicationAdapter(ApplicationListener applicationListener, int width, int height) {
 		Gdx.app = this;
 		this.applicationListener = applicationListener;
 		Gdx.audio = audio = createAudio();
 		this.type = createApplicationType();
-		Gdx.graphics = graphics = createGraphics();
+		Gdx.graphics = graphics = createGraphics(width, height);
 		Gdx.input = input = createInput();
 		Gdx.files = files = createFiles();
 		Gdx.net = net = createNet();
@@ -46,7 +46,7 @@ abstract public class GdxApplicationAdapter implements Application {
 
 	protected abstract LimeInput createInput();
 
-	protected abstract LimeGraphics createGraphics();
+	protected abstract LimeGraphics createGraphics(int width, int height);
 
 	public void log(int level, String tag, String message, Throwable exception) {
 		if (level <= this.logLevel) {
@@ -223,7 +223,11 @@ abstract public class GdxApplicationAdapter implements Application {
 
 	public void create() {
 		applicationListener.create();
-		resized(LimeApplication.getWidth(), LimeApplication.getHeight());
+		if (graphics.isFullscreen()) {
+			resized(LimeApplication.getDisplayWidth(), LimeApplication.getDisplayHeight());
+		} else {
+			resized(LimeApplication.getWindowWidth(), LimeApplication.getWindowHeight());
+		}
 	}
 
 	public void render() {
@@ -232,10 +236,7 @@ abstract public class GdxApplicationAdapter implements Application {
 		graphics.frame();
 	}
 
-	public void resized(int width, int height) {
-		graphics.width = width;
-		graphics.height = height;
-		Gdx.gl.glViewport(0, 0, width, height);
-		applicationListener.resize(width, height);
+	private void resized(int width, int height) {
+		applicationListener.resize(graphics.getWidth(), graphics.getHeight());
 	}
 }
