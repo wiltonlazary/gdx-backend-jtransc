@@ -214,24 +214,24 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 
 	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getWindowWidth();")
 	@JTranscMethodBody(target = "js", value = "return window.innerWidth|0;")
-	static public int getWindowWidth() {
-		return 640;
+	static int getWindowWidth() {
+		return LimeGraphics.defaultWidth;
 	}
 
 	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getWindowHeight();")
 	@JTranscMethodBody(target = "js", value = "return window.innerHeight|0;")
-	static public int getWindowHeight() {
-		return 480;
+	static int getWindowHeight() {
+		return LimeGraphics.defaultHeight;
 	}
 
 	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getDisplayWidth(0);")
-	public static int getDisplayWidth() {
-		return 640;
+	static int getDisplayWidth() {
+		return LimeGraphics.defaultWidth;
 	}
 
 	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getDisplayHeight(0);")
-	public static int getDisplayHeight() {
-		return 480;
+	static int getDisplayHeight() {
+		return LimeGraphics.defaultHeight;
 	}
 
 	private boolean firstFrame = true;

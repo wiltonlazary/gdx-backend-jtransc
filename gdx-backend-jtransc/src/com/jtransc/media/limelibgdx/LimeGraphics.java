@@ -34,16 +34,16 @@ public class LimeGraphics implements Graphics {
 	native private GL20Ext getInternalGl();
 
 	private Monitor2[] monitors = new Monitor2[]{
-		new Monitor2(640, 480, "default")
+		new Monitor2(defaultWidth, defaultHeight, "default")
 	};
 	private DisplayMode2[] displayModes = new DisplayMode2[]{
-		new DisplayMode2(640, 480, getFramesPerSecond(), 32)
+		new DisplayMode2(defaultWidth, defaultHeight, getFramesPerSecond(), 32)
 	};
-	public int width = 640;
-	public int height = 480;
+	public static final int defaultWidth = 640;
+	public static final int defaultHeight = 480;
 
 	static public class Monitor2 extends Monitor {
-		public Monitor2(int virtualX, int virtualY, String name) {
+		Monitor2(int virtualX, int virtualY, String name) {
 			super(virtualX, virtualY, name);
 		}
 	}
@@ -57,7 +57,7 @@ public class LimeGraphics implements Graphics {
 	double lastStamp = 0.0;
 	float deltaTime = 0f;
 
-	public void frame() {
+	void frame() {
 		double currentStamp = JTranscSystem.stamp();
 		frameId++;
 
@@ -94,12 +94,18 @@ public class LimeGraphics implements Graphics {
 
 	@Override
 	public int getBackBufferWidth() {
-		return initWidth;
+		if (isFullscreen()) {
+			return LimeApplication.getDisplayWidth();
+		}
+		return LimeApplication.getWindowWidth();
 	}
 
 	@Override
 	public int getBackBufferHeight() {
-		return initHeight;
+		if (isFullscreen()) {
+			return LimeApplication.getDisplayHeight();
+		}
+		return LimeApplication.getWindowHeight();
 	}
 
 	@Override

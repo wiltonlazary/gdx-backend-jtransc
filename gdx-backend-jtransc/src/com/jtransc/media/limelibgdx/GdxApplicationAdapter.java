@@ -235,9 +235,8 @@ abstract public class GdxApplicationAdapter implements Application {
 	}
 
 	public void resized(int width, int height) {
-		graphics.width = width;
-		graphics.height = height;
-		Gdx.gl.glViewport(0, 0, width, height);
-		applicationListener.resize(width, height);
+		// TODO: need more test, see as broken logic
+//		Gdx.gl.glViewport(0, 0, width, height);
+//		applicationListener.resize(width, height);
 	}
 }

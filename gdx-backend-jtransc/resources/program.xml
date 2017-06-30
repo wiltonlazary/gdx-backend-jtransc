@@ -5,7 +5,7 @@
 	<app swf-version="11.8" />
 
 	<window width="{{ initialWidth }}" height="{{ initialHeight }}" background="#FFFFFF" />
-	<window fullscreen="{{ fullscreen }}" resizable="{{ resizable }}" borderless="{{ borderless }}" vsync="{{ vsync }}" hardware="true" allow-shaders="true" require-shaders="true" depth-buffer="false" stencil-buffer="true" orientation="{{ orientation }}" highdpi="true" allow-high-dpi="true" />
+	<window fullscreen="{{ fullscreen }}" resizable="{{ resizable }}" borderless="{{ borderless }}" vsync="{{ vsync }}" hardware="true" allow-shaders="true" require-shaders="true" depth-buffer="false" stencil-buffer="true" orientation="{{ orientation }}" allow-high-dpi="false" />
 	<window fullscreen="true" if="mobile" />
 	<window fullscreen="false" if="js" />
 	<window fps="60" unless="js" />
