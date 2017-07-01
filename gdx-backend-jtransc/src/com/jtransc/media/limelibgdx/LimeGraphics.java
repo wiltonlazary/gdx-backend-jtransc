@@ -9,51 +9,82 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.glutils.GLVersion;
 import com.jtransc.JTranscSystem;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
-import com.jtransc.media.limelibgdx.flash.FlashStage3DGL20;
-import com.jtransc.media.limelibgdx.gl.LimeGL20;
 import com.jtransc.media.limelibgdx.logger.LoggerGL20;
 
 public class LimeGraphics implements Graphics {
-	//final private GL20 gl = new DummyGL20();
+
+	public static final int defaultWidth = 640;
+	public static final int defaultHeight = 480;
+
 	final private GL20 gl;
-	//final private GL20 gl = new LoggerGL20(new LimeGL20());
-	int frameId = 0;
 
-	private static int initWidth = 640;
-	private static int initHeight = 480;
+	private int frameId = 0;
 
-	public LimeGraphics(int width, int height, boolean trace) {
-		initWidth = width;
-		initHeight = height;
+	private static int initWidth = defaultWidth;
+	private static int initHeight = defaultHeight;
+	private int currentWidth = defaultWidth;
+	private int currentHeight = defaultHeight;
+
+	public static class JtranscMonitor extends Monitor {
+		JtranscMonitor(int virtualX, int virtualY, String name) {
+			super(virtualX, virtualY, name);
+		}
+	}
+	public static class JtranscMode extends DisplayMode {
+		public JtranscMode(int width, int height, int refreshRate, int bitsPerPixel) {
+			super(width, height, refreshRate, bitsPerPixel);
+		}
+	}
+	private final Monitor[] monitors;
+	private JtranscMode[] displayModes;
+
+	LimeGraphics(int width, int height, boolean trace) {
+		initWidth = currentWidth = width;
+		initHeight = currentHeight = height;
+		monitors = new Monitor[]{
+			new JtranscMonitor(width, height, "default")
+		};
+		displayModes = new JtranscMode[]{
+			new JtranscMode(width, height, getFramesPerSecond(), 32)
+		};
 		GL20Ext gl = getInternalGl();
 		if (trace) gl = new LoggerGL20(gl);
 		this.gl = gl;
 	}
 
-	//@HaxeMethodBody(target = "flash", value = "return {% SMETHOD com.jtransc.media.limelibgdx.flash.FlashStage3DGL20:create %}();")
+	@Override
+	public int getWidth() {
+		return currentWidth;
+	}
+
+	@Override
+	public int getHeight() {
+		return currentHeight;
+	}
+
+	@Override
+	public int getBackBufferWidth() {
+		if (isFullscreen()) {
+			return LimeApplication.getDisplayWidth();
+		}
+		return LimeApplication.getWindowWidth();
+	}
+
+	@Override
+	public int getBackBufferHeight() {
+		if (isFullscreen()) {
+			return LimeApplication.getDisplayHeight();
+		}
+		return LimeApplication.getWindowHeight();
+	}
+
+	void onResized(int width, int height) {
+		monitors[0] = new JtranscMonitor(LimeApplication.getDisplayWidth(), LimeApplication.getDisplayHeight(), "default");
+		displayModes[0] = new JtranscMode(LimeApplication.getDisplayWidth(), LimeApplication.getDisplayHeight(), getFramesPerSecond(), 32);
+	}
+
 	@HaxeMethodBody("return {% SMETHOD com.jtransc.media.limelibgdx.gl.LimeGL20:create %}();")
 	native private GL20Ext getInternalGl();
-
-	private Monitor2[] monitors = new Monitor2[]{
-		new Monitor2(defaultWidth, defaultHeight, "default")
-	};
-	private DisplayMode2[] displayModes = new DisplayMode2[]{
-		new DisplayMode2(defaultWidth, defaultHeight, getFramesPerSecond(), 32)
-	};
-	public static final int defaultWidth = 640;
-	public static final int defaultHeight = 480;
-
-	static public class Monitor2 extends Monitor {
-		Monitor2(int virtualX, int virtualY, String name) {
-			super(virtualX, virtualY, name);
-		}
-	}
-
-	static public class DisplayMode2 extends DisplayMode {
-		public DisplayMode2(int width, int height, int refreshRate, int bitsPerPixel) {
-			super(width, height, refreshRate, bitsPerPixel);
-		}
-	}
 
 	double lastStamp = 0.0;
 	float deltaTime = 0f;
@@ -81,32 +112,6 @@ public class LimeGraphics implements Graphics {
 	@Override
 	public GL30 getGL30() {
 		return null;
-	}
-
-	@Override
-	public int getWidth() {
-		return initWidth;
-	}
-
-	@Override
-	public int getHeight() {
-		return initHeight;
-	}
-
-	@Override
-	public int getBackBufferWidth() {
-		if (isFullscreen()) {
-			return LimeApplication.getDisplayWidth();
-		}
-		return LimeApplication.getWindowWidth();
-	}
-
-	@Override
-	public int getBackBufferHeight() {
-		if (isFullscreen()) {
-			return LimeApplication.getDisplayHeight();
-		}
-		return LimeApplication.getWindowHeight();
 	}
 
 	@Override
@@ -269,7 +274,7 @@ public class LimeGraphics implements Graphics {
 
 	}
 
-	@HaxeMethodBody("" +
+	@HaxeMethodBody(
 		"{% if fullscreen %} return {{ fullscreen }};" +
 		"{% else %} return false; {% end %}"
 	)

@@ -149,6 +149,12 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	private void setApplicationToLime(LimeApplication app) {
 	}
 
+	@HaxeMethodBody("return HaxeLimeGdxApplication.app != null;")
+	@JTranscMethodBody(target = "js", value = "return app !== null;")
+	public static boolean isAppCreated() {
+		return false;
+	}
+
 	@Override
 	public int getVersion() {
 		return 0;

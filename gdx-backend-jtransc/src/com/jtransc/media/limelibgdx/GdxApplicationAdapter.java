@@ -237,6 +237,9 @@ abstract public class GdxApplicationAdapter implements Application {
 	}
 
 	private void resized(int width, int height) {
+		if (LimeApplication.isAppCreated()) {
+			graphics.onResized(width, height);
+		}
 		applicationListener.resize(graphics.getWidth(), graphics.getHeight());
 	}
 }
