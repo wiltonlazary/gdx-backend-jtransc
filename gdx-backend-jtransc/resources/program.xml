@@ -60,8 +60,8 @@
 	{% if extra.deploymentVersion %}
 	<config:ios deployment="{{ extra.deploymentVersion }}" />
 	{% end %}
-	{% if extra.ios_devices %}
-	<config:ios devices="{{ extra.ios_devices }}" />
+	{% if extra.ios_device %}
+	<config:ios device="{{ extra.ios_device }}" />
 	{% end %}
 
 	{% if extra.certificate_path %}
