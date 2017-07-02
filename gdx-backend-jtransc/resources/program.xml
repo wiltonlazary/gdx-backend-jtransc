@@ -5,8 +5,9 @@
 	<app swf-version="11.8" />
 
 	<window width="{{ initialWidth }}" height="{{ initialHeight }}" background="#FFFFFF" />
-	<window fullscreen="{{ fullscreen }}" resizable="{{ resizable }}" borderless="{{ borderless }}" vsync="{{ vsync }}" hardware="true" allow-shaders="true" require-shaders="true" depth-buffer="false" stencil-buffer="true" orientation="{{ orientation }}" allow-high-dpi="false" />
-	<window fullscreen="true" if="mobile" />
+	<window fullscreen="{{ fullscreen }}" resizable="{{ resizable }}" borderless="{{ borderless }}" hardware="true" allow-shaders="true" require-shaders="true" depth-buffer="true" stencil-buffer="true" orientation="{{ orientation }}" allow-high-dpi="true" />
+	<window vsync="{{ vsync }}" antialiasing="4" if="cpp" />
+	<window fullscreen="true" width="0" height="0" if="mobile" />
 	<window fullscreen="false" if="js" />
 	<window fps="60" unless="js" />
 	{% if extra.fps %}
@@ -38,32 +39,29 @@
 	<define name="iosIcon" />
 	{% end %}
 
+	{% if extra.prerenderedIcon %}
+	<config:ios prerendered-icon="{{ extra.prerenderedIcon }}" />
+	{% end %}
+
 	{% for androidIconPath in androidIcons %}
 	<icon path="{{ androidIconPath }}" if="android androidIcon"/>
 	{% end %}
-
 	{% for iosIconPath in iosIcons %}
 	<icon path="{{ iosIconPath }}" if="ios iosIcon"/>
 	{% end %}
-
 	{% if hasIcon  %}
 	<icon path="{{ settings.icon }}" unless="androidIcon || iosIcon" />
 	{% end %}
 
-	{% if extra.prerenderedIcon %}
-	<config:ios prerendered-icon="{{ extra.prerenderedIcon }}" />
+	{% for splashScreen in splashScreens %}
+	<splashScreen path="{{ splashScreen }}" if="ios" />
 	{% end %}
 
 	{% if extra.deploymentVersion %}
 	<config:ios deployment="{{ extra.deploymentVersion }}" />
 	{% end %}
-
 	{% if extra.ios_devices %}
 	<config:ios devices="{{ extra.ios_devices }}" />
-	{% end %}
-
-	{% for splashScreen in splashScreens %}
-	<splashScreen path="{{ splashScreen }}" />
 	{% end %}
 
 	{% if extra.certificate_path %}
@@ -76,7 +74,6 @@
 		if="android"
 	/>
 	{% end %}
-
 	{% if extra.certificate_team_id %}
 	<certificate team-id="{{ extra.certificate_team_id }}" if="ios" />
 	{% end %}
