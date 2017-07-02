@@ -67,6 +67,7 @@ public class LwjglApplicationConfiguration {
 		this.fullscreen = true;
 	}
 
+	// TODO: review config and delete duplicate for LimeGraphics
 	@HaxeMethodBody("" +
 		"{% if extra.fps %} return {{ extra.fps }};" +
 		"{% else %} return 60;" +
@@ -77,7 +78,7 @@ public class LwjglApplicationConfiguration {
 	}
 
 	public static Graphics.DisplayMode getDesktopDisplayMode() {
-		return new LimeGraphics.DisplayMode2(640, 480, getFramesPerSecond(), 32);
+		return new LimeGraphics.JtranscMode(LimeGraphics.defaultWidth, LimeGraphics.defaultWidth, getFramesPerSecond(), 32);
 	}
 
 	public static Graphics.DisplayMode[] getDisplayModes() {

@@ -23,6 +23,7 @@ abstract public class GdxApplicationAdapter implements Application {
 	final private LimeNet net;
 
 	public GdxApplicationAdapter(ApplicationListener applicationListener, int width, int height) {
+		System.out.println("GdxApplicationAdapter(," + width + "," + height + ")");
 		Gdx.app = this;
 		this.applicationListener = applicationListener;
 		Gdx.audio = audio = createAudio();
@@ -237,6 +238,9 @@ abstract public class GdxApplicationAdapter implements Application {
 	}
 
 	private void resized(int width, int height) {
+		if (LimeApplication.isAppCreated()) {
+			graphics.onResized(width, height);
+		}
 		applicationListener.resize(graphics.getWidth(), graphics.getHeight());
 	}
 }
