@@ -2,23 +2,50 @@ package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.*;
 import com.jtransc.annotation.JTranscMethodBody;
+import com.jtransc.annotation.haxe.HaxeMethodBody;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class LimeInput implements Input {
+
+	private static final int MAX_TOUCH_POINTS = 10;
+
 	private static boolean[] keys = new boolean[0x200];
 	private static boolean[] justPressed = new boolean[0x200];
 	private static boolean[] justReleased = new boolean[0x200];
+	private static boolean[] touchIndexes = new boolean[MAX_TOUCH_POINTS];
 
-	private static final boolean LIME_INPUT_DEBUG = false;
+	@HaxeMethodBody(
+		"{% if extra.debugLimeInput %}return {{ extra.debugLimeInput }};{% end %}" +
+		"{% if !extra.debugLimeInput %}return false;{% end %}"
+	)
+	private static boolean isLimeInputDebug() {
+		return false;
+	}
 
-	static HashMap<Integer, Pointer> pointers = new HashMap<>();
+	private static final HashMap<Integer, Pointer> pointers = new HashMap<>();
+	private static final Pointer mousePoint = new Pointer();
+	private static boolean lockMouse =
+		LimeDevice.getType() == Application.ApplicationType.iOS
+			|| LimeDevice.getType() == Application.ApplicationType.Android;
 
 	static private InputProcessor inputProcessor = new InputAdapter();
 
-	static {
-		pointers.put(0, new Pointer());
+	private static int getIndex(){
+		for (int i  = 0; i < touchIndexes.length; i++){
+			if (!touchIndexes[i]) {
+				touchIndexes[i] = true;
+				return i;
+			}
+		}
+		return MAX_TOUCH_POINTS;
+	}
+
+	private static void releaseIndex(int index){
+		if (index >= 0 && index < MAX_TOUCH_POINTS) {
+			touchIndexes[index] = false;
+		}
 	}
 
 	private static int toLogicalX(double realX) {
@@ -43,37 +70,46 @@ public class LimeInput implements Input {
 
 	@SuppressWarnings("unused")
 	public static void lime_onMouseUp(double x, double y, int button) {
-		if (LIME_INPUT_DEBUG) {
+		if (lockMouse) {
+			return;
+		}
+		if (isLimeInputDebug()) {
 			System.out.println("lime_onMouseUp(" + x + "," + y + "," + button + ")");
 		}
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
-		Pointer p = pointers.get(0);
-		p.setXY(localX, localY);
-		p.releaseButton(button);
+		mousePoint.setXY(localX, localY);
+		mousePoint.releaseButton(button);
 		inputProcessor.touchUp(localX, localY, 0, button);
 	}
 
 	@SuppressWarnings("unused")
 	public static void lime_onMouseDown(double x, double y, int button) {
-		if (LIME_INPUT_DEBUG) {
+		if (lockMouse) {
+			return;
+		}
+		if (isLimeInputDebug()) {
 			System.out.println("lime_onMouseDown(" + x + "," + y + "," + button + ")");
 		}
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
-		Pointer p = pointers.get(0);
-		p.setXY(localX, localY);
-		p.pressButton(button);
+		mousePoint.setXY(localX, localY);
+		mousePoint.pressButton(button);
 		inputProcessor.touchDown(localX, localY, 0, button);
 	}
 
 	@SuppressWarnings("unused")
 	public static void lime_onMouseMove(double x, double y) {
+		if (lockMouse) {
+			return;
+		}
+		if (isLimeInputDebug()) {
+			System.out.println("lime_onMouseMove(" + x + "," + y + ")");
+		}
 		int localX = toLogicalX(x);
 		int localY = toLogicalY(y);
-		Pointer p = pointers.get(0);
-		p.setXY(localX, localY);
-		if (p.isPressingAnyButton()) {
+		mousePoint.setXY(localX, localY);
+		if (mousePoint.isPressingAnyButton()) {
 			inputProcessor.touchDragged(localX, localY, 0);
 		} else {
 			inputProcessor.mouseMoved(localX, localY);
@@ -87,7 +123,7 @@ public class LimeInput implements Input {
 
 	@SuppressWarnings("unused")
 	public static void lime_onKeyUp(int keyCode, int modifier) {
-		if (LIME_INPUT_DEBUG) {
+		if (isLimeInputDebug()) {
 			System.out.println("lime_onKeyUp(" + keyCode + "," + modifier + ")");
 		}
 		int key = convertKeyCode(keyCode);
@@ -98,7 +134,7 @@ public class LimeInput implements Input {
 
 	@SuppressWarnings("unused")
 	public static void lime_onKeyDown(int keyCode, int modifier) {
-		if (LIME_INPUT_DEBUG) {
+		if (isLimeInputDebug()) {
 			System.out.println("lime_onKeyDown(" + keyCode + "," + modifier + ")");
 		}
 		int key = convertKeyCode(keyCode);
@@ -109,7 +145,7 @@ public class LimeInput implements Input {
 
 	@SuppressWarnings("unused")
 	static public void lime_onKeyTyped(char character) {
-		if (LIME_INPUT_DEBUG) {
+		if (isLimeInputDebug()) {
 			System.out.println("lime_onKeyTyped(" + character + ")");
 		}
 		inputProcessor.keyTyped(character);
@@ -117,48 +153,41 @@ public class LimeInput implements Input {
 
 	@SuppressWarnings("unused")
 	public static void lime_onTouchStart(int id, double x, double y) {
-		if (LIME_INPUT_DEBUG) {
+		if (isLimeInputDebug()) {
 			System.out.println("lime_onTouchStart(" + id + "," + x + "," + y + ")");
 		}
-		// TODO: fix out of bounds on real device
-		if (LimeDevice.getType() == Application.ApplicationType.iOS) {
-			return;
-		}
-		int localX = toLogicalX(x);
-		int localY = toLogicalY(y);
+		int localX = (int)(Gdx.graphics.getWidth() * x);
+		int localY = (int)(Gdx.graphics.getHeight() * y);
 		Pointer p = new Pointer();
 		p.setXY(localX, localY);
 		p.pressButton(0);
+		p.setIndex(getIndex());
 		pointers.put(id, p);
-		inputProcessor.touchDown(localX, localY, id, 0);
+		inputProcessor.touchDown(localX, localY, p.getIndex(), 0);
 	}
 
 	@SuppressWarnings("unused")
 	public static void lime_onTouchMove(int id, double x, double y) {
-		if (LIME_INPUT_DEBUG) {
+		if (isLimeInputDebug()) {
 			System.out.println("lime_onTouchMove(" + id + "," + x + "," + y + ")");
 		}
-		// TODO: fix out of bounds on real device
-		if (LimeDevice.getType() == Application.ApplicationType.iOS) {
-			return;
-		}
-		int localX = toLogicalX(x);
-		int localY = toLogicalY(y);
-		pointers.get(id).setXY(localX, localY);
-		inputProcessor.touchDragged(localX, localY, id);
+		int localX = (int)(Gdx.graphics.getWidth() * x);
+		int localY = (int)(Gdx.graphics.getHeight() * y);
+		Pointer p = pointers.get(id);
+		p.setXY(localX, localY);
+		inputProcessor.touchDragged(localX, localY, p.getIndex());
 	}
 
 	@SuppressWarnings("unused")
 	public static void lime_onTouchEnd(int id, double x, double y) {
-		if (LIME_INPUT_DEBUG) {
+		if (isLimeInputDebug()) {
 			System.out.println("lime_onTouchEnd(" + id + "," + x + "," + y + ")");
 		}
-		// TODO: fix out of bounds on real device
-		if (LimeDevice.getType() == Application.ApplicationType.iOS) {
-			return;
-		}
-		pointers.remove(id);
-		inputProcessor.touchUp(toLogicalX(x), toLogicalY(y), id, 0);
+		int localX = (int)(Gdx.graphics.getWidth() * x);
+		int localY = (int)(Gdx.graphics.getHeight() * y);
+		Pointer p = pointers.remove(id);
+		releaseIndex(p.getIndex());
+		inputProcessor.touchUp(localX, localY, p.getIndex(), 0);
 	}
 
 	@SuppressWarnings("unused")
@@ -213,6 +242,9 @@ public class LimeInput implements Input {
 		for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
 			entry.getValue().frame();
 		}
+		if (!lockMouse){
+			mousePoint.frame();
+		}
 	}
 
 	// @TODO: https://github.com/openfl/lime/blob/develop/lime/system/Sensor.hx
@@ -253,7 +285,10 @@ public class LimeInput implements Input {
 
 	@Override
 	public int getX(int i) {
-		return pointers.get(i) == null ? 0 : (int) pointers.get(i).getX();
+		if (lockMouse) {
+			return pointers.get(i) == null ? 0 : (int) pointers.get(i).getX();
+		}
+		return (int) mousePoint.getX();
 	}
 
 	@Override
@@ -263,7 +298,10 @@ public class LimeInput implements Input {
 
 	@Override
 	public int getDeltaX(int i) {
-		return pointers.get(i) == null ? 0 : (int) pointers.get(i).getDeltaX();
+		if (lockMouse) {
+			return pointers.get(i) == null ? 0 : (int) pointers.get(i).getDeltaX();
+		}
+		return (int) mousePoint.getDeltaX();
 	}
 
 	@Override
@@ -273,7 +311,10 @@ public class LimeInput implements Input {
 
 	@Override
 	public int getY(int i) {
-		return pointers.get(i) == null ? 0 : (int) pointers.get(i).getY();
+		if (lockMouse) {
+			return pointers.get(i) == null ? 0 : (int) pointers.get(i).getY();
+		}
+		return (int) mousePoint.getY();
 	}
 
 	@Override
@@ -283,33 +324,45 @@ public class LimeInput implements Input {
 
 	@Override
 	public int getDeltaY(int i) {
-		return pointers.get(i) == null ? 0 : (int) pointers.get(i).getDeltaY();
+		if (lockMouse) {
+			return pointers.get(i) == null ? 0 : (int) pointers.get(i).getDeltaY();
+		}
+		return (int) mousePoint.getDeltaY();
 	}
 
 	@Override
 	public boolean isTouched() {
-		for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
-			if (entry.getValue().isPressingAnyButton()) return true;
+		if (lockMouse) {
+			for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
+				if (entry.getValue().isPressingAnyButton()) return true;
+			}
+			return false;
 		}
-		return false;
+		return mousePoint.isPressingAnyButton();
 	}
 
 	@Override
 	public boolean justTouched() {
-		for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
-			if (entry.getValue().justPressedAnyButton()) return true;
+		if (lockMouse) {
+			for (Map.Entry<Integer, Pointer> entry : pointers.entrySet()) {
+				if (entry.getValue().justPressedAnyButton()) return true;
+			}
+			return false;
 		}
-		return false;
+		return mousePoint.justPressedAnyButton();
 	}
 
 	@Override
 	public boolean isTouched(int i) {
-		return pointers.get(i) != null && pointers.get(i).isPressingAnyButton();
+		if (lockMouse) {
+			return pointers.get(i) != null && pointers.get(i).isPressingAnyButton();
+		}
+		return mousePoint.isPressingAnyButton();
 	}
 
 	@Override
 	public boolean isButtonPressed(int i) {
-		return pointers.get(0).isPressingButton(i);
+		return mousePoint.isPressingButton(i);
 	}
 
 	@JTranscMethodBody(target = "js", value = "return p0;")
@@ -519,6 +572,7 @@ public class LimeInput implements Input {
 		private double lastY;
 		private double currentX;
 		private double currentY;
+		private int index = -1;
 
 		public void setXY(double x, double y) {
 			this.currentX = x;
@@ -533,6 +587,13 @@ public class LimeInput implements Input {
 			this.lastX = currentX;
 			this.lastY = currentY;
 			this.lastB = currentB;
+		}
+
+		public int getIndex() {
+			return index;
+		}
+		public void setIndex(int index) {
+			this.index = index;
 		}
 
 		public double getX() {

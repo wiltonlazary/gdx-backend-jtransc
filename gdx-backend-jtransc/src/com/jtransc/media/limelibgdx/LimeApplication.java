@@ -1,11 +1,13 @@
 package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Clipboard;
 import com.jtransc.JTranscSystem;
 import com.jtransc.annotation.*;
 import com.jtransc.annotation.haxe.*;
+import com.jtransc.media.limelibgdx.profiler.FrameRate;
 
 import java.io.File;
 import java.io.IOException;
@@ -221,29 +223,32 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getWindowWidth();")
 	@JTranscMethodBody(target = "js", value = "return window.innerWidth|0;")
 	static int getWindowWidth() {
-		return LimeGraphics.defaultWidth;
+		return LwjglApplicationConfiguration.defaultWidth;
 	}
 
 	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getWindowHeight();")
 	@JTranscMethodBody(target = "js", value = "return window.innerHeight|0;")
 	static int getWindowHeight() {
-		return LimeGraphics.defaultHeight;
+		return LwjglApplicationConfiguration.defaultHeight;
 	}
 
 	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getDisplayWidth(0);")
 	static int getDisplayWidth() {
-		return LimeGraphics.defaultWidth;
+		return LwjglApplicationConfiguration.defaultWidth;
 	}
 
 	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getDisplayHeight(0);")
 	static int getDisplayHeight() {
-		return LimeGraphics.defaultHeight;
+		return LwjglApplicationConfiguration.defaultHeight;
 	}
 
 	private boolean firstFrame = true;
 
 	@SuppressWarnings("unused")
 	public void render() {
+		if (!isAppCreated()) {
+			return;
+		}
 		super.render();
 		if (Gdx.gl instanceof GL20Ext) {
 			((GL20Ext)Gdx.gl).present();
@@ -285,7 +290,7 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 		return LimeDevice.getType();
 	}
 
-	@HaxeMethodBody("" +
+	@HaxeMethodBody(
 		"{% if extra.showFPS %} return {{ extra.showFPS }}; {% end %}" +
 		"{% if !extra.showFPS %} return false; {% end %}"
 	)
