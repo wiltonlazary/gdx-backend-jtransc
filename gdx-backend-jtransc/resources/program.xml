@@ -65,6 +65,13 @@
 	<config:ios device="{{ extra.ios_device }}" />
 	{% end %}
 
+	<!-- https://github.com/openfl/lime/blob/29fda1c54547a3a1f34ab8287a5fbbd72f347b3d/lime/project/Architecture.hx -->
+	<!-- ARMV5,ARMV6,ARMV7,ARMV7S,ARM64,X86,X64,MIPS,MIPSEL -->
+	<!-- TODO: for android provide architecture from gradle -->
+	<architecture name="armv7" if="android" />
+	<!-- Only ARM64 use for iOS, all devices from iPhone5s -->
+	<architecture name="arm64" if="ios" />
+
 	{% if extra.androidTargetSdkVersion %}<config:android target-sdk-version="{{ extra.androidTargetSdkVersion }}" />{% end %}
 	{% if extra.androidInstallLocation %}<config:android install-location="{{ extra.androidInstallLocation }}" />{% end %}
 	{% for androidPermission in androidPermissions %}<config:android permission="{{ androidPermission }}" />{% end %}
