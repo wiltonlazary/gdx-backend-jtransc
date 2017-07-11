@@ -41,6 +41,7 @@
 
 	{% if extra.prerenderedIcon %}
 	<config:ios prerendered-icon="{{ extra.prerenderedIcon }}" />
+	<config:tvos prerenderedIcon="{{ extra.prerenderedIcon }}" />
 	{% end %}
 
 	{% if hasIcon  %}
@@ -51,19 +52,22 @@
 	{% end %}
 	{% for iosIconPath in iosIcons %}
 	<icon path="{{ iosIconPath }}" if="ios iosIcon"/>
+	<icon path="{{ iosIconPath }}" if="tvos iosIcon"/>
 	{% end %}
 
 	{% for splashScreen in splashScreens %}
 	{% set splashImage = splashScreen|image_info %}
-	<splashScreen path="{{ splashScreen }}" width="{{ splashImage.width }}" height="{{ splashImage.height }}" if="ios" />
+	<splashScreen path="{{ splashScreen }}" width="{{ splashImage.width }}" height="{{ splashImage.height }}" />
 	{% end %}
 
 	{% if extra.deploymentVersion %}
 	<config:ios deployment="{{ extra.deploymentVersion }}" />
+	<config:tvos deployment="{{ extra.deploymentVersion }}"/>
 	{% end %}
 	{% if extra.ios_device %}
 	<config:ios device="{{ extra.ios_device }}" />
 	{% end %}
+	<config:tvos device="appletv" />
 
 	<!-- https://github.com/openfl/lime/blob/29fda1c54547a3a1f34ab8287a5fbbd72f347b3d/lime/project/Architecture.hx -->
 	<!-- ARMV5,ARMV6,ARMV7,ARMV7S,ARM64,X86,X64,MIPS,MIPSEL -->
@@ -71,6 +75,7 @@
 	<architecture name="armv7" if="android" />
 	<!-- Only ARM64 use for iOS, all devices from iPhone5s -->
 	<architecture name="arm64" if="ios" />
+	<architecture name="arm64" if="tvos" />
 
 	{% if extra.androidTargetSdkVersion %}<config:android target-sdk-version="{{ extra.androidTargetSdkVersion }}" />{% end %}
 	{% if extra.androidInstallLocation %}<config:android install-location="{{ extra.androidInstallLocation }}" />{% end %}
@@ -88,6 +93,7 @@
 	{% end %}
 	{% if extra.certificate_team_id %}
 	<certificate team-id="{{ extra.certificate_team_id }}" if="ios" />
+	<config:tvos identify="{{ extra.certificate_team_id }}" />
 	{% end %}
 
 	<haxelib name="lime" />

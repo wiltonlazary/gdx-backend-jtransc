@@ -18,6 +18,12 @@ public class LimeDevice {
 		return false;
 	}
 
+	@HaxeMethodBody(target = "tvos", value = "return true;")
+	@HaxeMethodBody("return false;")
+	private static boolean isTvos() {
+		return false;
+	}
+
 	private static boolean isJs() {
 		return JTranscSystem.isJs();
 	}
@@ -29,7 +35,7 @@ public class LimeDevice {
 	public static Application.ApplicationType getType() {
 		if (isJs()) {
 			return Application.ApplicationType.WebGL;
-		} else if (isIos()) {
+		} else if (isIos() || isTvos()) {
 			return Application.ApplicationType.iOS;
 		} else if (isAndroid()) {
 			return Application.ApplicationType.Android;
@@ -40,7 +46,7 @@ public class LimeDevice {
 	static Graphics.GraphicsType getGraphicsType() {
 		if (isJs()) {
 			return Graphics.GraphicsType.WebGL;
-		} else if (isIos()) {
+		} else if (isIos() || isTvos()) {
 			return Graphics.GraphicsType.iOSGL;
 		} else if (isAndroid()) {
 			return Graphics.GraphicsType.AndroidGL;
