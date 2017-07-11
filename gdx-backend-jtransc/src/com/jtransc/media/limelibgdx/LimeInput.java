@@ -117,7 +117,7 @@ public class LimeInput implements Input {
 		if (isLimeInputDebug()) {
 			System.out.println("lime_onWheel(" + x + ", " + y + ", " + z + ")");
 		}
-		inputProcessor.scrolled((int) y);
+		inputProcessor.scrolled((int) -y);
 	}
 
 	static void lime_onKeyUp(int keyCode, int modifier) {
