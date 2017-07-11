@@ -855,7 +855,6 @@ public class LimeGL20 extends DummyGL20 implements GL20Ext {
 
 	@Override
 	public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, Pixmap pixmap) {
-		System.out.println("glTexImage2D:target=" + target + ",level=" + level + ",internalformat=" + internalformat + ",width=" + width + ",height=" + height + ",border=" + border + ",format=" + format + ",type=" + type + ",pixmap=" + pixmap);
 		_glTexImage2D(target, level, internalformat, width, height, border, format, type, pixmap);
 	}
 
