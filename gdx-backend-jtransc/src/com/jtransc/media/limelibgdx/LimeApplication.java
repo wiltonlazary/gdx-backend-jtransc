@@ -254,6 +254,7 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 		if (!isAppCreated()) {
 			return;
 		}
+		LimeInput.flushInput();
 		super.render();
 		if (Gdx.gl instanceof GL20Ext) {
 			((GL20Ext)Gdx.gl).present();
