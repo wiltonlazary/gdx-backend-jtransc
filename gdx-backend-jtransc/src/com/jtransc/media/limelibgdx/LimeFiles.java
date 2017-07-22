@@ -10,6 +10,16 @@ import java.io.FileNotFoundException;
 
 public class LimeFiles implements Files {
 
+	static final String internalPath = "assets";
+	static String localPath;
+
+	@HaxeMethodBody(
+		"{% if extra.useLimeFileHandle %}return {{ extra.useLimeFileHandle }};{% else %}return false;{% end %}"
+	)
+	private static boolean useLimeFileHandle() {
+		return false;
+	}
+
 	@HaxeMethodBody(
 		"{% if extra.debugLimeFiles %}return {{ extra.debugLimeFiles }};{% else %}return false;{% end %}"
 	)
@@ -19,35 +29,60 @@ public class LimeFiles implements Files {
 
 	LimeFiles() {
 		JTranscSyncIO.impl = new JTranscSyncIOLimeImpl(JTranscSyncIO.impl);
+		localPath = getLocalPath();
+		localPath = localPath.replace("\\", "/").replace("//", "/");
+		if (isLimeFilesDebug()) {
+			System.out.println("localPath=" + localPath);
+		}
+	}
+
+	@HaxeMethodBody("return N.str(lime.system.System.applicationStorageDirectory);")
+	private String getLocalPath() {
+		return "/";
 	}
 
 	@Override
 	public FileHandle getFileHandle(String s, FileType fileType) {
-		return new FileHandle(s);
+		return new LimeFileHandle(s);
 	}
 
 	@Override
 	public FileHandle classpath(String s) {
+		if (useLimeFileHandle()) {
+			return new LimeFileHandle(s);
+		}
 		return new FileHandle(s);
 	}
 
 	@Override
 	public FileHandle internal(String s) {
+		if (useLimeFileHandle()) {
+			return new LimeFileHandle(s);
+		}
 		return new FileHandle(s);
 	}
 
 	@Override
 	public FileHandle external(String s) {
+		if (useLimeFileHandle()) {
+			return new LimeFileHandle(s);
+		}
 		return new FileHandle(s);
 	}
 
 	@Override
 	public FileHandle absolute(String s) {
+		if (useLimeFileHandle()) {
+			return new LimeFileHandle(s);
+		}
 		return new FileHandle(s);
 	}
 
 	@Override
 	public FileHandle local(String s) {
+		if (useLimeFileHandle()) {
+			return new LimeFileHandle(s, FileType.Local);
+		}
 		return new FileHandle(s);
 	}
 
@@ -63,12 +98,12 @@ public class LimeFiles implements Files {
 
 	@Override
 	public String getLocalStoragePath() {
-		return "/";
+		return useLimeFileHandle() ? localPath : "/";
 	}
 
 	@Override
 	public boolean isLocalStorageAvailable() {
-		return false;
+		return useLimeFileHandle();
 	}
 
 	static public String fixpath(String path) {
@@ -123,16 +158,16 @@ public class LimeFiles implements Files {
 			return result;
 		}
 
-		private static final int BA_EXISTS    = 0x01;
-		private static final int BA_REGULAR   = 0x02;
+		private static final int BA_EXISTS = 0x01;
+		private static final int BA_REGULAR = 0x02;
 		private static final int BA_DIRECTORY = 0x04;
-		private static final int BA_HIDDEN    = 0x08;
+		private static final int BA_HIDDEN = 0x08;
 
-		@HaxeMethodBody("return lime.Assets.exists(p0._str);")
+		@HaxeMethodBody("return lime.Assets.exists(N.i_str(p0));")
 		@JTranscMethodBody(target = "js", value = "return libgdx.io.exists(N.istr(p0));")
 		native private boolean exists(String path);
 
-		@HaxeMethodBody("return JA_B.fromBytes(lime.Assets.getBytes(p0._str));")
+		@HaxeMethodBody("return JA_B.fromBytes(lime.Assets.getBytes(N.i_str(p0)));")
 		@JTranscMethodBody(target = "js", value = "return libgdx.io.readBytes(N.istr(p0));")
 		native private byte[] readBytes(String path, int mode);
 	}
