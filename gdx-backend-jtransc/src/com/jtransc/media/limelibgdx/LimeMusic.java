@@ -87,7 +87,7 @@ class LimeMusic implements Music {
 	public native boolean isLooping();
 
 	@Override
-	@HaxeMethodBody("track.gain = p0;")
+	@HaxeMethodBody("var vol = p0 < 0 ? 0 : p0 > 1.0 ? 1.0 : p0; track.gain = vol;")
 	public native void setVolume(float volume);
 
 	@Override

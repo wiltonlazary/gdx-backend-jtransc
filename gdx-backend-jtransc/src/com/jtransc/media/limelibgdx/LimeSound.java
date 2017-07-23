@@ -60,7 +60,9 @@ class LimeSound implements Sound {
 		return play(true, volume);
 	}
 
-	@HaxeMethodBody("track.loops = p0 ? 100000 : 0; track.gain = p1 < 0 ? track.gain : p1; track.play(); return 0;")
+	@HaxeMethodBody("track.loops = p0 ? 100000 : 0; " +
+		"var vol = p1 < 0 ? track.gain : p1 > 1.0 ? 1.0 : p1; track.gain = vol;" +
+		"track.play(); return 0;")
 	private native long play(boolean loop, float volume);
 
 	@Override
@@ -104,7 +106,7 @@ class LimeSound implements Sound {
 	}
 
 	@Override
-	@HaxeMethodBody("track.gain = p1;")
+	@HaxeMethodBody("var vol = p1 < 0 ? 0 : p1 > 1.0 ? 1.0 : p1; track.gain = vol;")
 	public void setVolume(long soundId, float volume) {
 	}
 
