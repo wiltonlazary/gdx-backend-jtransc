@@ -109,5 +109,5 @@
 		{% end %}
 	{% end %}
 
-	{%if extra.enable-game-center %}<haxelib name="extension-gamecenter" />{% end %}
+	{%if extra.enable_game_center %}<haxelib name="extension-gamecenter" />{% end %}
 </project>
