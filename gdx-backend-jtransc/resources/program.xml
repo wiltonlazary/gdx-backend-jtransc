@@ -79,7 +79,7 @@
 	<!-- TODO: for android provide architecture from gradle -->
 	<architecture name="armv7" if="android" />
 	<!-- Only ARM64 use for iOS, all devices from iPhone5s -->
-	<architecture name="arm64" if="ios" />
+	<architecture name="arm64" exclude="armv7" if="ios" />
 	<architecture name="arm64" if="tvos" />
 	{% if extra.windows_arch %}
 	<architecture name="{{ extra.windows_arch }}" if="windows" />
