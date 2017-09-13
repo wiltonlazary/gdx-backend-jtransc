@@ -65,6 +65,10 @@
 	<config:ios deployment="{{ extra.deploymentVersion }}" />
 	<config:tvos deployment="{{ extra.deploymentVersion }}"/>
 	{% end %}
+	{% if extra.non_exempt_encryption %}
+	<config:ios non-exempt-encryption="{{ extra.non_exempt_encryption }}" />
+	<config:tvos non-exempt-encryption="{{ extra.non_exempt_encryption }}"/>
+	{% end %}
 	{% if extra.ios_device %}
 	<config:ios device="{{ extra.ios_device }}" />
 	{% end %}
