@@ -1,7 +1,7 @@
 package com.jtransc.media.limelibgdx.flash;
 
 import com.jtransc.annotation.JTranscInvisible;
-import com.jtransc.annotation.JTranscNativeClass;
+import com.jtransc.annotation.JTranscNativeName;
 import com.jtransc.annotation.haxe.HaxeAvailableOnTargets;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
 import com.jtransc.media.limelibgdx.GL20Ext;
@@ -229,7 +229,7 @@ public class FlashStage3DGL20 {
 	}
 
 	@HaxeAvailableOnTargets({"flash"})
-	@JTranscNativeClass("flash.display3D.Context3D")
+	@JTranscNativeName("flash.display3D.Context3D")
 	@JTranscInvisible
 	static class Context3D {
 		native public void clear(double red, double green, double blue, double alpha, double depth, int stencil, int mask);
@@ -280,7 +280,7 @@ public class FlashStage3DGL20 {
 
 	// http://wonderfl.net/c/qc87
 	@HaxeAvailableOnTargets({"flash"})
-	@JTranscNativeClass("flash.display3D.Context3DClearMask")
+	@JTranscNativeName("flash.display3D.Context3DClearMask")
 	@JTranscInvisible
 	static class ClearMask {
 		static public final int COLOR = 1;
@@ -292,7 +292,7 @@ public class FlashStage3DGL20 {
 	@HaxeAvailableOnTargets({"flash"})
 	@JTranscInvisible
 	static class Textures {
-		@JTranscNativeClass("flash.display3D.textures.Texture")
+		@JTranscNativeName("flash.display3D.textures.Texture")
 		static class Texture {
 			native public void uploadCompressedTextureFromByteArray(byte[] data, int byteArrayOffset, boolean async);
 
@@ -300,7 +300,7 @@ public class FlashStage3DGL20 {
 			native public void uploadFromByteArray(byte[] data, int byteArrayOffset, int miplevel);
 		}
 
-		@JTranscNativeClass("flash.display3D.textures.CubeTexture")
+		@JTranscNativeName("flash.display3D.textures.CubeTexture")
 		static class CubeTexture {
 
 		}
@@ -323,19 +323,19 @@ public class FlashStage3DGL20 {
 	}
 
 	@HaxeAvailableOnTargets({"flash"})
-	@JTranscNativeClass("flash.utils.ByteArray")
+	@JTranscNativeName("flash.utils.ByteArray")
 	@JTranscInvisible
 	static class ByteArray {
 	}
 
 	@HaxeAvailableOnTargets({"flash"})
-	@JTranscNativeClass("flash.display.BitmapData")
+	@JTranscNativeName("flash.display.BitmapData")
 	@JTranscInvisible
 	static class BitmapData {
 	}
 
 	@HaxeAvailableOnTargets({"flash"})
-	@JTranscNativeClass("flash.display3D.Program3D")
+	@JTranscNativeName("flash.display3D.Program3D")
 	@JTranscInvisible
 	static class Program3D {
 		native public void dispose();

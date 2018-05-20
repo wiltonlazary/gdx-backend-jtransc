@@ -12,12 +12,10 @@ public class LwjglApplication extends LimeApplication {
 	}
 
 	public LwjglApplication(ApplicationListener listener) {
-		this(listener, (String) null, 640, 480);
+		this(listener, "", LwjglApplicationConfiguration.defaultWidth, LwjglApplicationConfiguration.defaultHeight);
 	}
-
 
 	public LwjglApplication(ApplicationListener listener, LwjglApplicationConfiguration config) {
 		this(listener, config.title, config.width, config.height);
 	}
 }
-

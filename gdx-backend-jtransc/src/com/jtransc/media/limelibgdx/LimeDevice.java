@@ -1,23 +1,30 @@
 package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Graphics;
 import com.jtransc.JTranscSystem;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
 
 public class LimeDevice {
 	@HaxeMethodBody(target = "android", value = "return true;")
 	@HaxeMethodBody("return false;")
-	static public boolean isAndroid() {
+	private static boolean isAndroid() {
 		return false;
 	}
 
-	@HaxeMethodBody(target = "android", value = "return true;")
+	@HaxeMethodBody(target = "ios", value = "return true;")
 	@HaxeMethodBody("return false;")
-	static public boolean isIos() {
+	private static boolean isIos() {
 		return false;
 	}
 
-	static public boolean isJs() {
+	@HaxeMethodBody(target = "tvos", value = "return true;")
+	@HaxeMethodBody("return false;")
+	static boolean isTvos() {
+		return false;
+	}
+
+	private static boolean isJs() {
 		return JTranscSystem.isJs();
 	}
 
@@ -25,15 +32,25 @@ public class LimeDevice {
 		return JTranscSystem.isSwf();
 	}
 
-	static public Application.ApplicationType getType() {
-		if (LimeDevice.isJs()) {
+	public static Application.ApplicationType getType() {
+		if (isJs()) {
 			return Application.ApplicationType.WebGL;
-		} else if (LimeDevice.isIos()) {
+		} else if (isIos() || isTvos()) {
 			return Application.ApplicationType.iOS;
-		} else if (LimeDevice.isAndroid()) {
+		} else if (isAndroid()) {
 			return Application.ApplicationType.Android;
-		} else {
-			return Application.ApplicationType.Desktop;
 		}
+		return Application.ApplicationType.Desktop;
+	}
+
+	static Graphics.GraphicsType getGraphicsType() {
+		if (isJs()) {
+			return Graphics.GraphicsType.WebGL;
+		} else if (isIos() || isTvos()) {
+			return Graphics.GraphicsType.iOSGL;
+		} else if (isAndroid()) {
+			return Graphics.GraphicsType.AndroidGL;
+		}
+		return Graphics.GraphicsType.LWJGL;
 	}
 }

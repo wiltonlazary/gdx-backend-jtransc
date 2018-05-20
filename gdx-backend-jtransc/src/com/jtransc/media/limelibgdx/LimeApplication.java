@@ -1,11 +1,13 @@
 package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Clipboard;
 import com.jtransc.JTranscSystem;
 import com.jtransc.annotation.*;
 import com.jtransc.annotation.haxe.*;
+import com.jtransc.media.limelibgdx.profiler.DebugInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +38,6 @@ import java.io.IOException;
 	@HaxeAddSubtarget(name = "ios"),
 	@HaxeAddSubtarget(name = "linux"),
 	@HaxeAddSubtarget(name = "mac"),
-	@HaxeAddSubtarget(name = "tizen"),
 	@HaxeAddSubtarget(name = "tvos"),
 	@HaxeAddSubtarget(name = "webos"),
 	@HaxeAddSubtarget(name = "windows"),
@@ -49,8 +50,7 @@ import java.io.IOException;
 	"@limetest.cmd"
 })
 @HaxeAddLibraries({
-	"lime:3.4.1"
-	//"lime:2.9.1"
+	"lime:5.5.0"
 })
 @HaxeAddAssets({
 	"com/badlogic/gdx/utils/arial-15.fnt",
@@ -73,7 +73,7 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	//static private final boolean TRACE = true;
 
 	public LimeApplication(ApplicationListener applicationListener, String title, int width, int height) {
-		super(applicationListener);
+		super(applicationListener, width, height);
 		setApplicationToLime(this);
 		referenceClasses();
 		setTitle(title);
@@ -108,8 +108,19 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	}
 
 	@Override
-	protected LimeGraphics createGraphics() {
-		return new LimeGraphics(TRACE);
+	protected LimeGraphics createGraphics(int width, int height) {
+		return new LimeGraphics(width, height, TRACE);
+	}
+
+	private ApplicationLogger applicationLogger;
+	@Override
+	public void setApplicationLogger(ApplicationLogger logger) {
+		this.applicationLogger = logger;
+	}
+
+	@Override
+	public ApplicationLogger getApplicationLogger() {
+		return applicationLogger;
 	}
 
 	// @TODO: mark package to include!
@@ -138,6 +149,12 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	@HaxeMethodBody("HaxeLimeGdxApplication.app = p0;")
 	@JTranscMethodBody(target = "js", value = "app = p0;")
 	private void setApplicationToLime(LimeApplication app) {
+	}
+
+	@HaxeMethodBody("return HaxeLimeGdxApplication.app != null;")
+	@JTranscMethodBody(target = "js", value = "return app !== null;")
+	public static boolean isAppCreated() {
+		return false;
 	}
 
 	@Override
@@ -169,7 +186,6 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 
 			@Override
 			public void flush() {
-				System.out.println("GdxPreferencesAdapter.flush();");
 				super.flush();
 			}
 		};
@@ -186,7 +202,7 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 				native public String getContents();
 
 				@Override
-				@HaxeMethodBody("lime.system.Clipboard.text = p0._str;")
+				@HaxeMethodBody("lime.system.Clipboard.text = N.i_str(p0);")
 				native public void setContents(String content);
 			};
 		} else {
@@ -203,42 +219,57 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 		return new LimeAudio();
 	}
 
-	@SuppressWarnings("unused")
-	public void create() {
-		super.create();
-		resized(getWidth(), getHeight());
-	}
-
-	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getWidth();")
+	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getWindowWidth();")
 	@JTranscMethodBody(target = "js", value = "return window.innerWidth|0;")
-	static public int getWidth() {
-		return 640;
+	static int getWindowWidth() {
+		return LwjglApplicationConfiguration.defaultWidth;
 	}
 
-	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getHeight();")
+	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getWindowHeight();")
 	@JTranscMethodBody(target = "js", value = "return window.innerHeight|0;")
-	static public int getHeight() {
-		return 640;
+	static int getWindowHeight() {
+		return LwjglApplicationConfiguration.defaultHeight;
 	}
+
+	@HaxeMethodBody("return lime.app.Application.current.window.scale;")
+	public static float getApplicationScale() {
+		return 1f;
+	}
+
+	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getDisplayWidth(0);")
+	static int getDisplayWidth() {
+		return LwjglApplicationConfiguration.defaultWidth;
+	}
+
+	@HaxeMethodBody("return HaxeLimeGdxApplication.instance.getDisplayHeight(0);")
+	static int getDisplayHeight() {
+		return LwjglApplicationConfiguration.defaultHeight;
+	}
+
+	private boolean firstFrame = true;
 
 	@SuppressWarnings("unused")
 	public void render() {
-		LimeInput.lime_frame();
+		if (!isAppCreated()) {
+			return;
+		}
+		LimeInput.flushInput();
 		super.render();
 		if (Gdx.gl instanceof GL20Ext) {
 			((GL20Ext)Gdx.gl).present();
 		}
 		if (firstFrame) {
 			firstFrame = false;
+			if (DebugInfo.isShowDebugInfo()) {
+				debugInfo = new DebugInfo();
+			}
 			show();
 		}
-	}
-
-	private boolean firstFrame = true;
-
-	@SuppressWarnings("unused")
-	public void resized(int width, int height) {
-		super.resized(width, height);
+		if (DebugInfo.isShowDebugInfo()) {
+			debugInfo.update();
+			debugInfo.render();
+		}
+		LimeInput.lime_frame();
 	}
 
 	@Override
@@ -254,10 +285,15 @@ public class LimeApplication extends GdxApplicationAdapter implements Applicatio
 	@Override
 	public void onDisposed() {
 		super.onDisposed();
+		if (DebugInfo.isShowDebugInfo()) {
+			debugInfo.dispose();
+		}
 	}
 
 	@Override
 	protected ApplicationType createApplicationType() {
 		return LimeDevice.getType();
 	}
+
+	private DebugInfo debugInfo;
 }

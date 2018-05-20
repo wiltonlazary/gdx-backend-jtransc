@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
-	<meta title="{{ title }}" package="{{ package }}" version="{{ version }}" company="{{ company }}" />
+	<meta title="{{ title }}" package="{{ package }}" version="{{ extra.version }}" company="{{ company }}" />
+	<meta title="*{{ title }}" if="debug" />
 	<app main="{{ entryPointClass }}" path="out" file="{{ name }}" />
 	<app swf-version="11.8" />
 
 	<window width="{{ initialWidth }}" height="{{ initialHeight }}" background="#FFFFFF" />
-	<window fullscreen="false" resizable="true" borderless="false" vsync="false" hardware="true" allow-shaders="true" require-shaders="true" depth-buffer="false" stencil-buffer="true" orientation="{{ orientation }}" highdpi="true" allow-high-dpi="true" />
+	<window fullscreen="{{ fullscreen }}" resizable="{{ resizable }}" borderless="{{ borderless }}" hardware="true" allow-shaders="true" require-shaders="true" depth-buffer="true" stencil-buffer="true" orientation="{{ orientation }}" />
+	{% if extra.allowHighDpi %}<window allow-high-dpi="{{ extra.allowHighDpi }}" />{% else %}<window allow-high-dpi="false" />{% end %}
+	<window vsync="{{ vsync }}" antialiasing="4" if="cpp" />
 	<window fullscreen="true" if="mobile" />
-	<window fps="60" unless="js" />
-	<window fps="0" if="js" />
 	<window width="0" height="0" if="html5" />
+	<window fullscreen="false" if="js" />
+
+	<window fps="60" unless="js" />
+	{% if extra.fps %}<window fps="{{ extra.fps }}" unless="js" />{% end %}
+	<window fps="0" if="js" />
 
 	<setenv name="SHOW_CONSOLE" />
 
@@ -25,11 +31,63 @@
 	{% end %}
 
 	<source path="src" />
-	<assets path="{{ tempAssetsDir }}" rename="assets" embed="{{ embedResources }}" exclude="*.ttf|*.fla|*.zip|*.swf" type="binary" />
+	<assets path="{{ tempAssetsDir }}" rename="assets" embed="{{ embedResources }}" exclude="*.fla|*.zip|*.swf" type="binary" />
 
-	{% if hasIcon %}
-		<icon path="{{ settings.icon }}" />
+	{% if androidIcons != null %}
+	<define name="androidIcon" />
 	{% end %}
+	{% if iosIcons != null %}
+	<define name="iosIcon" />
+	{% end %}
+
+	{% if extra.prerenderedIcon %}
+	<config:ios prerendered-icon="{{ extra.prerenderedIcon }}" />
+	<config:tvos prerenderedIcon="{{ extra.prerenderedIcon }}" />
+	{% end %}
+
+	{% if hasIcon  %}
+	<icon path="{{ settings.icon }}" />
+	{% end %}
+	{% for androidIconPath in androidIcons %}
+	<icon path="{{ androidIconPath }}" if="android androidIcon"/>
+	{% end %}
+	{% for iosIconPath in iosIcons %}
+	<icon path="{{ iosIconPath }}" if="ios iosIcon"/>
+	<icon path="{{ iosIconPath }}" if="tvos iosIcon"/>
+	{% end %}
+
+	{% for splashScreen in splashScreens %}
+	{% set splashImage = splashScreen|image_info %}
+	<splashScreen path="{{ splashScreen }}" width="{{ splashImage.width }}" height="{{ splashImage.height }}" />
+	{% end %}
+
+	{% if extra.deploymentVersion %}
+	<config:ios deployment="{{ extra.deploymentVersion }}" />
+	<config:tvos deployment="{{ extra.deploymentVersion }}"/>
+	{% end %}
+	{% if extra.non_exempt_encryption %}
+	<config:ios non-exempt-encryption="{{ extra.non_exempt_encryption }}" />
+	<config:tvos non-exempt-encryption="{{ extra.non_exempt_encryption }}"/>
+	{% end %}
+	{% if extra.ios_device %}
+	<config:ios device="{{ extra.ios_device }}" />
+	{% end %}
+	<config:tvos device="appletv" />
+
+	<!-- https://github.com/openfl/lime/blob/29fda1c54547a3a1f34ab8287a5fbbd72f347b3d/lime/project/Architecture.hx -->
+	<!-- ARMV5,ARMV6,ARMV7,ARMV7S,ARM64,X86,X64,MIPS,MIPSEL -->
+	<!-- TODO: for android provide architecture from gradle -->
+	<architecture name="armv7" if="android" />
+	<!-- Only ARM64 use for iOS, all devices from iPhone5s -->
+	<architecture name="arm64" exclude="armv7" if="ios" />
+	<architecture name="arm64" if="tvos" />
+	{% if extra.windows_arch %}
+	<architecture name="{{ extra.windows_arch }}" if="windows" />
+	{% end %}
+
+	{% if extra.androidTargetSdkVersion %}<config:android target-sdk-version="{{ extra.androidTargetSdkVersion }}" />{% end %}
+	{% if extra.androidInstallLocation %}<config:android install-location="{{ extra.androidInstallLocation }}" />{% end %}
+	{% for androidPermission in androidPermissions %}<config:android permission="{{ androidPermission }}" />{% end %}
 
 	{% if extra.certificate_path %}
 	{% debug "extra.certificate_path: " + extra.certificate_path %}
@@ -38,7 +96,12 @@
 		{%if extra.certificate_password %} password="{{ extra.certificate_password }}"{% end %}
 		{%if extra.certificate_alias %} alias="{{ extra.certificate_alias }}"{% end %}
 		{%if extra.certificate_password %} alias-password="{{ extra.certificate_password }}"{% end %}
+		if="android"
 	/>
+	{% end %}
+	{% if extra.certificate_team_id %}
+	<certificate team-id="{{ extra.certificate_team_id }}" if="ios" />
+	<config:tvos identify="{{ extra.certificate_team_id }}" />
 	{% end %}
 
 	<haxelib name="lime" />
@@ -49,4 +112,7 @@
 			<haxelib name="{{ lib.name }}" />
 		{% end %}
 	{% end %}
+	<define name="lime" />
+
+	{%if extra.enable_game_center %}<haxelib name="jtransc-game-center" />{% end %}
 </project>

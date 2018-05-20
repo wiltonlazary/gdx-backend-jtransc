@@ -16,12 +16,14 @@
 
 package com.badlogic.gdx.graphics;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.glutils.ETC1TextureData;
 import com.badlogic.gdx.graphics.glutils.FileTextureData;
 import com.badlogic.gdx.graphics.glutils.KTXTextureData;
 import com.badlogic.gdx.graphics.glutils.MipMapGenerator;
+import com.jtransc.media.limelibgdx.LimeFiles;
 
 /** Used by a {@link Texture} to load the pixel data. A TextureData can either return a {@link Pixmap} or upload the pixel data
  * itself. It signals it's type via {@link #getType()} to the Texture that's using it. The Texture will then either invoke
@@ -95,7 +97,14 @@ public interface TextureData {
 			if (file.name().endsWith(".cim")) return new FileTextureData(file, PixmapIO.readCIM(file), format, useMipMaps);
 			if (file.name().endsWith(".etc1")) return new ETC1TextureData(file, useMipMaps);
 			if (file.name().endsWith(".ktx") || file.name().endsWith(".zktx")) return new KTXTextureData(file, useMipMaps);
-			return new FileTextureData(file, new Pixmap(file, false), format, useMipMaps);
+
+			if (Gdx.files instanceof LimeFiles) {
+				return new FileTextureData(file, new Pixmap(file, false), format, useMipMaps);
+			} else {
+				byte[] data = file.readBytes();
+				Pixmap pixmap = new Pixmap(data, 0, data.length);
+				return new FileTextureData(file, pixmap, format, useMipMaps);
+			}
 		}
 
 	}

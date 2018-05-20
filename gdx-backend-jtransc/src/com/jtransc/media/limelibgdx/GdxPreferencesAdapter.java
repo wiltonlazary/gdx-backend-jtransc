@@ -2,6 +2,7 @@ package com.jtransc.media.limelibgdx;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
 
 import java.io.IOException;
@@ -22,11 +23,13 @@ public abstract class GdxPreferencesAdapter implements Preferences {
 
 	// Default generic storage!
 	protected String loadString(String name) throws IOException {
-		return Gdx.files.absolute(Gdx.files.getLocalStoragePath() + "/" + name + ".prefs").readString();
+		FileHandle fileHandle = Gdx.files.local(name + ".prefs");
+		return fileHandle.readString();
 	}
 
 	protected void storeString(String name, String prefs) throws IOException {
-		Gdx.files.absolute(Gdx.files.getLocalStoragePath() + "/" + name + ".prefs").writeString(prefs, false);
+		FileHandle fileHandle = Gdx.files.local(name + ".prefs");
+		fileHandle.writeString(prefs, false);
 	}
 
 	private Json json = new Json();
@@ -34,7 +37,9 @@ public abstract class GdxPreferencesAdapter implements Preferences {
 	protected Map<String, Object> load(String name) {
 		try {
 			String s = loadString(name);
-			if (s == null) s = "{}";
+			if (s == null || s.length() == 0) {
+				s = "{}";
+			}
 			return json.fromJson(HashMap.class, s);
 		} catch (Throwable t) {
 			t.printStackTrace();

@@ -104,7 +104,7 @@ public class VertexBufferObject implements VertexData {
 
 	private void bufferChanged() {
 		if (isBound) {
-			Gdx.gl20.glBufferData(GL20.GL_ARRAY_BUFFER, buffer.limit(), buffer, usage);
+			Gdx.gl20.glBufferData(GL20.GL_ARRAY_BUFFER, buffer.limit() * 4, buffer, usage);
 			isDirty = false;
 		}
 	}
@@ -145,7 +145,7 @@ public class VertexBufferObject implements VertexData {
 
 		gl.glBindBuffer(GL20.GL_ARRAY_BUFFER, bufferHandle);
 		if (isDirty) {
-			gl.glBufferData(GL20.GL_ARRAY_BUFFER, buffer.limit(), buffer, usage);
+			gl.glBufferData(GL20.GL_ARRAY_BUFFER, buffer.limit() * 4, buffer, usage);
 			isDirty = false;
 		}
 

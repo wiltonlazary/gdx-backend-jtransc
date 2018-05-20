@@ -1,6 +1,8 @@
 // http://jedicoder.blogspot.com.es/2011/11/automated-gradle-project-deployment-to.html
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
 apply plugin: 'signing'
 
 group = "${project.ext.group}"
@@ -9,6 +11,9 @@ version = "${project.ext.mediaVersion}"
 repositories {
 	mavenLocal()
 	mavenCentral()
+	maven {
+		url "https://dl.bintray.com/jtransc/jtransc/"
+	}
 }
 
 sourceSets {
@@ -24,7 +29,7 @@ dependencies {
 	testCompile 'junit:junit:4.12'
 }
 
-if (System.getenv("CI") == null) {
+if (System.getenv("JTRANCS_DEPLOY") != null) {
 	task javadoc2(type: Javadoc) {
 		failOnError = false
 	}
@@ -91,4 +96,49 @@ if (System.getenv("CI") == null) {
 	}
 
 //println("uploadArchives!: ${project.name}")
+}
+
+
+def props = rootProject.extensions.getExtraProperties()
+
+if (!props.has("gitVersion")) {
+	try {
+		props.set("gitVersion", "git describe".execute().text.trim())
+	} catch (Throwable) {
+		props.set("gitVersion", "${jtranscVersion}")
+	}
+}
+
+//println(props.get("gitVersion"))
+
+publishing {
+	publications {
+		MyPublication(MavenPublication) {
+			from components.java
+			groupId project.group
+			artifactId project.name
+			version props.get("gitVersion") ?: "unknown"
+			//version "$project.version"
+		}
+	}
+}
+
+bintray {
+	user = System.getenv("BINTRAY_USER") ?: properties['BINTRAY_USER'] ?: rootProject.properties['BINTRAY_USER']
+	key = System.getenv("BINTRAY_KEY") ?: properties['BINTRAY_USER'] ?: rootProject.properties['BINTRAY_KEY']
+
+	publications = ['MyPublication']
+
+	dryRun = false
+	publish = true
+	override = true
+
+	pkg {
+		userOrg = 'jtransc'
+		repo = 'jtransc'
+		name = 'jtransc'
+		//name = rootProject.name
+		licenses = ['Apache-2.0']
+		vcsUrl = 'https://github.com/jtransc/jtransc.git'
+	}
 }

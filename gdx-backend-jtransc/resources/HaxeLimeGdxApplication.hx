@@ -3,14 +3,16 @@ import lime.ui.Window;
 import lime.ui.Touch;
 import lime.ui.KeyCode;
 import lime.graphics.Renderer;
+import lime.system.Display;
+import lime.system.DisplayMode;
+import lime.system.System;
 
 typedef LimeInput = {% CLASS com.jtransc.media.limelibgdx.LimeInput %};
 
 class HaxeLimeGdxApplication extends lime.app.Application {
     static public var instance:HaxeLimeGdxApplication;
     static public var app:{% CLASS com.jtransc.media.limelibgdx.LimeApplication %};
-    static public var initializingListener:Bool = false;
-    static public var initializedListener:Bool = false;
+    static public var isInitialized:Bool = false;
 
     static private var DEBUG = false;
 
@@ -21,8 +23,19 @@ class HaxeLimeGdxApplication extends lime.app.Application {
 	static public var gl: lime.graphics.GLRenderContext;
 	#end
 
-	public function getWidth() return window.width;
-	public function getHeight() return window.height;
+	public function getWindowWidth() {
+		return window.width;
+	}
+	public function getWindowHeight() {
+		return window.height;
+	}
+
+	public function getDisplayWidth(id:Int) {
+		return System.getDisplay(id).currentMode.width;
+	}
+	public function getDisplayHeight(id:Int) {
+		return System.getDisplay(id).currentMode.height;
+	}
 
     static public function convertByteBuffer(buf:{% CLASS java.nio.ByteBuffer %}, size = -1) {
         var len = buf.{% METHOD java.nio.ByteBuffer:limit:()I %}();
@@ -81,13 +94,88 @@ class HaxeLimeGdxApplication extends lime.app.Application {
         return out;
     }
 
+    static public function fastConvertBuffer(buf:{% CLASS java.nio.Buffer %}):lime.utils.ArrayBufferView {
+        if (Std.is(buf, {% CLASS java.nio.ByteBuffer %})) return fastConvertByteBuffer(cast(buf, {% CLASS java.nio.ByteBuffer %}));
+        if (Std.is(buf, {% CLASS java.nio.ShortBuffer %})) return fastConvertShortBuffer(cast(buf, {% CLASS java.nio.ShortBuffer %}));
+        if (Std.is(buf, {% CLASS java.nio.IntBuffer %})) return convertIntBuffer(cast(buf, {% CLASS java.nio.IntBuffer %}));
+        if (Std.is(buf, {% CLASS java.nio.FloatBuffer %})) return convertFloatBuffer(cast(buf, {% CLASS java.nio.FloatBuffer %}));
+		throw 'Not implemented convertBuffer!';
+    }
+
+    static public function fastConvertByteBuffer(buf:{% CLASS java.nio.ByteBuffer %}) {
+		var ja_b = buf.{% METHOD java.nio.ByteBuffer:array:()[B %}();
+		var bytes = ja_b.data;
+		return lime.utils.UInt8Array.fromBytes(bytes);
+    }
+
+    static public function fastConvertShortBuffer(buf:{% CLASS java.nio.ShortBuffer %}) {
+    	if(Std.is(buf, {% CLASS java.nio.ByteBufferAsShortBuffer %})) {
+    		var shortBuffer = cast(buf, {% CLASS java.nio.ByteBufferAsShortBuffer %});
+			var byteBuffer = shortBuffer.{% METHOD java.nio.ByteBufferAsShortBuffer:getByteBuffer:()Ljava.nio.ByteBuffer; %}();
+    		var ja_b = byteBuffer.{% METHOD java.nio.ByteBuffer:array:()[B %}();
+    		return lime.utils.Int16Array.fromBytes(ja_b.data);
+    	} else {
+    		var ja_s = buf.{% METHOD java.nio.ShortBuffer:array:()[S %}();
+    		var length = ja_s.length;
+			var out = new lime.utils.Int16Array(length);
+			for (n in 0 ... length) out[n] = ja_s.get(n);
+			return out;
+		}
+    }
+
+    static public function fastConvertIntBuffer(buf:{% CLASS java.nio.IntBuffer %}) {
+    	if(Std.is(buf, {% CLASS java.nio.ByteBufferAsIntBuffer %})) {
+    		var intBuffer = cast(buf, {% CLASS java.nio.ByteBufferAsIntBuffer %});
+			var byteBuffer = intBuffer.{% METHOD java.nio.ByteBufferAsIntBuffer:getByteBuffer:()Ljava.nio.ByteBuffer; %}();
+    		var ja_b = byteBuffer.{% METHOD java.nio.ByteBuffer:array:()[B %}();
+    		return lime.utils.Int32Array.fromBytes(ja_b.data);
+    	} else {
+    		var ja_i = buf.{% METHOD java.nio.IntBuffer:array:()[I %}();
+    		var length = ja_i.length;
+			var out = new lime.utils.Int32Array(length);
+			for (n in 0 ... length) out[n] = ja_i.get(n);
+			return out;
+		}
+    }
+
+    static public function fastConvertFloatBuffer(buf:{% CLASS java.nio.FloatBuffer %}) {
+    	if(Std.is(buf, {% CLASS java.nio.ByteBufferAsFloatBuffer %})) {
+    		var floatBuffer = cast(buf, {% CLASS java.nio.ByteBufferAsFloatBuffer %});
+			var byteBuffer = floatBuffer.{% METHOD java.nio.ByteBufferAsFloatBuffer:getByteBuffer:()Ljava.nio.ByteBuffer; %}();
+    		var ja_b = byteBuffer.{% METHOD java.nio.ByteBuffer:array:()[B %}();
+    		return lime.utils.Float32Array.fromBytes(ja_b.data);
+		} else {
+			var ja_f = buf.{% METHOD java.nio.FloatBuffer:array:()[F %}();
+			var length = ja_f.length;
+			var out = new lime.utils.Float32Array(length);
+			for (n in 0 ... length) out[n] = ja_f.get(n);
+			return out;
+		}
+    }
+
+    static public function fastConvertIntArray(ja_i:JA_I, offset:Int, size:Int):lime.utils.Int32Array {
+		var length = ja_i.length;
+		var out = new lime.utils.Int32Array(length);
+		for (n in 0 ... length) out[n] = ja_i.get(n);
+		return out;
+    }
+
+    static public function fastConvertFloatArray(ja_f:JA_F, offset:Int, size:Int):lime.utils.Float32Array {
+    	var length = ja_f.length;
+		var out = new lime.utils.Float32Array(length);
+		for (n in 0 ... length) out[n] = ja_f.get(n);
+		return out;
+    }
+
     static public function loopInit(init: Void -> Void) {
     }
 
     static public function loopLoop(update: Void -> Void, render: Void -> Void) {
     }
 
+	public var preloadComplete:Bool = false;
     public override function onPreloadComplete():Void {
+    	preloadComplete = true;
         //switch (renderer.context) {
         //	case FLASH(sprite): #if flash initializeFlash(sprite); #end
         //	case OPENGL (gl):
@@ -96,11 +184,16 @@ class HaxeLimeGdxApplication extends lime.app.Application {
         //}
     }
 
+	var initializeCount:Int = 3;
+	var initializeRenderCount:Int = 3;
     public override function render(renderer:lime.graphics.Renderer) {
         super.render(renderer);
-        if (app != null) {
-            if (!initializingListener) {
-                initializingListener = true;
+        if (initializeCount > 0) {
+        	initializeCount--;
+        	return;
+        }
+        if (app != null && preloadComplete) {
+            if (!isInitialized) {
                 switch (renderer.context) {
 					#if flash
 					case FLASH(sprite): HaxeLimeGdxApplication.sprite = sprite;
@@ -117,18 +210,19 @@ class HaxeLimeGdxApplication extends lime.app.Application {
 
 					stage3D.addEventListener(flash.events.Event.CONTEXT3D_CREATE, function(e) {
                     	context3D = stage3D.context3D;
-						if (!initializedListener) {
 							app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:create %}();
-							initializedListener = true;
 						}
 					});
                     stage3D.requestContext3D();
 				#else
 	                app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:create %}();
-					initializedListener = true;
 				#end
-            }
-            if (initializedListener) {
+				isInitialized = true;
+            } else {
+            	if (initializeRenderCount > 0) {
+            		initializeRenderCount--;
+            		return;
+            	}
             	app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:render %}();
             }
         }
@@ -138,18 +232,27 @@ class HaxeLimeGdxApplication extends lime.app.Application {
         super.update(deltaTime);
     }
 
-    private function isReady() return app != null && initializedListener;
+    private function isReady() return app != null && isInitialized;
 
     public override function onWindowActivate(window:Window):Void {
-        if (isReady()) app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:onResumed %}();
+    	super.onWindowActivate(window);
+        if (isReady()) {
+        	app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:onResumed %}();
+        }
     }
 
     public override function onWindowDeactivate(window:Window):Void {
-        if (isReady()) app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:onPaused %}();
+        if (isReady()) {
+        	app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:onPaused %}();
+        }
+        super.onWindowDeactivate(window);
     }
 
     public override function onWindowClose (window:Window):Void {
-        if (isReady()) app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:onDisposed %}();
+        if (isReady()) {
+        	app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:onDisposed %}();
+        }
+        super.onWindowClose(window);
     }
 
     public function new() {
@@ -159,7 +262,10 @@ class HaxeLimeGdxApplication extends lime.app.Application {
     }
 
 	public override function onWindowResize(window:Window, width:Int, height:Int):Void {
-		if (isReady()) app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:resized:(II)V %}(width, height);
+		super.onWindowResize(window, width, height);
+		if (isReady()) {
+			app.{% METHOD com.jtransc.media.limelibgdx.LimeApplication:resized:(II)V %}(width, height);
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////
@@ -257,6 +363,9 @@ class JTranscModule extends lime.app.Module {
     override public function onMouseMove (window:Window, x:Float, y:Float):Void {
     	LimeInput.{% METHOD com.jtransc.media.limelibgdx.LimeInput:lime_onMouseMove %}(x, y);
     }
+	override public function onMouseWheel (window:Window, x:Float, y:Float):Void {
+		LimeInput.{% METHOD com.jtransc.media.limelibgdx.LimeInput:lime_onWheel %}(x, y, 0);
+	}
 
 
 	override public function onKeyDown(window:Window, keyCode:KeyCode, modifier:lime.ui.KeyModifier):Void {
